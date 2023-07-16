@@ -4,3 +4,9 @@
 cmake-build-debug
 cmakeBuildFiles
 *Zone.Identifier
+*.log
+*.out
+*.aux
+*.fdb*
+*.gz
+*.toc

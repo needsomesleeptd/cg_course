@@ -1,0 +1,11 @@
+//
+// Created by Андрей on 09.08.2023.
+//
+
+#ifndef DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_BASE_MATH_PRIMITIVE_H_
+#define DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_BASE_MATH_PRIMITIVE_H_
+class BaseMathPrimitive
+{
+	virtual  ~BaseMathPrimitive() = default;
+};
+#endif //DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_BASE_MATH_PRIMITIVE_H_

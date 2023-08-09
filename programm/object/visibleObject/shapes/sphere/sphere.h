@@ -6,10 +6,13 @@
 #define DZ2_CG_COURSE_PROGRAMM_SHAPES_SPHERE_SPHERE_H_
 
 #include "vector.h"
-class Sphere
+#include "baseShape.h"
+class Sphere : public BaseShape
 {
-	double Radius;
-	VecD3 Center;
+	double _radius;
+	VecD3 _center;
+	void transform(const TransformParams& transformParams) override;
 };
+
 
 #endif //DZ2_CG_COURSE_PROGRAMM_SHAPES_SPHERE_SPHERE_H_

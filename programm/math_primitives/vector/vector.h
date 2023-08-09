@@ -12,15 +12,21 @@ template<typename T, int n>
 class Vector
 {
  public:
-
+	explicit Vector();
 	explicit Vector(int size);
 	explicit Vector(std::initializer_list<T> l);
 	explicit Vector(const Vector& other);
+	explicit Vector(Vector&& other);
 	~Vector();
 
 	T& operator[](const int i);
 	T operator[](const int i) const;
 	T operator^(Vector<T, n>& other) const;
+	Vector<T,n>& operator=(const Vector &other);
+	void operator+=(const Vector &other);
+	void operator/=(const Vector &other);
+	void operator-=(const Vector &other);
+
 	int norm() const;
 
  private:

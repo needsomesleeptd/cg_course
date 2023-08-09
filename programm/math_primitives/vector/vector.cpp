@@ -47,7 +47,7 @@ T Vector<T, n>::operator^(Vector<T, n>& other) const
 	if (len != other.len)
 	{
 		time_t timer = time(nullptr);
-		throw InvalidMallocException(__FILE__, __LINE__, "Vector<T>", ctime(&timer));
+		throw InvalidOperationException(__FILE__, __LINE__, "Vector<T>", ctime(&timer));
 	}
 	T res = 0;
 	for (int i = 0; i < other.len; i++)
@@ -63,16 +63,75 @@ template<typename T, int n>
 Vector<T, n>::Vector(const Vector& other)
 {
 	len = other.len;
-	values = std::memmove(values,other.values,sizeof(T) * other.values); //TODO::Might need to choose memcpy
+	values = std::memmove(values, other.values, sizeof(T) * other.values); //TODO::Might need to choose memcpy
 }
+
 template<typename T, int n>
 int Vector<T, n>::norm() const
 {
 	return *this ^ *this; //TODO::might overflow
 }
 
+template<typename T, int n>
+Vector<T, n>::Vector(Vector&& other)
+{
+	values = std::move(other);
+	len = other.len;
+	other.len = -1; //TODO::remove after debug
+}
+
+template<typename T, int n>
+Vector<T, n>& Vector<T, n>::operator=(const Vector& other)
+{
+	delete values;
+	values = new T[other.len];
+	len = other.len;
+	values = std::memmove(values, other.values, sizeof(T) * other.values);
+	return *this;
+}
+template<typename T, int n>
+Vector<T, n>::Vector()
+{
+	len = 3; //default size is 3
+	values = new T[len];
+}
+
+template<typename T, int n>
+void Vector<T, n>::operator+=(const Vector& other)
+{
+	if (len != other.len)
+	{
+		time_t timer = time(nullptr);
+		throw InvalidOperationException(__FILE__, __LINE__, "Vector<T>", ctime(&timer));
+	}
+	for (int i = 0; i < other.len; i++)
+		values[i] += other.values[i];
+}
 
 
+template<typename T, int n>
+void Vector<T, n>::operator-=(const Vector& other)
+{
+	if (len != other.len)
+	{
+		time_t timer = time(nullptr);
+		throw InvalidOperationException(__FILE__, __LINE__, "Vector<T>", ctime(&timer));
+	}
+	for (int i = 0; i < other.len; i++)
+		values[i] -= other.values[i];
+}
+
+template<typename T, int n>
+void Vector<T, n>::operator/=(const Vector& other)
+{
+	if (len != other.len)
+	{
+		time_t timer = time(nullptr);
+		throw InvalidOperationException(__FILE__, __LINE__, "Vector<T>", ctime(&timer));
+	}
+	for (int i = 0; i < other.len; i++)
+		values[i] /= other.values[i];
+}
 
 
 

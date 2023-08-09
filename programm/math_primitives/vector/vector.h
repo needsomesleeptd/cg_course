@@ -6,6 +6,7 @@
 #define DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_VECTOR_VECTOR_H_
 
 #include <initializer_list>
+#include "base_math_primitive.h"
 
 template<typename T, int n>
 class Vector

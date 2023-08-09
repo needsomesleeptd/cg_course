@@ -6,6 +6,7 @@
 #define DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_BASE_MATH_PRIMITIVE_H_
 class BaseMathPrimitive
 {
-	virtual  ~BaseMathPrimitive() = default;
+ public:
+	virtual  ~BaseMathPrimitive() = delete;
 };
 #endif //DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_BASE_MATH_PRIMITIVE_H_

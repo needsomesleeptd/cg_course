@@ -1,7 +1,3 @@
-//
-// Created by Андрей on 09.08.2023.
-//
-
 #ifndef DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_VECTOR_VECTOR_H_
 #define DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_VECTOR_VECTOR_H_
 
@@ -65,10 +61,4 @@ Vector<T,3> operator*(const Vector<T,3>& lhs, const Vector<T,3>& rhs)
 	T z = lhs[0] * rhs[1] - lhs[1] * rhs[0];
 	return Vector<T,3>({x,y,z});
 }
-
-
-
-
-
-
 #endif //DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_VECTOR_VECTOR_H_

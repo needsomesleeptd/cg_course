@@ -3,10 +3,12 @@
 //
 
 #include "LightSource.h"
+
+
 LightSource::LightSource()
 {
 	_intensivity = 1;
-	_position = VecD3({ 0.0, 0.0, 0.0});
+	_position = VecD3({ 0.0, 0.0, 0.0 });
 }
 VecD3 LightSource::getPosition()
 {
@@ -38,7 +40,7 @@ LightSorceFactory::LightSorceFactory(const VecD3& position, double intensivity)
 
 std::shared_ptr<BaseLightSource> LightSorceFactory::create()
 {
-	return std::make_shared<LightSource>(_position,_intensivity);
+	return std::make_shared<LightSource>(_position, _intensivity);
 }
 
 void LightSource::accept(std::shared_ptr<Visitor> visitor)

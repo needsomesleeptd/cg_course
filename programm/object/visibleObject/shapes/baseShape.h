@@ -5,6 +5,7 @@
 #ifndef LAB_03_CG_COURSE_PROGRAMM_OBJECT_VISIBLEOBJECT_SHAPES_BASESHAPE_H_
 #define LAB_03_CG_COURSE_PROGRAMM_OBJECT_VISIBLEOBJECT_SHAPES_BASESHAPE_H_
 #include "object.h"
+#include "transform.h"
 
 class BaseShape : public VisibleObject
 {

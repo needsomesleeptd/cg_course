@@ -32,12 +32,22 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-        object
-        visitor
-        object/visibleObject/shapes
-        scene
-        math_primitives
-        renderer/Renderer.cpp renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h)
+        math_primitives/vector/vector.cpp math_primitives/vector/vector.h math_primitives/vector/vector_exceptions.h
+        math_primitives/ray/ray.cpp math_primitives/ray/ray.h
+        visitor/TransformVisitor.h visitor/TransformVisitor.cpp visitor/visitor.h
+        object/primitives/transform.h
+        object/visibleObject/shapes/sphere/sphere.cpp object/visibleObject/shapes/sphere/sphere.h
+        object/visibleObject/shapes/baseShape.h
+        object/object.h
+        object/invisibleObject/cameraStructure.cpp  object/invisibleObject/cameraStructure.h
+        object/invisibleObject/baseCamera.h
+        object/invisibleObject/camera.h
+        object/invisibleObject/camera.cpp
+
+
+        renderer/Renderer.cpp renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
+
+        renderer/baseRenderer.h color/color.cpp color/color.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(lab_03

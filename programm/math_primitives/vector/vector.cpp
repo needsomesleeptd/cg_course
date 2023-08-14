@@ -1,9 +1,9 @@
-
 #include "vector.h"
 #include "vector_exceptions.h"
 #include <time.h>
 #include <cstring>
 #include "cassert"
+
 
 template<typename T, int n>
 Vector<T, n>::Vector(int size) : len(size)
@@ -132,7 +132,3 @@ void Vector<T, n>::operator/=(const Vector& other)
 	for (int i = 0; i < other.len; i++)
 		values[i] /= other.values[i];
 }
-
-
-
-

@@ -3,3 +3,8 @@
 //
 
 #include "Renderer.h"
+ColorRGB Renderer::renderPixel(int x, int y, Ray ray, const std::vector<BaseShape>& shapes)
+{
+	//TODO:: implement Ray tracing
+	return ColorRGB();
+}

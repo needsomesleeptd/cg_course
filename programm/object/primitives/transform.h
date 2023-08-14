@@ -1,17 +1,15 @@
 #ifndef LAB_03_TRANSFORM_H
 #define LAB_03_TRANSFORM_H
 
-#include "point.h"
+
 #include "vector.h"
 
 class TransformParams
 {
  public:
-	TransformParams()
+	TransformParams() :_moveParams({0,0,0}),_scaleParams({1,1,1}),_rotateParams({0,0,0})
 	{
-		_moveParams = VecD3{ 0, 0, 0 };
-		_scaleParams = VecD3{ 1, 1, 1 };
-		_rotateParams = VecD3{ 0, 0, 0 };
+
 	};
 	TransformParams(const VecD3& moveParams, const VecD3& scaleParams, const VecD3& rotateParams)
 		: _moveParams(moveParams), _scaleParams(scaleParams), _rotateParams(rotateParams)

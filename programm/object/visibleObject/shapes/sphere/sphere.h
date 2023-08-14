@@ -7,6 +7,7 @@
 
 #include "vector.h"
 #include "baseShape.h"
+
 class Sphere : public BaseShape
 {
 	double _radius;

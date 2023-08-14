@@ -1,26 +1,22 @@
 #ifndef LAB_03_CAMERA_H
 #define LAB_03_CAMERA_H
 
-#include "TransformVisitor.h"
-#include "object.h"
-#include "drawManager.h"
-#include "transformManager.h"
-#include "glmWrapper.h"
+
 #include "cameraStructure.h"
-#include "TransformVisitor.h"
-#include "DrawVisitor.h"
 #include "baseCamera.h"
 
+class TransformVisitor;
 class Camera : public BaseCamera
 {
  public:
 
-	friend void TransformVisitor::visit(const Camera& camera);
-	friend DrawVisitor; // need this to enable getting Proection out of protected
+	//friend void TransformVisitor::visit(const Camera& camera);
+	friend TransformVisitor;
+
 
 
 	Camera() = default;
-	explicit Camera(const Point& coordinates, const Vector3& direction);
+	explicit Camera(const VecD3& coordinates, const VecD3& direction);
 	explicit Camera(std::shared_ptr<CameraStructureImp> cameraStructure);
 	~Camera() override = default;
 
@@ -35,13 +31,13 @@ class Camera : public BaseCamera
 class CameraFactory : public BaseCameraFactory
 {
  public:
-	CameraFactory(const Point& position, const Vector3& direction);
+	CameraFactory(const VecD3& position, const VecD3& direction);
 	virtual ~CameraFactory() = default;
 
 	virtual std::shared_ptr<Camera> create() override;
  private:
-	Point _position{ 0, 0, 0 };
-	Vector3 _direction{ 0, 0, 0 };
+	VecD3 _position{ 0, 0, 0 };
+	VecD3 _direction{ 0, 0, 0 };
 };
 
 

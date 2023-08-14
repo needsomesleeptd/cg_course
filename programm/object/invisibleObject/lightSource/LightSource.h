@@ -6,12 +6,16 @@
 #define LAB_03_CG_COURSE_PROGRAMM_OBJECT_INVISIBLEOBJECT_LIGHTSOURCE_H_
 
 #include "baseLightSource.h"
-#include "TransformVisitor.h"
+#include "vector.h"
+
+class TransformVisitor;
 
 class LightSource : public BaseLightSource
 {
  public:
-	friend void TransformVisitor::visit(const LightSource& lightSource);
+	//friend void TransformVisitor::visit(LightSource& lightSorce) const;
+	friend TransformVisitor;
+
 	LightSource();
 	LightSource(const VecD3& position,double intensivity);
 

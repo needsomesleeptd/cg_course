@@ -3,7 +3,7 @@
 
 #include <memory>
 
-class FrameModel;
+
 class Camera;
 class Composite;
 class LightSource;
@@ -16,9 +16,8 @@ public:
 	virtual ~Visitor() = default;
 
 	virtual void visit(const Camera &camera) = 0;
-	virtual void visit(const FrameModel &model) = 0;
 	virtual void visit(const Composite &composite) = 0;
-	virtual void visit(const LightSource &lightSource) = 0;
+	virtual void visit(LightSource& lightSource) const = 0;
 	virtual void visit(const Sphere &sphere) = 0;
 };
 

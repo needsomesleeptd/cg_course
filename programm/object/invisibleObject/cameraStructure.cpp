@@ -11,6 +11,10 @@ CameraStructureImp::CameraStructureImp(const  VecD3& coordinates, const  VecD3& 
 	return  VecD3(_coordinates);
 }
 
+VecD3 CameraStructureImp::getView() const
+{
+	return  VecD3(_front);
+}
 /*[[nodiscard]] Matrix4 CameraStructureImp::getView()
 {
 	Vector3 coords = Vector3{ _coordinates.getX(), _coordinates.getY(), _coordinates.getZ() };
@@ -60,6 +64,10 @@ void CameraStructureImp::move(const  VecD3& moveParams)
 void CameraStructureImp::setCoordinates(const  VecD3& coordinates)
 {
 	_coordinates = coordinates;
+}
+VecD3 CameraStructureImp::getUp() const
+{
+	return VecD3(_up);
 }
 
 /*Matrix4 CameraStructureImp::getProjection() const

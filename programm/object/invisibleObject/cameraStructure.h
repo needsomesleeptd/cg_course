@@ -10,13 +10,17 @@ public:
 	~CameraStructureImp() = default;
 
 	[[nodiscard]]   VecD3 getCoordinates() const;
+	[[nodiscard]]  VecD3 getView() const;
+	[[nodiscard]]  VecD3 getUp() const;
+
+
 	void setCoordinates(const  VecD3& coordinates);
 	void transform(const TransformParams &transformParams);
 
 	//[[nodiscard]] Matrix4 getView();
 	//[[nodiscard]] Matrix4 getProjection() const;
 	void move(const  VecD3& moveParams);
-	 VecD3 setDirection(const  VecD3 &direction);
+	VecD3 setDirection(const  VecD3 &direction);
 
 protected:
 	//void updateVectors();

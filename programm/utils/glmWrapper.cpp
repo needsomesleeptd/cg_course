@@ -24,3 +24,7 @@ Matrix4 perspective(float rad, float aspect, float zNear, float zFar) {
 	return glm::perspective(rad, aspect, zNear, zFar);
 }
 */
+float dot(VecD3 a, VecD3 b)
+{
+	return glm::dot(a, b);
+}

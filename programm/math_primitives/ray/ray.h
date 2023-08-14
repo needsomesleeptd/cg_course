@@ -9,9 +9,11 @@
 class Ray
 {
  public:
+	Ray() = default;
+	Ray(const VecD3& eye, const VecD3& direction);
 	double t;
-	 VecD3 E;
-	 VecD3 D;
+	VecD3 E;
+	VecD3 D;
 
 };
 

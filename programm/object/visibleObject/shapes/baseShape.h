@@ -6,6 +6,8 @@
 #define LAB_03_CG_COURSE_PROGRAMM_OBJECT_VISIBLEOBJECT_SHAPES_BASESHAPE_H_
 #include "object.h"
 #include "transform.h"
+#include "ray.h"
+#include "material.h"
 
 class BaseShape : public VisibleObject
 {
@@ -13,6 +15,8 @@ class BaseShape : public VisibleObject
 	BaseShape() = default;
 	virtual ~BaseShape() = default;
 	virtual void transform(const TransformParams& transformParams) = 0;
+	virtual  Material getMaterial() = 0;
+	virtual double intersection(const Ray& ray) = 0;
 };
 
 

@@ -10,7 +10,7 @@
 class BaseRenderer
 {
  public:
-	virtual ColorRGB renderPixel(int x,int y, Ray ray,const std::vector<BaseShape>& shapes) = 0;
+	virtual ColorRGB renderPixel(int x, int y, const std::vector<std::shared_ptr<BaseShape>>& shapes) = 0;
 	virtual ~BaseRenderer() = default;
 };
 #endif //LAB_03_CG_COURSE_PROGRAMM_RENDERER_BASERENDERER_H_

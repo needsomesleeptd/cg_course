@@ -21,6 +21,18 @@ Camera::Camera(const  VecD3& coordinates, const  VecD3& direction)
 	: _cameraStructure(std::make_shared<CameraStructureImp>(coordinates, direction))
 {
 }
+VecD3 Camera::getViewPoint()
+{
+	return _cameraStructure->getCoordinates();
+}
+VecD3 Camera::getViewDirection()
+{
+	return _cameraStructure->getView();
+}
+VecD3 Camera::getUpVector()
+{
+	return _cameraStructure->getUp();
+}
 
 CameraFactory::CameraFactory(const  VecD3& position, const  VecD3& direction)
 	: _position(position), _direction(direction)

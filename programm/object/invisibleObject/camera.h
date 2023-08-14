@@ -20,6 +20,10 @@ class Camera : public BaseCamera
 	explicit Camera(std::shared_ptr<CameraStructureImp> cameraStructure);
 	~Camera() override = default;
 
+	VecD3 getViewPoint() override;
+	VecD3 getViewDirection() override;
+	VecD3 getUpVector() override;
+
 
 	void accept(std::shared_ptr<Visitor> visitor) override;
 

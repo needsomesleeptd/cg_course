@@ -44,10 +44,11 @@ set(PROJECT_SOURCES
         object/invisibleObject/camera.h
         object/invisibleObject/camera.cpp
 
+        utils/glmWrapper.h utils/glmWrapper.cpp
 
         renderer/Renderer.cpp renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 
-        renderer/baseRenderer.h color/color.cpp color/color.h)
+        renderer/baseRenderer.h color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h spectral_parameters/material.cpp spectral_parameters/material.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(lab_03
@@ -84,7 +85,7 @@ find_library(LIBCONFIGPP_LOCATION libconfig++)
 find_library(LIBCONFIG_LOCATION libconfig)
 target_link_libraries(lab_03 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets -L/opt/homebrew/Cellar/libconfig/1.7.3/lib -lconfig++)
 
-set_target_properties(lab_03 PROPERTIES
+set_target_properties(lab_03  PROPERTIES
         MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
         MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
         MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}

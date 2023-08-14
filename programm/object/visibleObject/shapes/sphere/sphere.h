@@ -11,7 +11,7 @@
 class Sphere : public BaseShape
 {
 	double _radius;
-	VecD3 _center;
+	 VecD3 _center;
 	void transform(const TransformParams& transformParams) override;
 };
 

@@ -10,8 +10,8 @@ class Ray
 {
  public:
 	double t;
-	VecD3 E;
-	VecD3 D;
+	 VecD3 E;
+	 VecD3 D;
 
 };
 

@@ -17,31 +17,31 @@ class LightSource : public BaseLightSource
 	friend TransformVisitor;
 
 	LightSource();
-	LightSource(const VecD3& position,double intensivity);
+	LightSource(const  VecD3& position,double intensivity);
 
 	~LightSource() = default;
 
-	VecD3 getPosition();
-	void setPosition(const VecD3& newPosition);
+	 VecD3 getPosition();
+	void setPosition(const  VecD3& newPosition);
 
 	double getIntensivity();
 	void setIntensivity(double newIntensivity);
 
 	void accept(std::shared_ptr<Visitor> visitor);
  private:
-	VecD3 _position;
+	 VecD3 _position;
 	double _intensivity;
 };
 
 class LightSorceFactory : BaseLightSourceFactory
 {
  public:
-	LightSorceFactory(const VecD3& position, double intensivity);
+	LightSorceFactory(const  VecD3& position, double intensivity);
 	virtual ~LightSorceFactory() = default;
 
 	virtual std::shared_ptr<BaseLightSource> create() override;
  private:
-	VecD3 _position{ 0.0, 0.0, 0.0 };
+	 VecD3 _position{ 0.0, 0.0, 0.0 };
 	double _intensivity;
 };
 

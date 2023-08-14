@@ -16,7 +16,7 @@ class Camera : public BaseCamera
 
 
 	Camera() = default;
-	explicit Camera(const VecD3& coordinates, const VecD3& direction);
+	explicit Camera(const  VecD3& coordinates, const  VecD3& direction);
 	explicit Camera(std::shared_ptr<CameraStructureImp> cameraStructure);
 	~Camera() override = default;
 
@@ -31,13 +31,13 @@ class Camera : public BaseCamera
 class CameraFactory : public BaseCameraFactory
 {
  public:
-	CameraFactory(const VecD3& position, const VecD3& direction);
+	CameraFactory(const  VecD3& position, const  VecD3& direction);
 	virtual ~CameraFactory() = default;
 
 	virtual std::shared_ptr<Camera> create() override;
  private:
-	VecD3 _position{ 0, 0, 0 };
-	VecD3 _direction{ 0, 0, 0 };
+	 VecD3 _position{ 0, 0, 0 };
+	 VecD3 _direction{ 0, 0, 0 };
 };
 
 

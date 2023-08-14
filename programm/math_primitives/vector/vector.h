@@ -3,7 +3,7 @@
 
 #include <initializer_list>
 #include "base_math_primitive.h"
-
+#include "glmWrapper.h"
 template<typename T, int n>
 class Vector
 {
@@ -48,7 +48,7 @@ Vector<T, n> operator/(const Vector<T, n>& lhs, const double& rhs)
 
 //starting shortcuts
 using VecI3 = Vector<int,3>;
-using VecD3 = Vector<double,3>;
+
 
 using VecI4 = Vector<int,4>;
 using VecD4 = Vector<double,4>;

@@ -1,14 +1,14 @@
 #include "cameraStructure.h"
 #include "vector.h"
 
-CameraStructureImp::CameraStructureImp(const VecD3& coordinates, const VecD3& direction)
+CameraStructureImp::CameraStructureImp(const  VecD3& coordinates, const  VecD3& direction)
 	: _coordinates(coordinates), _front(direction)
 {
 }
 
-VecD3 CameraStructureImp::getCoordinates() const
+ VecD3 CameraStructureImp::getCoordinates() const
 {
-	return VecD3(_coordinates);
+	return  VecD3(_coordinates);
 }
 
 /*[[nodiscard]] Matrix4 CameraStructureImp::getView()
@@ -38,10 +38,10 @@ void CameraStructureImp::rotate(float xOffset, float yOffset)
 		_yaw = 90.0f;
 	if (_yaw < -90.0f)
 		_yaw = -90.0f;
-	updateVectors();
+	//updateVectors();
 }
 
-void CameraStructureImp::move(const VecD3& moveParams)
+void CameraStructureImp::move(const  VecD3& moveParams)
 {
 	_coordinates += moveParams;
 }
@@ -57,7 +57,7 @@ void CameraStructureImp::move(const VecD3& moveParams)
 	_up = normalize(cross(_right, _front));
 }*/
 
-void CameraStructureImp::setCoordinates(const VecD3& coordinates)
+void CameraStructureImp::setCoordinates(const  VecD3& coordinates)
 {
 	_coordinates = coordinates;
 }

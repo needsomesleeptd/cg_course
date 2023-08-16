@@ -28,3 +28,8 @@ float dot(VecD3 a, VecD3 b)
 {
 	return glm::dot(a, b);
 }
+
+VecD3 normalise(VecD3 a)
+{
+	return glm::normalize(a);
+}

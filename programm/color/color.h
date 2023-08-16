@@ -7,6 +7,11 @@
 
 struct ColorRGB
 {
+ public:
+	ColorRGB() = default;
+	ColorRGB(int R_,int G_,int B_);
+	ColorRGB operator*(int value);
+
 	int R;
 	int G;
 	int B;

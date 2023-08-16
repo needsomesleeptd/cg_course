@@ -11,6 +11,8 @@ class Ray
  public:
 	Ray() = default;
 	Ray(const VecD3& eye, const VecD3& direction);
+	VecD3 getPoint(float t);
+
 	double t;
 	VecD3 E;
 	VecD3 D;

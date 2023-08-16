@@ -3,3 +3,15 @@
 //
 
 #include "color.h"
+ColorRGB::ColorRGB(int R_, int G_, int B_) : R(R_), G(G_), B(B_)
+{
+
+}
+ColorRGB ColorRGB::operator*(int value)
+{
+	int changedR = R * value;
+	int changedG = G * value;
+	int changedB = B * value;
+	return ColorRGB(changedR,changedG,changedB);
+
+}

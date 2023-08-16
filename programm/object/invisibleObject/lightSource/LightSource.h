@@ -21,10 +21,10 @@ class LightSource : public BaseLightSource
 
 	~LightSource() = default;
 
-	 VecD3 getPosition();
-	void setPosition(const  VecD3& newPosition);
+	VecD3 getPosition() override;
+	void setPosition(const  VecD3& newPosition) override;
 
-	double getIntensivity();
+	double getIntensivity() override;
 	void setIntensivity(double newIntensivity);
 
 	void accept(std::shared_ptr<Visitor> visitor);

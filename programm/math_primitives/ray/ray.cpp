@@ -9,3 +9,7 @@ Ray::Ray(const VecD3& eye, const VecD3& direction)
 	E = eye;
 	D = direction;
 }
+VecD3 Ray::getPoint(float t)
+{
+	return E + D * t;
+}

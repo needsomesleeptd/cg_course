@@ -6,12 +6,17 @@
 #define LAB_03_CG_COURSE_PROGRAMM_OBJECT_INVISIBLEOBJECT_LIGHTSOURCE_BASELIGHTSOURCE_H_
 
 #include "object.h"
+#include "vector.h"
 
 class BaseLightSource : public InvisibleObject
 {
  public:
 	BaseLightSource() = default;
 	virtual ~BaseLightSource() = default;
+	virtual VecD3 getPosition() = 0;
+	virtual double getIntensivity() = 0;
+	virtual void setPosition(const VecD3& newPosition) = 0;
+	virtual void setIntensivity(double newIntensivity) = 0;
 };
 
 class BaseLightSourceFactory

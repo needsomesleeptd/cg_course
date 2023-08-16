@@ -43,12 +43,17 @@ set(PROJECT_SOURCES
         object/invisibleObject/baseCamera.h
         object/invisibleObject/camera.h
         object/invisibleObject/camera.cpp
-
+        scene/scene.cpp scene/scene.h
+        object/visibleObject/composite.cpp object/visibleObject/composite.h
         utils/glmWrapper.h utils/glmWrapper.cpp
+        manager/scene/sceneManager.cpp manager/scene/sceneManager.h
+        manager/scene/sceneManagerCreator.cpp manager/scene/sceneManagerCreator.h
+        manager/draw/drawManager.cpp manager/draw/drawManager.h
+        manager/draw/drawManagerCreator.cpp manager/draw/drawManagerCreator.h
 
         renderer/Renderer.cpp renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 
-        renderer/baseRenderer.h color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h spectral_parameters/material.cpp spectral_parameters/material.h)
+        renderer/baseRenderer.h color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h material/material.cpp material/material.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(lab_03

@@ -13,12 +13,8 @@ void DrawManager::drawScene(std::shared_ptr<Scene> scene)
 	//TODO::implement renderer
 	//_drawer->clearScene();
 	//std::shared_ptr<Visitor> visitor = DrawVisitorFactory(_camera, _drawer).create();
-	/*auto objects = scene->getComposite();
-	for (auto iterator = objects->begin(); iterator < objects->end(); iterator++)
-	{
-		auto object = *iterator;
-		object->accept(visitor);
-	}*/
+	auto objects = scene->getComposite();
+	_renderer->renderScene(objects);
 
 }
 void DrawManager::setRenderer(std::shared_ptr<BaseRenderer> renderer)

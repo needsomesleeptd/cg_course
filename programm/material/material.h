@@ -8,6 +8,7 @@
 #include "color.h"
 struct Material // TODO:: Might be better to make class with restricted access
 {
+
 	ColorRGB color;
 	float k_a;
 	float k_d;

@@ -4,32 +4,60 @@
 #include <memory>
 #include <vector>
 #include "visitor.h"
+#include "material.h"
+#include "ray.h"
 
 class BaseObject;
 using Iterator = std::vector<std::shared_ptr<BaseObject>>::iterator;
 
-class BaseObject {
-public:
+class BaseObject
+{
+ public:
 	BaseObject() = default;
 	virtual ~BaseObject() = default;
+	virtual double intersection(const Ray& ray)
+	{
+		return -1.0;
+	};
+	virtual Material getMaterial()
+	{
+		return Material();
+	};
 
-	virtual bool isVisible() { return false; };
-	virtual bool isComposite() { return false; };
+	virtual bool isVisible()
+	{
+		return false;
+	};
+	virtual bool isComposite()
+	{
+		return false;
+	};
 
 	virtual void accept(std::shared_ptr<Visitor> visitor) = 0;
 
+	virtual bool add(const std::shared_ptr<BaseObject>&)
+	{
+		return false;
+	};
+	virtual bool remove(const Iterator&)
+	{
+		return false;
+	};
 
-	virtual bool add(const std::shared_ptr<BaseObject> &) { return false; };
-	virtual bool remove(const Iterator &) { return false; };
-
-	virtual Iterator begin() { return Iterator(); };
-	virtual Iterator end() { return Iterator(); };
-
+	virtual Iterator begin()
+	{
+		return Iterator();
+	};
+	virtual Iterator end()
+	{
+		return Iterator();
+	};
 
 };
 
-class VisibleObject : public BaseObject {
-public:
+class VisibleObject : public BaseObject
+{
+ public:
 	VisibleObject() = default;
 	~VisibleObject() = default;
 	bool isVisible() override

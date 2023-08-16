@@ -32,13 +32,13 @@ LightSource::LightSource(const  VecD3& position, double intensivity)
 	_intensivity = intensivity;
 }
 
-LightSorceFactory::LightSorceFactory(const  VecD3& position, double intensivity)
+LightSourceFactory::LightSourceFactory(const  VecD3& position, double intensivity)
 {
 	_position = position;
 	_intensivity = intensivity;
 }
 
-std::shared_ptr<BaseLightSource> LightSorceFactory::create()
+std::shared_ptr<BaseLightSource> LightSourceFactory::create()
 {
 	return std::make_shared<LightSource>(_position, _intensivity);
 }

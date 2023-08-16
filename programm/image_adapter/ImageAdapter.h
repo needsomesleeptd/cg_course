@@ -11,9 +11,12 @@
 class ImageAdapter
 {
  public:
+	ImageAdapter();
+	explicit ImageAdapter(int width,int height);
 	void setPixelColor(int x,int y,ColorRGB color);
 	int getWidth();
 	int getHeight();
+	std::shared_ptr<QImage> getImage();
  private:
 	std::shared_ptr<QImage> image;
 };

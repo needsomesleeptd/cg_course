@@ -25,6 +25,7 @@ class Camera : public BaseCamera
 	VecD3 getUpVector() override;
 
 
+
 	void accept(std::shared_ptr<Visitor> visitor) override;
 
  private:

@@ -4,6 +4,7 @@
 #include <vector>
 #include "object.h"
 #include "baseCamera.h"
+#include "baseLightSource.h"
 
 class Scene
 {
@@ -13,6 +14,7 @@ class Scene
 
 	std::vector<std::shared_ptr<BaseObject>> getModels();
 	std::vector<std::shared_ptr<Camera>> getCameras();
+	std::shared_ptr<BaseLightSource> getLightSource();
 	std::shared_ptr<Composite> getComposite();
 
 	void addModel(const std::shared_ptr<BaseObject>& model);
@@ -22,6 +24,8 @@ class Scene
 	void removeCamera(const std::size_t index);
 
 	void setCamera(std::size_t index);
+	void setLightSource(std::shared_ptr<BaseLightSource> lightSource);
+
 	[[nodiscard]] std::shared_ptr<Camera> getCamera() const;
 
  protected:
@@ -29,7 +33,8 @@ class Scene
 
 	std::vector<std::shared_ptr<Camera>> _cameras;
 	std::shared_ptr<Composite> _models;
-	std::size_t _currCameraIdx;
+	std::shared_ptr<BaseLightSource> _lightSource;
+	std::size_t _currCameraIdx = 0;
 };
 
 #endif //LAB_03_SCENE_H

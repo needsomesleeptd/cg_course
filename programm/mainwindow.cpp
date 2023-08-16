@@ -1,12 +1,28 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "sphere.h"
+#include "camera.h"
+#include "Renderer.h"
+#include "LightSource.h"
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
 
+	_sceneManager = SceneManagerCreator().createManager();
+
+	//_sceneManager->setScene()
+	_drawManager = DrawManagerCreator().createManager();
+	std::shared_ptr<Camera> camera = CameraFactory({0,0,-5},{0,0,-1}).create();
+	_drawManager->setCamera(camera);
+	_sceneManager->getScene()->addCamera(camera);
+
+
 	setupScene();
+
+
+
 
 	/*std::string config = "/home/andrew/OOP/OOP/OOP/lab_03Another/data/config.txt";
 	std::shared_ptr<ConfigCreator> config_creator = std::make_shared<ConfigCreator>();
@@ -55,8 +71,22 @@ void MainWindow::setupScene()
 
 	auto cont = ui->graphicsView->contentsRect();
 	_scene->setSceneRect(0, 0, cont.width(), cont.height());
+	ColorRGB color(240,0,0);
+	Material material(1,1,1,color);
+	//std::shared_ptr<Sphere>
+	std::shared_ptr<Sphere> sphere = std::make_shared<Sphere>(VecD3({1.0,1.0,-5.0}),6.0,material);
+	_sceneManager->getScene()->addModel(sphere);
+	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(5.0,7.0,-8.0),1).create();
+	_sceneManager->getScene()->setLightSource(lightsource);
 
-	/*std::shared_ptr<AbstractDrawerFactory> factory(new DrawerQtFactory(_scene));
-	_drawer = factory->graphicCreate();*/
+	std::shared_ptr<BaseRenderer> renderer = std::make_shared<Renderer>(_scene);
+	_drawManager->setRenderer(renderer);
+	updateScene();
+
+}
+void MainWindow::updateScene()
+{
+	_drawManager->drawScene(_sceneManager->getScene());
+
 }
 

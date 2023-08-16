@@ -4,6 +4,7 @@
 
 #include "sphere.h"
 #include "vector.h"
+#include <iostream> //TODO::remove after print
 void Sphere::transform(const TransformParams& transformParams)
 {
 	_center += transformParams.getMoveParams();
@@ -15,6 +16,7 @@ double Sphere::intersection(const Ray& ray)
 	float b = dot(ray.E * 2.0f, ray.D);
 	float c = dot(ray.E, ray.E) - 1;
 	float discriminant = b * b - 4 * a * c;
+	std::cout << ray.E[0] << ray.E[1] << ray.E[2] << " " << ray.D[0] << ray.D[1] << ray.D[2] << " " << discriminant << std::endl;
 	if (discriminant < 0)
 		return -1.0; //TODO::might need a special flag of intersection
 	else
@@ -38,13 +40,13 @@ double Sphere::intersection(const Ray& ray)
 }
 void Sphere::setSpectralParams(float k_a, float k_d, float k_s)
 {
-	_material.k_a = k_a;
-	_material.k_d = k_d;
-	_material.k_s = k_s;
+	_material._k_a = k_a;
+	_material._k_d = k_d;
+	_material._k_s = k_s;
 }
 void Sphere::setColorParams(const ColorRGB& color)
 {
-	_material.color = color;
+	_material._color = color;
 }
 Material Sphere::getMaterial()
 {
@@ -58,4 +60,8 @@ Sphere::Sphere(const VecD3& center, double radius, const Material& material)
 	: _center(center), _radius(radius), _material(material)
 {
 
+}
+void Sphere::accept(std::shared_ptr<Visitor> visitor)
+{
+	visitor->visit(*this);
 }

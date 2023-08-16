@@ -3,15 +3,29 @@
 //
 
 #include "ImageAdapter.h"
-void ImageAdapter::setPixelColor(int x, int y,ColorRGB color)
+
+#include <memory>
+void ImageAdapter::setPixelColor(int x, int y, ColorRGB color)
 {
-	image->setPixelColor(x,y,QColor(color.R,color.G,color.B));
+	image->setPixelColor(x, y, QColor(color.R, color.G, color.B));
 }
 int ImageAdapter::getWidth()
 {
-	image->width();
+	return image->width();
 }
 int ImageAdapter::getHeight()
 {
-	image->height();
+	return image->height();
+}
+std::shared_ptr<QImage> ImageAdapter::getImage()
+{
+	return image;
+}
+ImageAdapter::ImageAdapter()
+{
+	image = std::make_shared<QImage>();
+}
+ImageAdapter::ImageAdapter(int width, int height)
+{
+	image = std::make_shared<QImage>(width,height,QImage::Format_RGB32);
 }

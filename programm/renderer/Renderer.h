@@ -6,23 +6,22 @@
 #define LAB_03_CG_COURSE_PROGRAMM_RENDERER_RENDERER_H_
 
 #include "baseRenderer.h"
-#include "ImageAdapter.h"
 #include "camera.h"
 #include "baseLightSource.h"
-
+#include "scene.h"
+#include <QGraphicsScene>
 const float EPS = 1e-7;
 const float maxRange = 1e9;
 
-class Renderer : BaseRenderer
+class Renderer : public BaseRenderer
 {
  public:
-	Ray createRay(int x,int y);
-	ColorRGB renderPixel(int x, int y, const std::vector<std::shared_ptr<BaseShape>>& shapes) override;
-	void renderScene(const std::vector<std::shared_ptr<BaseShape>>& shapes) override;
+	explicit Renderer(QGraphicsScene *scene);
+	Ray createRay(int x, int y, std::shared_ptr<Camera> currentCamera);
+	ColorRGB renderPixel(int x, int y, std::shared_ptr<Scene> scene) override;
+	void renderScene(std::shared_ptr<Scene> scene) override;
  private:
-	std::shared_ptr<ImageAdapter> image;
-	std::shared_ptr<Camera> currentCamera;
-	std::shared_ptr<BaseLightSource> currentLightSource;
+	QGraphicsScene *_scene;
 };
 
 #endif //LAB_03_CG_COURSE_PROGRAMM_RENDERER_RENDERER_H_

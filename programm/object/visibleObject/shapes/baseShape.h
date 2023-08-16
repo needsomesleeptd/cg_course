@@ -18,6 +18,7 @@ class BaseShape : public VisibleObject
 	virtual Material getMaterial() = 0;
 	virtual double intersection(const Ray& ray) = 0;
 	virtual VecD3 getNormal(VecD3 intersectionPoint) = 0;
+	virtual void accept(std::shared_ptr<Visitor> visitor) = 0;
 };
 
 class BaseShapeFactory

@@ -8,11 +8,12 @@
 #include "color.h"
 struct Material // TODO:: Might be better to make class with restricted access
 {
-
-	ColorRGB color;
-	float k_a;
-	float k_d;
-	float k_s;
+	Material() = default;
+	explicit Material(float k_a_src, float k_d_src, float k_s_src, ColorRGB color);
+	ColorRGB _color;
+	float _k_a;
+	float _k_d;
+	float _k_s;
 };
 
 #endif //LAB_03_CG_COURSE_PROGRAMM_SPECTRAL_PARAMETERS_MATERIAL_H_

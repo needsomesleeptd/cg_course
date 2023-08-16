@@ -1,4 +1,5 @@
 #include <iterator>
+#include <utility>
 #include "scene.h"
 #include "composite.h"
 
@@ -42,4 +43,12 @@ void Scene::setCamera(std::size_t index) {
 
 std::shared_ptr<Camera> Scene::getCamera() const {
 	return _cameras.at(_currCameraIdx);
+}
+void Scene::setLightSource(std::shared_ptr<BaseLightSource> lightSource)
+{
+	_lightSource = std::move(lightSource);
+}
+std::shared_ptr<BaseLightSource> Scene::getLightSource()
+{
+	return _lightSource;
 }

@@ -6,7 +6,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <memory>
 
+#include "drawManager.h"
+#include "drawManagerCreator.h"
+#include "sceneManager.h"
+#include "sceneManagerCreator.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -33,6 +38,8 @@ private:
 	Ui::MainWindow *ui;
 
 	QGraphicsScene *_scene;
+	std::shared_ptr<DrawManager> _drawManager;
+	std::shared_ptr<SceneManager> _sceneManager;
 	/*std::shared_ptr<Facade> _facade;
 	std::shared_ptr<AbstractDrawer> _drawer;
 

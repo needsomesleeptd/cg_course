@@ -33,11 +33,11 @@ class LightSource : public BaseLightSource
 	double _intensivity;
 };
 
-class LightSorceFactory : BaseLightSourceFactory
+class LightSourceFactory : BaseLightSourceFactory
 {
  public:
-	LightSorceFactory(const  VecD3& position, double intensivity);
-	virtual ~LightSorceFactory() = default;
+	LightSourceFactory(const  VecD3& position, double intensivity);
+	virtual ~LightSourceFactory() = default;
 
 	virtual std::shared_ptr<BaseLightSource> create() override;
  private:

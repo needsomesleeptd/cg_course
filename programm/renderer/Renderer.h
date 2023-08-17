@@ -14,7 +14,7 @@
 
 const float EPS = 1e-7;
 const float maxRange = 1e9;
-const int maxDepth = 5;
+const int maxDepth = 12;
 const ColorRGB backGround = ColorRGB(0,0,0);
 
 
@@ -25,6 +25,7 @@ class Renderer : public BaseRenderer
 	Ray createRay(int x, int y, std::shared_ptr<Camera> currentCamera);
 	ColorRGB renderPixel(int x, int y, std::shared_ptr<Scene> scene) override;
 	void renderScene(std::shared_ptr<Scene> scene) override;
+	void rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene,int curDepth) override;
  private:
 	QGraphicsScene *_scene;
 };

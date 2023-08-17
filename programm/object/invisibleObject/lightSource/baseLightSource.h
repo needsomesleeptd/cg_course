@@ -17,6 +17,8 @@ class BaseLightSource : public InvisibleObject
 	virtual double getIntensivity() = 0;
 	virtual void setPosition(const VecD3& newPosition) = 0;
 	virtual void setIntensivity(double newIntensivity) = 0;
+	virtual ColorRGB getColor() = 0;
+	virtual void setColor(const ColorRGB& color) = 0;
 };
 
 class BaseLightSourceFactory

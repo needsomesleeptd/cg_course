@@ -10,9 +10,10 @@ struct ColorRGB
  public:
 	ColorRGB() = default;
 	ColorRGB(int R_,int G_,int B_);
-	ColorRGB operator*(int value);
+	ColorRGB operator*(float value);
 	ColorRGB operator+(const ColorRGB& color);
-
+	ColorRGB operator*(const ColorRGB& color);
+	void normalize();
 	int R;
 	int G;
 	int B;

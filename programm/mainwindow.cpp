@@ -67,16 +67,23 @@ void MainWindow::setupScene()
 
 	ui->graphicsView->setScene(_scene);
 	ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-	ui->graphicsView->setStyleSheet("QGraphicsView {background-color: white}");
+	ui->graphicsView->setStyleSheet("QGraphicsView {background-red: white}");
 
 	auto cont = ui->graphicsView->contentsRect();
 	_scene->setSceneRect(0, 0, cont.width(), cont.height());
-	ColorRGB color(240,0,0);
-	Material material(0.7,0.9,0,color);
+	ColorRGB red(120,0,0);
+	ColorRGB green(0,120,200);
+	Material materialRed(0.0,0.5,0.8,red);
+	Material materialGreen(0.0,0.5,0.8,green);
+
+
 	//std::shared_ptr<Sphere>
-	std::shared_ptr<Sphere> sphere = std::make_shared<Sphere>(VecD3({1.0,1.0,-5.0}),6.0,material);
-	_sceneManager->getScene()->addModel(sphere);
-	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(5.0,7.0,0.0),1).create();
+	std::shared_ptr<Sphere> sphereRed = std::make_shared<Sphere>(VecD3({1.0,1.0,-9.0}),6.0,materialRed);
+	std::shared_ptr<Sphere> sphereGreen = std::make_shared<Sphere>(VecD3({1.0,-1.0,-10.0}),6.0,materialGreen);
+	_sceneManager->getScene()->addModel(sphereRed);
+	_sceneManager->getScene()->addModel(sphereGreen);
+	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(5.0,-55.0,-12.0),1).create();
+	lightsource->setColor(ColorRGB(255,255,255));
 	_sceneManager->getScene()->setLightSource(lightsource);
 
 	std::shared_ptr<BaseRenderer> renderer = std::make_shared<Renderer>(_scene);

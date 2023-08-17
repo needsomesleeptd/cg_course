@@ -9,6 +9,7 @@ LightSource::LightSource()
 {
 	_intensivity = 1;
 	_position =  VecD3({ 0.0, 0.0, 0.0 });
+	_color = ColorRGB(255,255,25);
 }
  VecD3 LightSource::getPosition()
 {
@@ -46,4 +47,12 @@ std::shared_ptr<BaseLightSource> LightSourceFactory::create()
 void LightSource::accept(std::shared_ptr<Visitor> visitor)
 {
 	visitor->visit(*this);
+}
+ColorRGB LightSource::getColor()
+{
+	return _color;
+}
+void LightSource::setColor(const ColorRGB& color)
+{
+	_color = color;
 }

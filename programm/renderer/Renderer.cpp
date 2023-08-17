@@ -9,42 +9,11 @@
 ColorRGB Renderer::renderPixel(int x, int y, std::shared_ptr<Scene> scene)
 {
 	Ray tracedRay = createRay(x, y, scene->getCamera());
-	std::shared_ptr<BaseShape> closestShape;
-	float t = maxRange;
-	for (auto shape : scene->getModels())
-	{
-
-		float intersection_t = shape->intersection(tracedRay);
-		std::cout << intersection_t << std::endl;
-		if (intersection_t > 0 || fabs(intersection_t) < EPS)
-		{
-			t = std::min(t, intersection_t);
-			closestShape = std::dynamic_pointer_cast<BaseShape>(shape);
-		}
-	}
-	if (abs(t - maxRange) < EPS)
-	{
-		return backGround; //Returning background color
-	}
-	std::shared_ptr<BaseLightSource> currentLightSource = scene->getLightSource();
-	VecD3 intersectionPoint = tracedRay.getPoint(t);
-	VecD3 lightVector = normalise(intersectionPoint - currentLightSource->getPosition());
-	VecD3 shapeNormal = normalise(closestShape->getNormal(intersectionPoint));
-
-	Material shapeMaterial = closestShape->getMaterial();
-	float dotLight = dot(shapeNormal, lightVector);
-	if (dotLight > 0) //TODO:: replace with get diffuse exc... when tested
-	{
-		float diffuseIntensivity = dotLight * shapeMaterial._k_d * currentLightSource->getIntensivity();
-		float ambientIntensivity = shapeMaterial._k_a * currentLightSource->getIntensivity();
-		return shapeMaterial._color * (diffuseIntensivity + ambientIntensivity);
-	}
-	else
-	{
-		return backGround; //Returning background color
-	}
+	ColorRGB finalColor = backGround;
+	rayTrace(tracedRay, finalColor, scene, 0);
+	return finalColor;
 }
-void rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene,int curDepth)
+void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene, int curDepth)
 {
 	std::shared_ptr<BaseShape> closestShape;
 	float t = maxRange;
@@ -52,7 +21,7 @@ void rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene>
 	{
 
 		float intersection_t = shape->intersection(tracedRay);
-		std::cout << intersection_t << std::endl;
+		//std::cout << intersection_t << std::endl;
 		if (intersection_t > 0 || fabs(intersection_t) < EPS)
 		{
 			t = std::min(t, intersection_t);
@@ -70,28 +39,41 @@ void rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene>
 
 	Material shapeMaterial = closestShape->getMaterial();
 	float ambientIntensivity = shapeMaterial._k_a * currentLightSource->getIntensivity();
-	finalColor = shapeMaterial._color * ambientIntensivity;
-	float dotLight = dot(shapeNormal, lightVector);
+	finalColor = shapeMaterial._color * ambientIntensivity + finalColor;
+	float diffuseLight = dot(shapeNormal, lightVector);
 	if (shapeMaterial._k_d > 0)
 	{
-		if (dotLight > 0)
+		if (diffuseLight > 0)
 		{
-			float diffuseIntensivity = dotLight * shapeMaterial._k_d * currentLightSource->getIntensivity();
-			float ambientIntensivity = shapeMaterial._k_a * currentLightSource->getIntensivity();
+			//std::cout << " diffuseLight" << diffuseLight << std::endl;
+			float diffuseIntensivity = diffuseLight * shapeMaterial._k_d * currentLightSource->getIntensivity();
 			finalColor = shapeMaterial._color * diffuseIntensivity + finalColor;
+
 		}
 	}
 	if (shapeMaterial._k_s > 0)
 	{
+
+		Ray reflected = tracedRay.calculateReflected(shapeNormal, intersectionPoint);
+		float specularDot = dot(reflected.D, tracedRay.D);
+		//std::cout << " diffuseLight" << diffuseLight << std::endl;
+		if (specularDot > 0.0)
+		{
+			//float spec = powf( specularDot, 20 ) * shapeMaterial._k_s;
+			finalColor = currentLightSource->getColor() * specularDot + finalColor;
+		}
+	}
+	if (shapeMaterial._k_s > 0.0f)
+	{
+		VecD3 N = closestShape->getNormal(intersectionPoint);
+		Ray reflected = tracedRay.calculateReflected(shapeNormal, intersectionPoint);
+		VecD3 R = tracedRay.D - 2.0f * dot(tracedRay.D, N) * N;
 		if (curDepth < maxDepth)
 		{
-			Ray reflected = tracedRay.calculateReflected(shapeNormal, intersectionPoint);
-			if (dotLight > 0)
-			{
-
-				finalColor = shapeMaterial._color * shapeMaterial._k_s + finalColor;
-				rayTrace(reflected, finalColor, scene, curDepth + 1);
-			}
+			ColorRGB rcol(0, 0, 0);
+			float dist;
+			rayTrace(reflected, rcol, scene,curDepth + 1);
+			finalColor = rcol * shapeMaterial._k_s  * closestShape->getMaterial()._color + finalColor;
 		}
 	}
 }
@@ -130,6 +112,8 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 		for (int j = 0; j < image->getHeight(); j++)
 		{
 			ColorRGB pixelColor = renderPixel(i, j, scene);
+			pixelColor.normalize();
+			std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
 			image->setPixelColor(i, j, pixelColor);
 		}
 	}

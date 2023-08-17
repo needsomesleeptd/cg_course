@@ -28,9 +28,12 @@ class LightSource : public BaseLightSource
 	void setIntensivity(double newIntensivity);
 
 	void accept(std::shared_ptr<Visitor> visitor);
+	ColorRGB getColor() override;
+	void setColor(const ColorRGB& color) override;
  private:
 	 VecD3 _position;
-	double _intensivity;
+	 double _intensivity;
+	ColorRGB _color;
 };
 
 class LightSourceFactory : BaseLightSourceFactory

@@ -10,8 +10,13 @@
 #include "baseLightSource.h"
 #include "scene.h"
 #include <QGraphicsScene>
+
+
 const float EPS = 1e-7;
 const float maxRange = 1e9;
+const int maxDepth = 5;
+const ColorRGB backGround = ColorRGB(0,0,0);
+
 
 class Renderer : public BaseRenderer
 {

@@ -11,6 +11,7 @@ struct ColorRGB
 	ColorRGB() = default;
 	ColorRGB(int R_,int G_,int B_);
 	ColorRGB operator*(int value);
+	ColorRGB operator+(const ColorRGB& color);
 
 	int R;
 	int G;

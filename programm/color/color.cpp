@@ -12,6 +12,10 @@ ColorRGB ColorRGB::operator*(int value)
 	int changedR = R * value;
 	int changedG = G * value;
 	int changedB = B * value;
-	return ColorRGB(changedR,changedG,changedB);
+	return ColorRGB(changedR, changedG, changedB);
 
+}
+ColorRGB ColorRGB::operator+(const ColorRGB& color)
+{
+	return ColorRGB(this->R + color.R, this->G + color.G, this->B + color.B);
 }

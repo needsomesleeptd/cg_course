@@ -11,8 +11,8 @@ class Ray
  public:
 	Ray() = default;
 	Ray(const VecD3& eye, const VecD3& direction);
-	VecD3 getPoint(float t);
-
+	Ray calculateReflected(const VecD3& normalToIntersection, const VecD3& intersectionPoint) const;
+	VecD3 getPoint(float t) const;
 	double t;
 	VecD3 E;
 	VecD3 D;

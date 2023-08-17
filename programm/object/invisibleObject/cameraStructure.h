@@ -33,7 +33,7 @@ private:
 
 	 VecD3 _up{0.0, 1.0, 0.0};
 
-	 VecD3 _right{0.0, 0.0, 1.0};
+	 VecD3 _right{1.0, 0.0, 0.0};
 
 	 VecD3 _worldUp{0.0, 1.0, 0.0};
 

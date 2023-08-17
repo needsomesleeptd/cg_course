@@ -14,7 +14,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 	//_sceneManager->setScene()
 	_drawManager = DrawManagerCreator().createManager();
-	std::shared_ptr<Camera> camera = CameraFactory({0,0,-5},{0,0,-1}).create();
+	std::shared_ptr<Camera> camera = CameraFactory({0,0,-3},{0,0,-1}).create();
 	_drawManager->setCamera(camera);
 	_sceneManager->getScene()->addCamera(camera);
 
@@ -72,11 +72,11 @@ void MainWindow::setupScene()
 	auto cont = ui->graphicsView->contentsRect();
 	_scene->setSceneRect(0, 0, cont.width(), cont.height());
 	ColorRGB color(240,0,0);
-	Material material(1,1,1,color);
+	Material material(0.7,0.9,0,color);
 	//std::shared_ptr<Sphere>
 	std::shared_ptr<Sphere> sphere = std::make_shared<Sphere>(VecD3({1.0,1.0,-5.0}),6.0,material);
 	_sceneManager->getScene()->addModel(sphere);
-	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(5.0,7.0,-8.0),1).create();
+	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(5.0,7.0,0.0),1).create();
 	_sceneManager->getScene()->setLightSource(lightsource);
 
 	std::shared_ptr<BaseRenderer> renderer = std::make_shared<Renderer>(_scene);

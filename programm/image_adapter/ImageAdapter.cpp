@@ -7,7 +7,12 @@
 #include <memory>
 void ImageAdapter::setPixelColor(int x, int y, ColorRGB color)
 {
-	image->setPixelColor(x, y, QColor(color.R, color.G, color.B));
+	QColor qcolor;
+	qcolor.setRedF(color.R);
+	qcolor.setGreenF(color.G);
+	qcolor.setBlueF(color.B);
+
+	image->setPixelColor(x, y, qcolor);
 }
 int ImageAdapter::getWidth()
 {

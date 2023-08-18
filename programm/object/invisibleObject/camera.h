@@ -1,7 +1,7 @@
 #ifndef LAB_03_CAMERA_H
 #define LAB_03_CAMERA_H
 
-
+#include <QKeyEvent>
 #include "cameraStructure.h"
 #include "baseCamera.h"
 
@@ -23,8 +23,12 @@ class Camera : public BaseCamera
 	VecD3 getViewPoint() override;
 	VecD3 getViewDirection() override;
 	VecD3 getUpVector() override;
+	MatD4  getInverseProjectionMatrix() override;
+	MatD4  getInverseViewMatrix() override;
 
 
+	void setImageParams(int height, int width);
+	void update(QKeyEvent* e, float time);
 
 	void accept(std::shared_ptr<Visitor> visitor) override;
 
@@ -58,7 +62,7 @@ class CameraFactory : public BaseCameraFactory
 //	[[nodiscard]] Point getCoordinates() const noexcept;
 //	void setCoordinates(Point &coordinates);
 //
-//	[[nodiscard]] Matrix4 getView();
+//	[[nodiscard]] Matrix4 getViewDirection();
 //	[[nodiscard]] Matrix4 getProjection() const;
 //
 //	friend Point DrawManager::getProection(const Point &point);
@@ -72,7 +76,7 @@ class CameraFactory : public BaseCameraFactory
 //private:
 //	Point _coordinates;
 //
-//	Vector3 _front{0.0f, 0.0f, -1.0f};
+//	Vector3 _forward{0.0f, 0.0f, -1.0f};
 //	Vector3 _up{0.0, 1.0, 0.0};
 //	Vector3 _right{0.0, 0.0, 1.0};
 //	Vector3 _worldUp{0.0, 1.0, 0.0};

@@ -2,7 +2,7 @@
 #include "vector.h"
 
 CameraStructureImp::CameraStructureImp(const  VecD3& coordinates, const  VecD3& direction)
-	: _coordinates(coordinates), _front(direction)
+	: _coordinates(coordinates), _forward(direction)
 {
 }
 
@@ -11,14 +11,14 @@ CameraStructureImp::CameraStructureImp(const  VecD3& coordinates, const  VecD3& 
 	return  VecD3(_coordinates);
 }
 
-VecD3 CameraStructureImp::getView() const
+VecD3 CameraStructureImp::getViewDirection() const
 {
-	return  VecD3(_front);
+	return  VecD3(_forward);
 }
-/*[[nodiscard]] Matrix4 CameraStructureImp::getView()
+/*[[nodiscard]] Matrix4 CameraStructureImp::getViewDirection()
 {
 	Vector3 coords = Vector3{ _coordinates.getX(), _coordinates.getY(), _coordinates.getZ() };
-	Matrix4 view = glm::lookAt(coords, coords + _front, _up);
+	Matrix4 view = glm::lookAt(coords, coords + _forward, _up);
 	return view;
 }*/
 
@@ -30,20 +30,7 @@ void CameraStructureImp::transform(const TransformParams& transformParams)
 	//rotate(rotateParams.getX(), rotateParams.getY());
 }
 
-void CameraStructureImp::rotate(float xOffset, float yOffset)
-{
-	_yaw += xOffset;
-	_pitch += yOffset;
-	if (_pitch > 90.0f)
-		_pitch = 90.0f;
-	if (_pitch < -90.0f)
-		_pitch = -90.0f;
-	if (_yaw > 90.0f)
-		_yaw = 90.0f;
-	if (_yaw < -90.0f)
-		_yaw = -90.0f;
-	//updateVectors();
-}
+
 
 void CameraStructureImp::move(const  VecD3& moveParams)
 {
@@ -56,9 +43,9 @@ void CameraStructureImp::move(const  VecD3& moveParams)
 	front.x = cos(glm::radians(_yaw)) * cos(glm::radians(_pitch));
 	front.y = sin(glm::radians(_pitch));
 	front.z = sin(glm::radians(_yaw)) * cos(glm::radians(_pitch));
-	_front = normalize(front);
-	_right = normalize(cross(_front, _worldUp));
-	_up = normalize(cross(_right, _front));
+	_forward = normalize(front);
+	_right = normalize(cross(_forward, _worldUp));
+	_up = normalize(cross(_right, _forward));
 }*/
 
 void CameraStructureImp::setCoordinates(const  VecD3& coordinates)
@@ -69,14 +56,39 @@ VecD3 CameraStructureImp::getUp() const
 {
 	return VecD3(_up);
 }
+void CameraStructureImp::updateView()
+{
+	_mView = glm::lookAt(_coordinates,_coordinates + _forward,_up);//TODO::write own lookat function
+	_mInverseView = glm::inverse(_mView);
+}
 
-/*Matrix4 CameraStructureImp::getProjection() const
+
+VecD3 CameraStructureImp::setDirection(const VecD3 & direction)
 {
-	return perspective(glm::radians(90.0f), _aspect, _zNear, _zFar);
+	_forward = direction;
 }
-Vector3 CameraStructureImp::setDirection(const Vector3& direction)
+void CameraStructureImp::updateProjection()
 {
-	_front = direction;
+	_mProjection = glm::perspectiveFov(glm::radians(_verticalFOV), (float)_viewPortWidth, (float)_viewPortHeight, _nearCLip, _farClip); //TODO::remove glm
+	_mInverseProjection = glm::inverse(_mProjection);
 }
-*/
+void CameraStructureImp::setViewPortParams(int height, int width)
+{
+	_viewPortHeight = height;
+	_viewPortWidth = width;
+}
+MatD4 CameraStructureImp::getInverseProjectionMatrix()
+{
+	return _mInverseProjection;
+}
+MatD4 CameraStructureImp::getInverseViewMatrix()
+{
+	return _mInverseView;
+}
+VecD3 CameraStructureImp::getRight() const
+{
+	return _right;
+}
+
+
 

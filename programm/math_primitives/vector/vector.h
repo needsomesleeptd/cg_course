@@ -48,10 +48,12 @@ Vector<T, n> operator/(const Vector<T, n>& lhs, const double& rhs)
 
 //starting shortcuts
 using VecI3 = Vector<int,3>;
+using VecD4 = glm::vec4;
 
+using MatD4 = glm::mat4;
 
 using VecI4 = Vector<int,4>;
-using VecD4 = Vector<double,4>;
+//using VecD4 = Vector<double,4>;
 
 template<typename T, int n>
 Vector<T,3> operator*(const Vector<T,3>& lhs, const Vector<T,3>& rhs)

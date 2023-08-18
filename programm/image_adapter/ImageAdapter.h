@@ -7,7 +7,7 @@
 #include <QImage>
 #include "memory"
 #include "color.h"
-
+#include <QColor>
 class ImageAdapter
 {
  public:

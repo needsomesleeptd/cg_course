@@ -82,7 +82,7 @@ private:
 	void onRemoveCameraButtonClicked();
 	void onAddCameraButtonClicked();
 	void changeCam();
-	//void keyPressEvent(QKeyEvent *event) override;
+	void keyPressEvent(QKeyEvent *event) override;
 };
 
 #endif // MAINWINDOW_H

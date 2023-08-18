@@ -14,9 +14,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 	//_sceneManager->setScene()
 	_drawManager = DrawManagerCreator().createManager();
-	std::shared_ptr<Camera> camera = CameraFactory({0,0,-3},{0,0,-1}).create();
-	_drawManager->setCamera(camera);
-	_sceneManager->getScene()->addCamera(camera);
+
 
 
 	setupScene();
@@ -71,23 +69,29 @@ void MainWindow::setupScene()
 
 	auto cont = ui->graphicsView->contentsRect();
 	_scene->setSceneRect(0, 0, cont.width(), cont.height());
-	ColorRGB red(120,0,0);
-	ColorRGB green(0,120,200);
-	Material materialRed(0.0,0.5,0.8,red);
-	Material materialGreen(0.0,0.5,0.8,green);
+	ColorRGB red(0.4,0,0);
+	ColorRGB green(0,0.5,0.2);
+	Material materialRed(0.1,0.8,0.3,red);
+	Material materialGreen(0.1,0.3,0.8,green);
 
 
 	//std::shared_ptr<Sphere>
-	std::shared_ptr<Sphere> sphereRed = std::make_shared<Sphere>(VecD3({1.0,1.0,-9.0}),6.0,materialRed);
-	std::shared_ptr<Sphere> sphereGreen = std::make_shared<Sphere>(VecD3({1.0,-1.0,-10.0}),6.0,materialGreen);
-	_sceneManager->getScene()->addModel(sphereRed);
+	std::shared_ptr<Sphere> sphereRed = std::make_shared<Sphere>(VecD3({1.0,1.0,0}),1.0,materialRed);
+	std::shared_ptr<Sphere> sphereGreen = std::make_shared<Sphere>(VecD3({1.0,-5.0,0}),1.0,materialGreen);
 	_sceneManager->getScene()->addModel(sphereGreen);
-	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(5.0,-55.0,-12.0),1).create();
-	lightsource->setColor(ColorRGB(255,255,255));
+	_sceneManager->getScene()->addModel(sphereRed);
+	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0,0,0),1).create();
+	lightsource->setColor(ColorRGB(0.5,0.5,0.5));
 	_sceneManager->getScene()->setLightSource(lightsource);
 
 	std::shared_ptr<BaseRenderer> renderer = std::make_shared<Renderer>(_scene);
 	_drawManager->setRenderer(renderer);
+
+
+	std::shared_ptr<Camera> camera = CameraFactory({0,0,-5},{0,0,1}).create();
+	camera->setImageParams(_scene->height(),_scene->width());
+	_drawManager->setCamera(camera);
+	_sceneManager->getScene()->addCamera(camera);
 	updateScene();
 
 }
@@ -97,3 +101,10 @@ void MainWindow::updateScene()
 
 }
 
+void MainWindow::keyPressEvent(QKeyEvent* e)
+{
+	_sceneManager->getScene()->getCamera()->update(e, 1.0f);
+
+	updateScene();
+
+}

@@ -8,6 +8,8 @@
 #include <iostream>
 ColorRGB Renderer::renderPixel(int x, int y, std::shared_ptr<Scene> scene)
 {
+
+
 	Ray tracedRay = createRay(x, y, scene->getCamera());
 	ColorRGB finalColor = backGround;
 	rayTrace(tracedRay, finalColor, scene, 0);
@@ -46,8 +48,8 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 		if (diffuseLight > 0)
 		{
 			//std::cout << " diffuseLight" << diffuseLight << std::endl;
-			float diffuseIntensivity = diffuseLight * shapeMaterial._k_d * currentLightSource->getIntensivity();
-			finalColor = shapeMaterial._color * diffuseIntensivity + finalColor;
+			ColorRGB diffuseColorRay = currentLightSource->getColor() * diffuseLight * shapeMaterial._k_d;
+			finalColor = shapeMaterial._color * diffuseColorRay + finalColor;
 
 		}
 	}
@@ -60,18 +62,16 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 		if (specularDot > 0.0)
 		{
 			//float spec = powf( specularDot, 20 ) * shapeMaterial._k_s;
-			finalColor = currentLightSource->getColor() * specularDot + finalColor;
+			finalColor = currentLightSource->getColor() * specularDot * shapeMaterial._k_s + finalColor;
 		}
 	}
 	if (shapeMaterial._k_s > 0.0f)
 	{
 		VecD3 N = closestShape->getNormal(intersectionPoint);
 		Ray reflected = tracedRay.calculateReflected(shapeNormal, intersectionPoint);
-		VecD3 R = tracedRay.D - 2.0f * dot(tracedRay.D, N) * N;
 		if (curDepth < maxDepth)
 		{
 			ColorRGB rcol(0, 0, 0);
-			float dist;
 			rayTrace(reflected, rcol, scene,curDepth + 1);
 			finalColor = rcol * shapeMaterial._k_s  * closestShape->getMaterial()._color + finalColor;
 		}
@@ -89,16 +89,15 @@ Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)
 	VecD3 up = viewPoint - float(imageHeight / 2);
 	VecD3 down = viewPoint + float(imageHeight / 2);
 
-	VecD3 u_deformation = float(x + 0.5) * (r - l) / float(imageWidth);
-	VecD3 v_deformation = float(y + 0.5) * (up - down) / float(imageHeight);//TODO::fix ray origin
+	//VecD3 u_deformation = float(x) * (r - l) / float(imageWidth);
+	//VecD3 v_deformation = float(y) * (up - down) / float(imageHeight);//TODO::fix ray origin
 	/*VecD3 ray_origin = viewPoint + u_deformation * VecD3(1, 0, 0) + v_deformation * VecD3(0, 1, 0);
 	return Ray(ray_origin, -currentCamera->getViewDirection());*/
 	glm::vec2 coord = { (float)x / (float)imageWidth, (float)y / (float)imageWidth };
 	coord = coord * 2.0f - 1.0f; // -1 -> 1
 
-	glm::vec4 target = 1.0f * glm::vec4(coord.x, coord.y, 1, 1);
-	glm::vec3
-		rayDirection = glm::vec3(1.0f * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0)); // World space
+	glm::vec4 target = currentCamera->getInverseProjectionMatrix() * glm::vec4(coord.x, coord.y, 1, 1);
+	glm::vec3 rayDirection = glm::vec3(currentCamera->getInverseViewMatrix() * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0)); // World space
 	return Ray(viewPoint, rayDirection);
 	/*VecD3 dir =VecD3(4*x,3*y,0) - viewPoint;
 	return Ray(viewPoint,dir);*/
@@ -113,7 +112,7 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 		{
 			ColorRGB pixelColor = renderPixel(i, j, scene);
 			pixelColor.normalize();
-			std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
+			//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
 			image->setPixelColor(i, j, pixelColor);
 		}
 	}

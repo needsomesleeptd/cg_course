@@ -12,9 +12,10 @@ void Sphere::transform(const TransformParams& transformParams)
 }
 double Sphere::intersection(const Ray& ray)
 {
+	VecD3 origin  = ray.E - this->_center;
 	float a = dot(ray.D, ray.D);
-	float b = dot(ray.E * 2.0f, ray.D);
-	float c = dot(ray.E, ray.E) - 1;
+	float b = 2.0f * dot(origin, ray.D);
+	float c = dot(origin, origin) - _radius * _radius;
 	float discriminant = b * b - 4 * a * c;
 	//std::cout << ray.E[0] << ray.E[1] << ray.E[2] << " " << ray.D[0] << ray.D[1] << ray.D[2] << " " << discriminant << std::endl;
 	if (discriminant < 0)

@@ -3,15 +3,15 @@
 //
 
 #include "color.h"
-ColorRGB::ColorRGB(int R_, int G_, int B_) : R(R_), G(G_), B(B_)
+ColorRGB::ColorRGB(float R_, float G_, float B_) : R(R_), G(G_), B(B_)
 {
 
 }
 ColorRGB ColorRGB::operator*(float value)
 {
-	int changedR = R * value;
-	int changedG = G * value;
-	int changedB = B * value;
+	float changedR = R * value;
+	float changedG = G * value;
+	float changedB = B * value;
 	return ColorRGB(changedR, changedG, changedB);
 
 }
@@ -21,12 +21,12 @@ ColorRGB ColorRGB::operator+(const ColorRGB& color)
 }
 void ColorRGB::normalize()
 {
-	if (R > 255)
-		R = 255;
-	if (G > 255)
-		G = 255;
-	if (B > 255)
-		B = 255;
+	if (R > 1.0)
+		R = 1;
+	if (G > 1.0)
+		G = 1;
+	if (B > 1.0)
+		B = 1;
 
 }
 ColorRGB ColorRGB::operator*(const ColorRGB& color)

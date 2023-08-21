@@ -1,6 +1,11 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.26.X)
 
-project(lab_03 VERSION 0.1 LANGUAGES CXX)
+
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
+project(lab_03 VERSION 0.1 LANGUAGES CXX CUDA)
+
+
+set(CMAKE_CUDA_ARCHITECTURES "native")
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
@@ -9,7 +14,14 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
+execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cudaComputeVersion.bash OUTPUT_VARIABLE GENCODE)
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
+set(CUDA_NVCC_FLAGS --expt-relaxed-constexpr)
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; "${GENCODE}")
+set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3 -arch=sm_60)
+message(CUDA_NVCC_FLAGS="${CUDA_NVCC_FLAGS}")
+
+find_package(QT NAMES Qt6  REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
 
@@ -28,12 +40,12 @@ ENDMACRO()
 
 
 set(PROJECT_SOURCES
-        main.cpp
+        main.cu
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
         math_primitives/vector/vector.cpp math_primitives/vector/vector.h math_primitives/vector/vector_exceptions.h
-        math_primitives/ray/ray.cpp math_primitives/ray/ray.h
+        math_primitives/ray/ray.cu math_primitives/ray/ray.h
         visitor/TransformVisitor.h visitor/TransformVisitor.cpp visitor/visitor.h
         object/primitives/transform.h
         object/visibleObject/shapes/sphere/sphere.cpp object/visibleObject/shapes/sphere/sphere.h
@@ -51,7 +63,7 @@ set(PROJECT_SOURCES
         manager/draw/drawManager.cpp manager/draw/drawManager.h
         manager/draw/drawManagerCreator.cpp manager/draw/drawManagerCreator.h
 
-        renderer/Renderer.cpp renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
+        renderer/Renderer.cu renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 
         renderer/baseRenderer.h color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h material/material.cpp material/material.h)
 

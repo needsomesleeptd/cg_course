@@ -4,15 +4,16 @@
 
 #ifndef DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_RAY_RAY_H_
 #define DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_RAY_RAY_H_
+#include  <cuda_runtime.h>
 #include "vector.h"
 
 class Ray
 {
  public:
-	Ray() = default;
-	Ray(const VecD3& eye, const VecD3& direction);
-	Ray calculateReflected(const VecD3& normalToIntersection, const VecD3& intersectionPoint) const;
-	VecD3 getPoint(float t) const;
+	__device__ Ray() {};
+	__device__ Ray(const VecD3& eye, const VecD3& direction);
+	__device__ Ray calculateReflected(const VecD3& normalToIntersection, const VecD3& intersectionPoint) const;
+	__device__ VecD3 getPoint(float t) const;
 	double t;
 	VecD3 E;
 	VecD3 D;

@@ -30,7 +30,7 @@ class CameraStructureImp
 	//[[nodiscard]] Matrix4 getViewDirection();
 	//[[nodiscard]] Matrix4 getProjection() const;
 	void move(const VecD3& moveParams);
-	VecD3 setDirection(const VecD3& direction);
+	void setDirection(const VecD3& direction);
 	void updateView();
 	void updateProjection();
 	void setViewPortParams(int height, int width);

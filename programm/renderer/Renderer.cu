@@ -6,16 +6,16 @@
 #include "scene.h"
 
 #include <iostream>
-ColorRGB Renderer::renderPixel(int x, int y, std::shared_ptr<Scene> scene)
+#include  <cuda_runtime.h>
+
+__device__ ColorRGB Renderer::renderPixel(int x, int y, std::shared_ptr<Scene> scene)
 {
-
-
 	Ray tracedRay = createRay(x, y, scene->getCamera());
 	ColorRGB finalColor = backGround;
 	rayTrace(tracedRay, finalColor, scene, 0);
 	return finalColor;
 }
-void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene, int curDepth)
+__device__  void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene, int curDepth)
 {
 	std::shared_ptr<BaseShape> closestShape;
 	float t = maxRange;
@@ -78,7 +78,7 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 	}
 }
 
-Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)
+__device__  Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)
 {
 	float imageHeight = _scene->height();
 	float imageWidth = _scene->width();
@@ -97,31 +97,48 @@ Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)
 	coord = coord * 2.0f - 1.0f; // -1 -> 1
 
 	glm::vec4 target = currentCamera->getInverseProjectionMatrix() * glm::vec4(coord.x, coord.y, 1, 1);
-	glm::vec3 rayDirection = glm::vec3(currentCamera->getInverseViewMatrix() * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0)); // World space
+	VecD3 rayDirection = VecD3(currentCamera->getInverseViewMatrix() * glm::vec4(glm::normalize(VecD3(target) / target.w), 0)); // World space
 	return Ray(viewPoint, rayDirection);
 	/*VecD3 dir =VecD3(4*x,3*y,0) - viewPoint;
 	return Ray(viewPoint,dir);*/
 }
-void Renderer::renderScene(std::shared_ptr<Scene> scene)
+__device__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
 	std::shared_ptr<ImageAdapter> image = std::make_shared<ImageAdapter>(_scene->width(), _scene->height());
 	auto objects = scene->getModels();//TODO::remove dynamic casting
-	for (int i = 0; i < image->getWidth(); i++)
-	{
-		for (int j = 0; j < image->getHeight(); j++)
-		{
-			ColorRGB pixelColor = renderPixel(i, j, scene);
-			pixelColor.normalize();
-			//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
-			image->setPixelColor(i, j, pixelColor);
-		}
-	}
+	int i = threadIdx.x + blockIdx.x * blockDim.x;
+	int j = threadIdx.y + blockIdx.y * blockDim.y;
+	ColorRGB pixelColor = renderPixel(i, j, scene);
+	pixelColor.normalize();
+	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
+	image->setPixelColor(i, j, pixelColor);
+
+
 	QPixmap pixmap;
 	pixmap.convertFromImage(*image->getImage());
 	_scene->addPixmap(pixmap);
 }
 
+__global__ void renderScene(std::shared_ptr<Scene> scene, std::shared_ptr<BaseRenderer> renderer)
+{
+	std::shared_ptr<ImageAdapter> image = std::make_shared<ImageAdapter>(500,500);
+	auto objects = scene->getModels();//TODO::remove dynamic casting
+	int i = threadIdx.x + blockIdx.x * blockDim.x;
+	int j = threadIdx.y + blockIdx.y * blockDim.y;
+	ColorRGB pixelColor = renderer->renderPixel(i, j, scene);
+	pixelColor.normalize();
+	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
+	image->setPixelColor(i, j, pixelColor);
+	renderer->drawImage(image);
+}
+
 Renderer::Renderer(QGraphicsScene* scene)
 {
 	_scene = scene;
+}
+__device__ void Renderer::drawImage(std::shared_ptr<ImageAdapter> image)
+{
+	QPixmap pixmap;
+	pixmap.convertFromImage(*image->getImage());
+	_scene->addPixmap(pixmap);
 }

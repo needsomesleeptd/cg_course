@@ -1,5 +1,6 @@
 #include "cameraStructure.h"
 #include "vector.h"
+#include "glmWrapper.h"
 
 CameraStructureImp::CameraStructureImp(const  VecD3& coordinates, const  VecD3& direction)
 	: _coordinates(coordinates), _forward(direction)
@@ -63,7 +64,7 @@ void CameraStructureImp::updateView()
 }
 
 
-VecD3 CameraStructureImp::setDirection(const VecD3 & direction)
+void CameraStructureImp::setDirection(const VecD3 & direction)
 {
 	_forward = direction;
 }

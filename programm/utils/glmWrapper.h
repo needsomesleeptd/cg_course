@@ -1,7 +1,7 @@
 #ifndef LAB_03_GLMWRAPPER_H
 #define LAB_03_GLMWRAPPER_H
 
-#include <glm/vec3.hpp>
+#include <glm/glm.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/trigonometric.hpp>

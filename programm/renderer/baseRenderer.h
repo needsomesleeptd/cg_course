@@ -12,9 +12,10 @@
 class BaseRenderer
 {
  public:
-	virtual ColorRGB renderPixel(int x, int y, std::shared_ptr<Scene> scene) = 0;
-	virtual void renderScene(std::shared_ptr<Scene> scene) = 0;
+	__device__ virtual ColorRGB renderPixel(int x, int y, std::shared_ptr<Scene> scene) = 0;
+	__device__ 	virtual void renderScene(std::shared_ptr<Scene> scene) = 0;
 	virtual ~BaseRenderer() = default;
-	virtual void rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene,int curDepth) = 0;
+	__device__ virtual void rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene,int curDepth) = 0;
+	__device__ virtual void drawImage(std::shared_ptr<ImageAdapter> image) = 0;
 };
 #endif //LAB_03_CG_COURSE_PROGRAMM_RENDERER_BASERENDERER_H_

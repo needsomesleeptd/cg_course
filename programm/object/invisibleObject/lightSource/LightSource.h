@@ -16,20 +16,20 @@ class LightSource : public BaseLightSource
 	//friend void TransformVisitor::visit(LightSource& lightSorce) const;
 	friend TransformVisitor;
 
-	LightSource();
-	LightSource(const  VecD3& position,double intensivity);
+	__device__ LightSource();
+	__device__ LightSource(const  VecD3& position,double intensivity);
 
 	~LightSource() = default;
 
-	VecD3 getPosition() override;
-	void setPosition(const  VecD3& newPosition) override;
+	__device__ VecD3 getPosition() override;
+	__device__ void setPosition(const  VecD3& newPosition) override;
 
-	double getIntensivity() override;
-	void setIntensivity(double newIntensivity);
+	__device__ double getIntensivity() override;
+	__device__ void setIntensivity(double newIntensivity);
 
-	void accept(std::shared_ptr<Visitor> visitor);
-	ColorRGB getColor() override;
-	void setColor(const ColorRGB& color) override;
+	__device__ void accept(std::shared_ptr<Visitor> visitor);
+	__device__ ColorRGB getColor() override;
+	__device__ void setColor(const ColorRGB& color) override;
  private:
 	 VecD3 _position;
 	 double _intensivity;

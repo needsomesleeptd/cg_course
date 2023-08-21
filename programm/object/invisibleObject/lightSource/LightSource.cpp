@@ -5,35 +5,35 @@
 #include "LightSource.h"
 
 
-LightSource::LightSource()
+__device__ LightSource::LightSource()
 {
 	_intensivity = 1;
 	_position =  VecD3({ 0.0, 0.0, 0.0 });
 	_color = ColorRGB(255,255,25);
 }
- VecD3 LightSource::getPosition()
+__device__ VecD3 LightSource::getPosition()
 {
 	return  VecD3(_position); //TODO::Might slow down
 }
-void LightSource::setPosition(const  VecD3& newPosition)
+__device__ void LightSource::setPosition(const  VecD3& newPosition)
 {
 	_position = newPosition;
 }
-double LightSource::getIntensivity()
+__device__ double LightSource::getIntensivity()
 {
 	return _intensivity;
 }
-void LightSource::setIntensivity(double newIntensivity)
+__device__ void LightSource::setIntensivity(double newIntensivity)
 {
 	_intensivity = newIntensivity;
 }
-LightSource::LightSource(const  VecD3& position, double intensivity)
+__device__ LightSource::LightSource(const  VecD3& position, double intensivity)
 {
 	_position = position;
 	_intensivity = intensivity;
 }
 
-LightSourceFactory::LightSourceFactory(const  VecD3& position, double intensivity)
+__device__ LightSourceFactory::LightSourceFactory(const  VecD3& position, double intensivity)
 {
 	_position = position;
 	_intensivity = intensivity;

@@ -15,11 +15,11 @@ class BaseObject
  public:
 	BaseObject() = default;
 	virtual ~BaseObject() = default;
-	virtual double intersection(const Ray& ray)
+	__device__ virtual double intersection(const Ray& ray)
 	{
 		return -1.0;
 	};
-	virtual Material getMaterial()
+	__device__ virtual Material getMaterial()
 	{
 		return Material();
 	};
@@ -33,7 +33,7 @@ class BaseObject
 		return false;
 	};
 
-	virtual void accept(std::shared_ptr<Visitor> visitor) = 0;
+	__device__ virtual void accept(std::shared_ptr<Visitor> visitor) = 0;
 
 	virtual bool add(const std::shared_ptr<BaseObject>&)
 	{

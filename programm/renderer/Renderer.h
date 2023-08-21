@@ -22,7 +22,7 @@ class Renderer : public BaseRenderer
 {
  public:
 	explicit Renderer(QGraphicsScene *scene);
-	Ray createRay(int x, int y, std::shared_ptr<Camera> currentCamera);
+	__device__ Ray createRay(int x, int y, std::shared_ptr<Camera> currentCamera);
 	__device__	ColorRGB renderPixel(int x, int y, std::shared_ptr<Scene> scene) override;
 	__device__ void renderScene(std::shared_ptr<Scene> scene) override;
 	__device__ void rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene,int curDepth) override;

@@ -5,12 +5,12 @@
 #include "sphere.h"
 #include "vector.h"
 #include <iostream> //TODO::remove after print
-void Sphere::transform(const TransformParams& transformParams)
+__device__ void Sphere::transform(const TransformParams& transformParams)
 {
 	_center += transformParams.getMoveParams();
 	_radius += transformParams.getScaleParams()[0];
 }
-double Sphere::intersection(const Ray& ray)
+__device__ double Sphere::intersection(const Ray& ray)
 {
 	VecD3 origin  = ray.E - this->_center;
 	float a = dot(ray.D, ray.D);
@@ -39,30 +39,30 @@ double Sphere::intersection(const Ray& ray)
 	}
 
 }
-void Sphere::setSpectralParams(float k_a, float k_d, float k_s)
+__device__ void Sphere::setSpectralParams(float k_a, float k_d, float k_s)
 {
 	_material._k_a = k_a;
 	_material._k_d = k_d;
 	_material._k_s = k_s;
 }
-void Sphere::setColorParams(const ColorRGB& color)
+__device__ void Sphere::setColorParams(const ColorRGB& color)
 {
 	_material._color = color;
 }
-Material Sphere::getMaterial()
+__device__ Material Sphere::getMaterial()
 {
 	return _material;
 }
-VecD3 Sphere::getNormal(VecD3 intersectionPoint)
+__device__ VecD3 Sphere::getNormal(VecD3 intersectionPoint)
 {
 	return (intersectionPoint - _center) * float(_radius);
 }
-Sphere::Sphere(const VecD3& center, double radius, const Material& material)
+__device__ Sphere::Sphere(const VecD3& center, double radius, const Material& material)
 	: _center(center), _radius(radius), _material(material)
 {
 
 }
-void Sphere::accept(std::shared_ptr<Visitor> visitor)
+__device__ void Sphere::accept(std::shared_ptr<Visitor> visitor)
 {
 	visitor->visit(*this);
 }

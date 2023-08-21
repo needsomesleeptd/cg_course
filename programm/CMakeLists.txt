@@ -1,9 +1,7 @@
 cmake_minimum_required(VERSION 3.26.X)
 
-
-set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
+set(CMAKE_CUDA_COMPILER "/usr/bin/nvcc")
 project(lab_03 VERSION 0.1 LANGUAGES CXX CUDA)
-
 
 set(CMAKE_CUDA_ARCHITECTURES "native")
 
@@ -14,16 +12,21 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cudaComputeVersion.bash OUTPUT_VARIABLE GENCODE)
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
-set(CUDA_NVCC_FLAGS --expt-relaxed-constexpr)
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; "${GENCODE}")
-set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3 -arch=sm_60)
-message(CUDA_NVCC_FLAGS="${CUDA_NVCC_FLAGS}")
 
-find_package(QT NAMES Qt6  REQUIRED COMPONENTS Widgets)
+#set(CUDA_NVCC_FLAGS "--expt-relaxed-constexpr")
+#set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}${GENCODE}")
+#set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3 -arch=sm_60)
+#set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+#message(CUDA_NVCC_FLAGS="${CUDA_NVCC_FLAGS}")
+
+
+
+find_package(QT NAMES Qt5  REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 
+find_package(glm REQUIRED)
+target_link_libraries(glm::glm)
 
 
 MACRO(HEADER_DIRECTORIES return_list)
@@ -101,6 +104,13 @@ target_include_directories(
 find_library(LIBCONFIGPP_LOCATION libconfig++)
 find_library(LIBCONFIG_LOCATION libconfig)
 target_link_libraries(lab_03 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets -L/opt/homebrew/Cellar/libconfig/1.7.3/lib -lconfig++)
+
+target_compile_options(lab_03 PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
+        --generate-line-info
+        --use_fast_math
+        --relocatable-device-code=true
+        --expt-relaxed-constexpr
+        >)
 
 set_target_properties(lab_03  PROPERTIES
         MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com

@@ -4,21 +4,23 @@
 
 #ifndef LAB_03_CG_COURSE_PROGRAMM_IMAGE_ADAPTER_IMAGEADAPTER_H_
 #define LAB_03_CG_COURSE_PROGRAMM_IMAGE_ADAPTER_IMAGEADAPTER_H_
-#include <QImage>
-#include "memory"
-#include "color.h"
-#include <QColor>
+#include <vector>
+#include "cudaUtils.h"
+#include "../color/color.h"
 class ImageAdapter
 {
  public:
-	ImageAdapter();
-	explicit ImageAdapter(int width,int height);
-	void setPixelColor(int x,int y,ColorRGB color);
-	int getWidth();
-	int getHeight();
-	std::shared_ptr<QImage> getImage();
+	__device__ ImageAdapter();
+	__device__ explicit ImageAdapter(int width,int height);
+	__device__ void setPixelColor(int x,int y,ColorRGB color);
+	__device__ int getWidth();
+	__device__ int getHeight();
+	__device__ ImageAdapter getImage();
+	__device__ ~ImageAdapter();
  private:
-	std::shared_ptr<QImage> image;
+	ColorRGB* colorMatrix;
+	int width;
+	int height;
 };
 
 #endif //LAB_03_CG_COURSE_PROGRAMM_IMAGE_ADAPTER_IMAGEADAPTER_H_

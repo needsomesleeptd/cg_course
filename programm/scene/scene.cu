@@ -52,3 +52,4 @@ std::shared_ptr<BaseLightSource> Scene::getLightSource()
 {
 	return _lightSource;
 }
+

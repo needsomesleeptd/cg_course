@@ -5,17 +5,18 @@
 #include "object.h"
 #include "baseCamera.h"
 #include "baseLightSource.h"
+#include <thrust/device_vector.h>
 
 class Scene
 {
  public:
-	Scene();
+	 Scene();
 	~Scene() = default;
 
-	std::vector<std::shared_ptr<BaseObject>> getModels();
-	std::vector<std::shared_ptr<Camera>> getCameras();
-	std::shared_ptr<BaseLightSource> getLightSource();
-	std::shared_ptr<Composite> getComposite();
+	__host__ std::vector<std::shared_ptr<BaseObject>> getModels();
+	 std::vector<std::shared_ptr<Camera>> getCameras();
+	 std::shared_ptr<BaseLightSource> getLightSource();
+	 std::shared_ptr<Composite> getComposite();
 
 	void addModel(const std::shared_ptr<BaseObject>& model);
 	void addCamera(const std::shared_ptr<Camera>& camera);

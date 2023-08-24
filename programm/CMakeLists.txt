@@ -1,23 +1,23 @@
-cmake_minimum_required(VERSION 3.26.X)
+cmake_minimum_required(VERSION 3.26.3)
 
-set(CMAKE_CUDA_COMPILER "/usr/bin/nvcc")
+#set(CMAKE_CUDA_COMPILER "/usr/bin/cc")
 project(lab_03 VERSION 0.1 LANGUAGES CXX CUDA)
 
-set(CMAKE_CUDA_ARCHITECTURES "native")
+#set(CMAKE_CUDA_ARCHITECTURES "native")
 
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#set(CMAKE_CXX_STANDARD 17)
+#set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 #set(CUDA_NVCC_FLAGS "--expt-relaxed-constexpr")
 #set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}${GENCODE}")
 #set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3 -arch=sm_60)
-#set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
+set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
 #message(CUDA_NVCC_FLAGS="${CUDA_NVCC_FLAGS}")
 
 
@@ -58,7 +58,7 @@ set(PROJECT_SOURCES
         object/invisibleObject/baseCamera.h
         object/invisibleObject/camera.h
         object/invisibleObject/camera.cpp
-        scene/scene.cpp scene/scene.h
+        scene/scene.cu scene/scene.h
         object/visibleObject/composite.cpp object/visibleObject/composite.h
         utils/glmWrapper.h utils/glmWrapper.cpp
         manager/scene/sceneManager.cpp manager/scene/sceneManager.h
@@ -68,7 +68,7 @@ set(PROJECT_SOURCES
 
         renderer/Renderer.cu renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 
-        renderer/baseRenderer.h color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h material/material.cpp material/material.h)
+        renderer/baseRenderer.h color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(lab_03
@@ -123,6 +123,8 @@ set_target_properties(lab_03  PROPERTIES
 install(TARGETS lab_03
         BUNDLE DESTINATION .
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+
+
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(lab_03)

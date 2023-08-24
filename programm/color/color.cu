@@ -19,7 +19,7 @@ ColorRGB ColorRGB::operator+(const ColorRGB& color)
 {
 	return ColorRGB(this->R + color.R, this->G + color.G, this->B + color.B);
 }
-void ColorRGB::normalize()
+__device__ void ColorRGB::normalize()
 {
 	if (R > 1.0)
 		R = 1;

@@ -1,6 +1,9 @@
 //
 // Created by Андрей on 03.06.2023.
 //
+
+#include <memory>
+
 #include "TransformVisitor.h"
 #include "camera.h"
 

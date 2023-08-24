@@ -13,7 +13,7 @@
 #include "../object/invisibleObject/camera.h"
 #include "../color/color.h"
 #include "../image_adapter/ImageAdapter.h"
-#include <QGraphicsScene>
+
 
 const float EPS = 1e-7;
 const float maxRange = 1e9;
@@ -23,14 +23,13 @@ const ColorRGB backGround = ColorRGB(0, 0, 0);
 class Renderer : public BaseRenderer
 {
  public:
-	explicit Renderer(QGraphicsScene* scene);
+	explicit Renderer();
 	__device__ Ray createRay(int x, int y, Camera* currentCamera);
 	__device__    ColorRGB renderPixel(int x, int y, Scene* scene, Camera* camera) override;
 	__host__  void renderScene(std::shared_ptr<Scene> scene) override;
 	__device__ void rayTrace(const Ray& tracedRay, ColorRGB& finalColor, Scene* scene, int curDepth) override;
-	void drawImage(ImageAdapter* image);
- private:
-	QGraphicsScene* _scene;
+	void getImage(ImageAdapter* image);
+
 };
 
 __device__  void rayTrace(const Ray& tracedRay,

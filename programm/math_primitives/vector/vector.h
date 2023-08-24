@@ -9,7 +9,91 @@
 
 using MatD4 = Matrix4;
 
-class VecD4;
+class VecD4
+{
+
+ public:
+	__host__ __device__ VecD4()
+	{
+	}
+	__host__ __device__ VecD4(float e0, float e1, float e2, float e3)
+	{
+		e[0] = e0;
+		e[1] = e1;
+		e[2] = e2;
+		e[3] = e3;
+	}
+	__host__ __device__ inline float x() const
+	{
+		return e[0];
+	}
+	__host__ __device__ inline float y() const
+	{
+		return e[1];
+	}
+	__host__ __device__ inline float z() const
+	{
+		return e[2];
+	}
+
+	__host__ __device__ inline float w() const
+	{
+		return e[3];
+	}
+	__host__ __device__ inline float r() const
+	{
+		return e[0];
+	}
+	__host__ __device__ inline float g() const
+	{
+		return e[1];
+	}
+	__host__ __device__ inline float b() const
+	{
+		return e[2];
+	}
+
+	__host__ __device__ inline float h() const
+	{
+		return e[3];
+	}
+
+	__host__ __device__ inline const VecD4 operator+() const
+	{
+		return *this;
+	}
+	__host__ __device__ inline  VecD4 operator-() const
+	{
+		return VecD4(-e[0], -e[1], -e[2], -e[3]);
+	}
+	__host__ __device__ inline float operator[](int i) const
+	{
+		return e[i];
+	}
+	__host__ __device__ inline float& operator[](int i)
+	{
+		return e[i];
+	};
+
+	__host__ __device__ inline VecD4& operator+=(const VecD4& v2);
+	__host__ __device__ inline VecD4& operator-=(const VecD4& v2);
+	__host__ __device__ inline VecD4& operator*=(const VecD4& v2);
+	__host__ __device__ inline VecD4& operator/=(const VecD4& v2);
+	__host__ __device__ inline VecD4& operator*=(const float t);
+	__host__ __device__ inline VecD4& operator/=(const float t);
+
+	__host__ __device__ inline float length() const
+	{
+		return sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2] + e[3] * e[3]);
+	}
+	__host__ __device__ inline float squared_length() const
+	{
+		return e[0] * e[0] + e[1] * e[1] + e[2] * e[2] + e[3] * e[3];
+	}
+	__host__ __device__ inline void make_unit_vector();
+
+	float e[4];
+};
 
 class VecD3
 {
@@ -25,7 +109,12 @@ class VecD3
 		e[2] = e2;
 	}
 
-	__host__ __device__ VecD3(const VecD4& ref);
+	__host__ __device__ VecD3(const VecD4& ref)
+	{
+		e[0] = ref.x();
+		e[1] = ref.y();
+		e[2] = ref.z();
+	}
 
 	__host__ __device__ inline float x() const
 	{
@@ -214,91 +303,7 @@ __host__ __device__ inline VecD3 normalise(VecD3 v)
 	return v / v.length();
 }
 
-class VecD4
-{
 
- public:
-	__host__ __device__ VecD4()
-	{
-	}
-	__host__ __device__ VecD4(float e0, float e1, float e2, float e3)
-	{
-		e[0] = e0;
-		e[1] = e1;
-		e[2] = e2;
-		e[3] = e3;
-	}
-	__host__ __device__ inline float x() const
-	{
-		return e[0];
-	}
-	__host__ __device__ inline float y() const
-	{
-		return e[1];
-	}
-	__host__ __device__ inline float z() const
-	{
-		return e[2];
-	}
-
-	__host__ __device__ inline float w() const
-	{
-		return e[3];
-	}
-	__host__ __device__ inline float r() const
-	{
-		return e[0];
-	}
-	__host__ __device__ inline float g() const
-	{
-		return e[1];
-	}
-	__host__ __device__ inline float b() const
-	{
-		return e[2];
-	}
-
-	__host__ __device__ inline float h() const
-	{
-		return e[3];
-	}
-
-	__host__ __device__ inline const VecD4 operator+() const
-	{
-		return *this;
-	}
-	__host__ __device__ inline  VecD4 operator-() const
-	{
-		return VecD4(-e[0], -e[1], -e[2], -e[3]);
-	}
-	__host__ __device__ inline float operator[](int i) const
-	{
-		return e[i];
-	}
-	__host__ __device__ inline float& operator[](int i)
-	{
-		return e[i];
-	};
-
-	__host__ __device__ inline VecD4& operator+=(const VecD4& v2);
-	__host__ __device__ inline VecD4& operator-=(const VecD4& v2);
-	__host__ __device__ inline VecD4& operator*=(const VecD4& v2);
-	__host__ __device__ inline VecD4& operator/=(const VecD4& v2);
-	__host__ __device__ inline VecD4& operator*=(const float t);
-	__host__ __device__ inline VecD4& operator/=(const float t);
-
-	__host__ __device__ inline float length() const
-	{
-		return sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2] + e[3] * e[3]);
-	}
-	__host__ __device__ inline float squared_length() const
-	{
-		return e[0] * e[0] + e[1] * e[1] + e[2] * e[2] + e[3] * e[3];
-	}
-	__host__ __device__ inline void make_unit_vector();
-
-	float e[4];
-};
 
 inline std::istream& operator>>(std::istream& is, VecD4& t)
 {
@@ -423,11 +428,6 @@ __host__ __device__ inline VecD4 normalise(VecD4 v)
 }
 
 
-__host__ __device__ VecD3::VecD3(const VecD4& ref)
-{
-	e[0] = ref.x();
-	e[1] = ref.y();
-	e[2] = ref.z();
-}
+
 
 #endif //DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_VECTOR_VECTOR_H_

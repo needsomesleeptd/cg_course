@@ -84,7 +84,7 @@ void MainWindow::setupScene()
 	lightsource->setColor(ColorRGB(0.5,0.5,0.5));
 	_sceneManager->getScene()->setLightSource(lightsource);
 
-	std::shared_ptr<BaseRenderer> renderer = std::make_shared<Renderer>(_scene);
+	std::shared_ptr<BaseRenderer> renderer = std::make_shared<Renderer>();
 	_drawManager->setRenderer(renderer);
 
 

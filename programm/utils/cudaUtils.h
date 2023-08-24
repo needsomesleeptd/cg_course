@@ -13,7 +13,7 @@
 #include <iostream>
 
 #define gpuErrorCheck(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-__device__  void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+__device__  inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
 {
 	if (code != cudaSuccess)
 	{
@@ -24,7 +24,7 @@ __device__  void gpuAssert(cudaError_t code, const char *file, int line, bool ab
 
 #define cpuErrorCheck(val) cpuAssert( (val), #val, __FILE__, __LINE__ )
 
-void cpuAssert(cudaError_t result, char const *const func, const char *const file, int const line) {
+inline void cpuAssert(cudaError_t result, char const *const func, const char *const file, int const line) {
 	if (result) {
 		std::cerr << "CUDA error = " << static_cast<unsigned int>(result) << " at " <<
 		          file << ":" << line << " '" << func << "' \n";

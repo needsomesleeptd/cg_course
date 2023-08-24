@@ -1,32 +1,8 @@
-cmake_minimum_required(VERSION 3.26.3)
+cmake_minimum_required(VERSION 3.24.3)
 
-#set(CMAKE_CUDA_COMPILER "/usr/bin/cc")
 project(lab_03 VERSION 0.1 LANGUAGES CXX CUDA)
 
-#set(CMAKE_CUDA_ARCHITECTURES "native")
 
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-#set(CMAKE_CXX_STANDARD 17)
-#set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
-
-#set(CUDA_NVCC_FLAGS "--expt-relaxed-constexpr")
-#set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}${GENCODE}")
-#set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS}; -O3 -arch=sm_60)
-set(CMAKE_CUDA_SEPARABLE_COMPILATION ON)
-#message(CUDA_NVCC_FLAGS="${CUDA_NVCC_FLAGS}")
-
-
-
-find_package(QT NAMES Qt5  REQUIRED COMPONENTS Widgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
-
-find_package(glm REQUIRED)
-target_link_libraries(glm::glm)
 
 
 MACRO(HEADER_DIRECTORIES return_list)
@@ -43,7 +19,7 @@ ENDMACRO()
 
 
 set(PROJECT_SOURCES
-        main.cu
+        main.cpp
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
@@ -66,32 +42,49 @@ set(PROJECT_SOURCES
         manager/draw/drawManager.cpp manager/draw/drawManager.h
         manager/draw/drawManagerCreator.cpp manager/draw/drawManagerCreator.h
 
-        renderer/Renderer.cu renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
+         object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 
-        renderer/baseRenderer.h color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h)
+         color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h)
 
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(lab_03
-            MANUAL_FINALIZATION
-            ${PROJECT_SOURCES}
-            )
-    # Define target properties for Android with Qt 6 as:
-    #    set_property(TARGET lab_03 APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-    #                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-    # For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
-else()
-    if(ANDROID)
-        add_library(lab_03 SHARED
-                ${PROJECT_SOURCES}
-                )
-        # Define properties for Android with Qt 5 after find_package() calls as:
-        #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(lab_03
-                ${PROJECT_SOURCES}
-                )
-    endif()
-endif()
+
+
+
+find_package(CUDA REQUIRED)
+
+message("CUDA_TOOLKIT_ROOT_DIR: ${CUDA_TOOLKIT_ROOT_DIR}")
+message("cuda version: ${CUDA_VERSION_STRING}")
+
+include_directories(
+        ${CUDA_INCLUDE_DIRS}
+        ${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc
+)
+
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++11 -gencode arch=compute_61,code=sm_61 -DNDEBUG")
+message("CMAKE_CUDA_FLAGS: ${CMAKE_CUDA_FLAGS}")
+
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(QT_DIR "/opt/Qt5.12.0")
+set(QT_SUB_DIR "5.12.0")
+find_package(Qt5 COMPONENTS Widgets Gui OpenGL HINTS ${QT_DIR}/${QT_SUB_DIR}/gcc_64/lib/cmake/Qt5)
+
+
+set(CMAKE_CXX_STANDARD 17)
+
+
+CUDA_ADD_EXECUTABLE(lab_03 ${PROJECT_SOURCES})
+target_compile_options(lab_03 PUBLIC -fPIC)
+
+target_link_libraries(lab_03
+        Qt5::Widgets
+        ${CUDA_LIBRARIES}
+        ${CUDA_cudadevrt_LIBRARY}
+        )
+
 HEADER_DIRECTORIES(header_dir_list)
 
 target_include_directories(
@@ -100,32 +93,23 @@ target_include_directories(
         ${header_dir_list}
 )
 
+list(APPEND CUDA_NVCC_FLAGS -Xcompiler -fopenmp)
 
-find_library(LIBCONFIGPP_LOCATION libconfig++)
-find_library(LIBCONFIG_LOCATION libconfig)
-target_link_libraries(lab_03 PRIVATE Qt${QT_VERSION_MAJOR}::Widgets -L/opt/homebrew/Cellar/libconfig/1.7.3/lib -lconfig++)
+CUDA_ADD_LIBRARY(rendererLib SHARED
+       renderer/baseRenderer.h
+        renderer/Renderer.h
+        renderer/Renderer.cu
+        OPTIONS ${CUDA_NVCC_FLAGS}
+        )
+target_include_directories(
+        rendererLib
+        PUBLIC
+        ${header_dir_list}
+)
 
-target_compile_options(lab_03 PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:
-        --generate-line-info
-        --use_fast_math
-        --relocatable-device-code=true
-        --expt-relaxed-constexpr
-        >)
-
-set_target_properties(lab_03  PROPERTIES
-        MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
-        MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-        MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-        MACOSX_BUNDLE TRUE
-        WIN32_EXECUTABLE TRUE
+target_link_libraries(rendererLib
+        Qt5::Widgets
         )
 
-install(TARGETS lab_03
-        BUNDLE DESTINATION .
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-
-
-if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(lab_03)
-endif()
+TARGET_LINK_LIBRARIES(lab_03 rendererLib)

@@ -11,11 +11,11 @@ struct ColorRGB
 {
  public:
 	ColorRGB() = default;
-	ColorRGB(float R_, float G_, float B_);
-	ColorRGB operator*(float value);
-	ColorRGB operator+(const ColorRGB& color);
-	ColorRGB operator*(const ColorRGB& color);
-	__device__ void normalize();
+	__host__ __device__ ColorRGB(float R_, float G_, float B_);
+	__host__ __device__ ColorRGB operator*(float value);
+	__host__ __device__ ColorRGB operator+(const ColorRGB& color);
+	__host__ __device__ ColorRGB operator*(const ColorRGB& color);
+	__host__ __device__ void normalize();
 	float R;
 	float G;
 	float B;

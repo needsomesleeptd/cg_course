@@ -5,7 +5,7 @@
 #include "Renderer.h"
 #include "scene.h"
 
-#include "vector.h"
+#include "color.h"
 #include "../scene/scene.h"
 #include "../object/invisibleObject/camera.h"
 #include "../image_adapter/ImageAdapter.h"
@@ -21,7 +21,7 @@ __device__  void rayTrace(const Ray& tracedRay,
 {
 	BaseShape* closestShape;
 	float t = maxRange;
-	for (thrust::device_vector<BaseShape*>::iterator shape = objects.begin(); shape != objects.end(); shape++)
+	/*for (thrust::device_vector<BaseShape*>::iterator shape = objects.begin(); shape != objects.end(); shape++)
 	{
 
 		float intersection_t = (**shape).intersection(tracedRay);
@@ -77,7 +77,7 @@ __device__  void rayTrace(const Ray& tracedRay,
 			rayTrace(reflected, rcol, scene, curDepth + 1, objects, lightSource);
 			finalColor = rcol * shapeMaterial._k_s * closestShape->getMaterial()._color + finalColor;
 		}
-	}
+	}*/
 }
 
 __device__  Ray createRay(int x, int y, Camera* currentCamera, ImageAdapter* image)
@@ -109,13 +109,13 @@ __device__ ColorRGB renderPixel(int x,
 	int y,
 	Scene* scene,
 	Camera* camera,
-	thrust::device_vector<BaseObject*> objects,
+	thrust::device_vector<BaseShape*> objects,
 	BaseLightSource* lightSource,
 	ImageAdapter* image)
 {
 	Ray tracedRay = createRay(x, y, camera, image);
-	ColorRGB finalColor = backGround;
-	rayTrace(tracedRay, finalColor, scene, 0, objects, lightSource);
+	ColorRGB finalColor;
+//	rayTrace(tracedRay, finalColor, scene, 0, objects, lightSource);
 	return finalColor;
 }
 
@@ -128,10 +128,10 @@ __global__ void renderSceneCuda(Scene* scene,
 
 	int i = threadIdx.x + blockIdx.x * blockDim.x;
 	int j = threadIdx.y + blockIdx.y * blockDim.y;
-	ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource);
+	/*ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource);
 	pixelColor.normalize();
 	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
-	image->setPixelColor(i, j, pixelColor);
+	image->setPixelColor(i, j, pixelColor);*/
 }
 
 __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
@@ -160,23 +160,18 @@ __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 	ImageAdapter* image,
 	thrust::device_vector<BaseObject*> objects, BaseLightSource* lightSource
 	 */
-	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, image.get()
-	deviceObjects, lightSource.get());
+	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, image.get(), deviceObjects, lightSource.get());
 
 	cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());
 
 }
 
-Renderer::Renderer(QGraphicsScene* scene)
+Renderer::Renderer() = default;
+
+__host__   void Renderer::getImage(ImageAdapter* image)
 {
-	_scene = scene;
-}
-__host__   void Renderer::drawImage(ImageAdapter* image)
-{
-	//QPixmap pixmap;
-	//pixmap.convertFromImage(*image->getImage());
-	//_scene->addPixmap(pixmap);
+	;
 }
 __device__ Ray Renderer::createRay(int x, int y, Camera* currentCamera)
 {

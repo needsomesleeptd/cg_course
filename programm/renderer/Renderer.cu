@@ -2,7 +2,7 @@
 // Created by Андрей on 09.08.2023.
 //
 
-#include "Renderer.h"
+#include "Renderer.cuh"
 #include "scene.h"
 
 #include "color.h"
@@ -109,8 +109,8 @@ __device__ ColorRGB renderPixel(int x,
 	int y,
 	Scene* scene,
 	Camera* camera,
-	thrust::device_vector<BaseShape*> objects,
-	BaseLightSource* lightSource,
+	CudaArray<Sphere*> objects,
+	LightSource* lightSource,
 	ImageAdapter* image)
 {
 	Ray tracedRay = createRay(x, y, camera, image);
@@ -121,17 +121,17 @@ __device__ ColorRGB renderPixel(int x,
 
 __global__ void renderSceneCuda(Scene* scene,
 	Camera* camera,
-	BaseRenderer* renderer,
+	Renderer* renderer,
 	ImageAdapter* image,
-	thrust::device_vector<BaseObject*> objects, BaseLightSource* lightSource)
+	CudaArray<Sphere*> objects, LightSource* lightSource)
 {
 
 	int i = threadIdx.x + blockIdx.x * blockDim.x;
 	int j = threadIdx.y + blockIdx.y * blockDim.y;
-	/*ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource);
-	pixelColor.normalize();
+	//ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource);
+	//pixelColor.normalize();
 	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
-	image->setPixelColor(i, j, pixelColor);*/
+	//image->setPixelColor(i, j, pixelColor);
 }
 
 __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
@@ -143,31 +143,30 @@ __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 	std::shared_ptr<ImageAdapter> image = std::make_shared<ImageAdapter>(nx, ny);
 	std::shared_ptr<Camera> camera = scene->getCamera();
 	std::shared_ptr<BaseLightSource> lightSource = scene->getLightSource();
-	thrust::device_vector < BaseObject * > deviceObjects;
+	thrust::device_vector < Sphere * > deviceObjects;
 
 	auto hostObjects = scene->getModels();
 	/*for (int i = 0; i < hostObjects.size(); i++)
 	{
 		deviceObjects.push_back(hostObjects[i].get());
 	}*/
+	CudaArray< Sphere *> deviceVector;
+	deviceVector.values =  thrust::raw_pointer_cast(deviceObjects.data());
+	deviceVector.n = deviceObjects.size();
 
 	dim3 blocks(nx / blockX + 1, ny / blockY + 1);
 	dim3 threads(blockX, blockY);
-	/*
-	Scene* scene,
-	Camera* camera,
-	BaseRenderer* renderer,
-	ImageAdapter* image,
-	thrust::device_vector<BaseObject*> objects, BaseLightSource* lightSource
-	 */
-	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, image.get(), deviceObjects, lightSource.get());
+	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, image.get(), deviceVector, lightSource.get());
 
 	cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());
 
 }
 
-Renderer::Renderer() = default;
+/*Renderer::Renderer(QGraphicsScene* scene)
+{
+	_scene = scene;
+}*/
 
 __host__   void Renderer::getImage(ImageAdapter* image)
 {

@@ -38,7 +38,7 @@ void Camera::setImageParams(int height, int width)
 {
 	_cameraStructure->setViewPortParams(height, width);
 }
-void Camera::update(QKeyEvent* e, float time)
+/*void Camera::update(QKeyEvent* e, float time)
 {
 	float movementspeed = 1.0f;
 	float rotationspeed = 1.0f;
@@ -73,7 +73,7 @@ void Camera::update(QKeyEvent* e, float time)
 		_cameraStructure->updateView();
 		_cameraStructure->updateProjection();
 	}
-}
+}*/
 MatD4 Camera::getInverseProjectionMatrix()
 {
 	return _cameraStructure->getInverseProjectionMatrix();

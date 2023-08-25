@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 #include "sphere.h"
 #include "camera.h"
-#include "Renderer.h"
+#include "Renderer.cuh"
 #include "LightSource.h"
 
 MainWindow::MainWindow(QWidget* parent)
@@ -103,7 +103,7 @@ void MainWindow::updateScene()
 
 void MainWindow::keyPressEvent(QKeyEvent* e)
 {
-	_sceneManager->getScene()->getCamera()->update(e, 1.0f);
+	//_sceneManager->getScene()->getCamera()->update(e, 1.0f);
 
 	updateScene();
 

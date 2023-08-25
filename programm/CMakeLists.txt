@@ -1,7 +1,20 @@
-cmake_minimum_required(VERSION 3.24.3)
+cmake_minimum_required(VERSION 3.26.X)
 
-project(lab_03 VERSION 0.1 LANGUAGES CXX CUDA)
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
 
+project(lab_03 VERSION 0.1 LANGUAGES CUDA CXX)
+
+include(CheckLanguage)
+check_language(CUDA)
+
+if(CMAKE_CUDA_COMPILER)
+    enable_language(CUDA)
+    find_package(CUDAToolkit)
+    #target_link_libraries(rendererLib CUDA::cudart)
+    #target_link_libraries(rendererLib CUDA::cuda_driver)
+else()
+    message(STATUS "No CUDA compiler found")
+endif()
 
 
 
@@ -15,7 +28,7 @@ MACRO(HEADER_DIRECTORIES return_list)
     LIST(REMOVE_DUPLICATES dir_list)
     SET(${return_list} ${dir_list})
 ENDMACRO()
-
+HEADER_DIRECTORIES(header_dir_list)
 
 
 set(PROJECT_SOURCES
@@ -42,15 +55,17 @@ set(PROJECT_SOURCES
         manager/draw/drawManager.cpp manager/draw/drawManager.h
         manager/draw/drawManagerCreator.cpp manager/draw/drawManagerCreator.h
 
-         object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
+        object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 
-         color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h)
+        color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h)
+
 
 
 
 
 find_package(CUDA REQUIRED)
 
+set(CUDA_TOOLKIT_ROOT_DIR " usr/local/cuda-12.2")
 message("CUDA_TOOLKIT_ROOT_DIR: ${CUDA_TOOLKIT_ROOT_DIR}")
 message("cuda version: ${CUDA_VERSION_STRING}")
 
@@ -59,7 +74,7 @@ include_directories(
         ${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc
 )
 
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++11 -gencode arch=compute_61,code=sm_61 -DNDEBUG")
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++11  -DNDEBUG")
 message("CMAKE_CUDA_FLAGS: ${CMAKE_CUDA_FLAGS}")
 
 
@@ -79,13 +94,45 @@ set(CMAKE_CXX_STANDARD 17)
 CUDA_ADD_EXECUTABLE(lab_03 ${PROJECT_SOURCES})
 target_compile_options(lab_03 PUBLIC -fPIC)
 
-target_link_libraries(lab_03
-        Qt5::Widgets
-        ${CUDA_LIBRARIES}
-        ${CUDA_cudadevrt_LIBRARY}
+list(APPEND CUDA_NVCC_FLAGS -Xcompiler -fopenmp -dc)
+
+#set_source_files_properties(renderer/baseRenderer.h renderer/Renderer.cuh renderer/Renderer.cu PROPERTIES LANGUAGE CUDA)
+
+set(RendererLibName "rendererLib")
+ADD_LIBRARY(${RendererLibName} SHARED
+        renderer/baseRenderer.h
+        renderer/Renderer.cuh
+        renderer/Renderer.cu
         )
 
-HEADER_DIRECTORIES(header_dir_list)
+set_target_properties(lab_03 PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+set_target_properties(${RendererLibName} PROPERTIES CUDA_SEPARABLE_COMPILATION ON)
+#set_property(TARGET lab_03 PROPERTY CUDA_SEPARABLE_COMPILATION ON)
+
+
+
+target_include_directories(
+        ${RendererLibName}
+        PUBLIC
+        ${header_dir_list}
+)
+
+#list(APPEND CUDA_LIBRARIES rendererLib)
+
+
+
+
+
+message(CUDA_LIBS==${CUDA_LIBRARIES})
+target_link_libraries(
+        ${PROJECT_NAME}
+        Qt5::Widgets
+        ${CUDA_LIBRARIES}
+        #${CUDA_cudadevrt_LIBRARY}
+        ${RendererLibName}
+)
+
+
 
 target_include_directories(
         ${PROJECT_NAME}
@@ -93,23 +140,11 @@ target_include_directories(
         ${header_dir_list}
 )
 
-list(APPEND CUDA_NVCC_FLAGS -Xcompiler -fopenmp)
+if ( TARGET Qt5::Core )
+    get_property( core_options TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS )
+    string( REPLACE "-fPIC" "" new_core_options "${core_options}" )
+    set_property( TARGET Qt5::Core PROPERTY INTERFACE_COMPILE_OPTIONS ${new_core_options} )
+    set_property( TARGET Qt5::Core PROPERTY INTERFACE_POSITION_INDEPENDENT_CODE "ON" )
+    set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
 
-CUDA_ADD_LIBRARY(rendererLib SHARED
-       renderer/baseRenderer.h
-        renderer/Renderer.h
-        renderer/Renderer.cu
-        OPTIONS ${CUDA_NVCC_FLAGS}
-        )
-target_include_directories(
-        rendererLib
-        PUBLIC
-        ${header_dir_list}
-)
-
-target_link_libraries(rendererLib
-        Qt5::Widgets
-        )
-
-
-TARGET_LINK_LIBRARIES(lab_03 rendererLib)
+endif()

@@ -1,7 +1,7 @@
 #ifndef LAB_03_CAMERA_H
 #define LAB_03_CAMERA_H
 
-#include <QKeyEvent>
+//#include <QKeyEvent>
 #include "cameraStructure.h"
 #include "baseCamera.h"
 
@@ -28,7 +28,7 @@ class Camera : public BaseCamera
 
 
 	void setImageParams(int height, int width);
-	void update(QKeyEvent* e, float time);
+	//void update(QKeyEvent* e, float time);
 
 	__device__ void accept(std::shared_ptr<Visitor> visitor) override;
 

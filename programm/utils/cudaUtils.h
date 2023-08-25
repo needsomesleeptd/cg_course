@@ -33,4 +33,18 @@ inline void cpuAssert(cudaError_t result, char const *const func, const char *co
 		exit(99);
 	}
 }
+
+template<typename T>
+struct CudaArray
+{
+	CudaArray() = default;
+	/*explicit CudaArray(thrust::device_vector<T>& vec)
+	{
+		n = vec.size();
+		values = vec.data();
+	}*/
+	int n = 0;
+	T* values;
+};
+
 #endif //LAB_03_CG_COURSE_PROGRAMM_UTILS_CUDAUTILS_H_

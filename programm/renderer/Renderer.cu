@@ -12,31 +12,35 @@
 #include "../object/object.h"
 
 #include "LightSource.h"
+#include "../utils/cudaUtils.h"
+#include "../object/invisibleObject/lightSource/LightSource.h"
 
 __device__  void rayTrace(const Ray& tracedRay,
 	ColorRGB& finalColor,
 	Scene* scene,
-	int curDepth, thrust::device_vector<BaseShape*> objects,
+	int curDepth, CudaArray<CudaShape*> objects,
 	BaseLightSource* lightSource)
 {
-	BaseShape* closestShape;
+	CudaShape* closestShape;
 	float t = maxRange;
-	/*for (thrust::device_vector<BaseShape*>::iterator shape = objects.begin(); shape != objects.end(); shape++)
+	#pragma unroll
+	for (int i = 0; i < objects.n; i++)
 	{
 
-		float intersection_t = (**shape).intersection(tracedRay);
+		float intersection_t = (objects[i])->intersection(tracedRay);
 		//std::cout << intersection_t << std::endl;
 		if (intersection_t > 0 || fabs(intersection_t) < EPS)
 		{
-			t = thrust::min(t, intersection_t);
-			closestShape = *shape;
+			if (intersection_t < t)
+				t = intersection_t;
+			closestShape = shape;
 		}
 	}
 	if (abs(t - maxRange) < EPS)
 	{
 		return; //Returning background color
 	}
-	std::shared_ptr<BaseLightSource> currentLightSource = scene->getLightSource();
+	/*std::shared_ptr<BaseLightSource> currentLightSource = scene->getLightSource();
 	VecD3 intersectionPoint = tracedRay.getPoint(t);
 	VecD3 lightVector = normalise(intersectionPoint - currentLightSource->getPosition());
 	VecD3 shapeNormal = normalise(closestShape->getNormal(intersectionPoint));
@@ -83,7 +87,7 @@ __device__  void rayTrace(const Ray& tracedRay,
 __device__  Ray createRay(int x, int y, Camera* currentCamera, ImageAdapter* image)
 {
 	float imageHeight = 500; //image->getHeight();
-	float imageWidth =  500; //image->getWidth();
+	float imageWidth = 500; //image->getWidth();
 	VecD3 viewPoint = { 0, 0, -3 };
 	/*VecD3 l = viewPoint - float(imageWidth / 2);
 	VecD3 r = viewPoint + float(imageWidth / 2);
@@ -115,20 +119,21 @@ __device__ ColorRGB renderPixel(int x,
 {
 	Ray tracedRay = createRay(x, y, camera, image);
 	ColorRGB finalColor;
-//	rayTrace(tracedRay, finalColor, scene, 0, objects, lightSource);
+	rayTrace(tracedRay, finalColor, scene, 0, objects, lightSource);
 	return finalColor;
 }
 
 __global__ void renderSceneCuda(Scene* scene,
 	Camera* camera,
 	Renderer* renderer,
-	ImageAdapter* image,
-	CudaArray<CudaShape*> objects, LightSource* lightSource)
+	CudaArray<CudaShape*> objects,
+	LightSource* lightSource,
+	ImageAdapter* image)
 {
 
 	int i = threadIdx.x + blockIdx.x * blockDim.x;
 	int j = threadIdx.y + blockIdx.y * blockDim.y;
-	ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource,image);
+	ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource, image);
 	pixelColor.normalize();
 	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
 	//image->setPixelColor(i, j, pixelColor);
@@ -140,7 +145,7 @@ __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 	int blockY = 10;
 	int nx = 500;
 	int ny = 500;
-	std::shared_ptr<ImageAdapter> image;
+	std::shared_ptr<ImageAdapter> image = std::make_shared<ImageAdapter>(nx,ny);
 	std::shared_ptr<Camera> camera = scene->getCamera();
 	LightSource* lightSource = (LightSource*)(scene->getLightSource().get());
 	thrust::device_vector < CudaShape * > deviceObjects;
@@ -150,13 +155,13 @@ __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 	{
 		deviceObjects.push_back(hostObjects[i].get());
 	}*/
-	CudaArray< CudaShape *> deviceVector;
-	deviceVector.values =  thrust::raw_pointer_cast(deviceObjects.data());
+	CudaArray<CudaShape*> deviceVector;
+	deviceVector.values = thrust::raw_pointer_cast(deviceObjects.data());
 	deviceVector.n = deviceObjects.size();
 
 	dim3 blocks(nx / blockX + 1, ny / blockY + 1);
 	dim3 threads(blockX, blockY);
-	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, image.get(), deviceVector, lightSource);
+	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, deviceVector, lightSource, image.get());
 
 	cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());

@@ -4,35 +4,35 @@
 
 #include "ImageAdapter.h"
 
-__device__ void ImageAdapter::setPixelColor(int x, int y, ColorRGB color)
+__host__ __device__ void ImageAdapter::setPixelColor(int x, int y, ColorRGB color)
 {
 	colorMatrix[x * width + y] = color;
 }
-__device__ int ImageAdapter::getWidth()
+__host__  __device__ int ImageAdapter::getWidth()
 {
 	return width;
 }
-__device__ int ImageAdapter::getHeight()
+__host__  __device__ int ImageAdapter::getHeight()
 {
 	return height;
 }
-__device__ ImageAdapter ImageAdapter::getImage()
+__host__  __device__ ImageAdapter ImageAdapter::getImage()
 {
 	return *this;
 }
-__device__ ImageAdapter::ImageAdapter()
+__host__   ImageAdapter::ImageAdapter()
 {
 	width = 1;
 	height = 1;
-	gpuErrorCheck(cudaMalloc((void**)&colorMatrix, 1 * sizeof(ColorRGB)));
+	cpuErrorCheck(cudaMalloc((void**)&colorMatrix, 1 * sizeof(ColorRGB)));
 }
-__device__ ImageAdapter::ImageAdapter(int width, int height)
+__host__  ImageAdapter::ImageAdapter(int width, int height)
 {
 	width = 1;
 	height = 1;
-	gpuErrorCheck(cudaMalloc((void**)&colorMatrix, width * height * sizeof(ColorRGB)));
+	cpuErrorCheck(cudaMalloc((void**)&colorMatrix, width * height * sizeof(ColorRGB)));
 }
-__device__ ImageAdapter::~ImageAdapter()
+__host__  ImageAdapter::~ImageAdapter()
 {
-	gpuErrorCheck(cudaFree(colorMatrix));
+	cpuErrorCheck(cudaFree(colorMatrix));
 }

@@ -79,7 +79,7 @@ include_directories(
 )
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++11  -DNDEBUG")
-list(APPEND CUDA_NVCC_FLAGS -arch=sm_75 -Xcompiler -fopenmp -dc)
+list(APPEND CUDA_NVCC_FLAGS -arch=sm_75  -Xcompiler -fopenmp -dc)
 message("CMAKE_CUDA_FLAGS: ${CMAKE_CUDA_FLAGS}")
 
 

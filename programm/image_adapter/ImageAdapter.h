@@ -10,13 +10,13 @@
 class ImageAdapter
 {
  public:
-	__device__ ImageAdapter();
-	__device__ explicit ImageAdapter(int width,int height);
-	__device__ void setPixelColor(int x,int y,ColorRGB color);
-	__device__ int getWidth();
-	__device__ int getHeight();
-	__device__ ImageAdapter getImage();
-	__device__ ~ImageAdapter();
+	__host__  ImageAdapter();
+	__host__   explicit ImageAdapter(int width,int height);
+	__host__  __device__ void setPixelColor(int x,int y,ColorRGB color);
+	__host__  __device__ int getWidth();
+	__host__  __device__ int getHeight();
+	__host__  __device__ ImageAdapter getImage();
+	__host__  __device__ ~ImageAdapter();
  private:
 	ColorRGB* colorMatrix;
 	int width;

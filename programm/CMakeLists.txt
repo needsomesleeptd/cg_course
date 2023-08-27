@@ -57,7 +57,11 @@ set(PROJECT_SOURCES
 
         object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 
-        color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h)
+        color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h object/visibleObject/CudaShape.cpp object/visibleObject/CudaShape.h
+        renderer/baseRenderer.h
+        renderer/Renderer.cuh
+        renderer/Renderer.cu
+        )
 
 
 
@@ -126,10 +130,11 @@ target_include_directories(
 message(CUDA_LIBS==${CUDA_LIBRARIES})
 target_link_libraries(
         ${PROJECT_NAME}
+
         Qt5::Widgets
         ${CUDA_LIBRARIES}
-        #${CUDA_cudadevrt_LIBRARY}
-        ${RendererLibName}
+        ${CUDA_cudadevrt_LIBRARY}
+
 )
 
 

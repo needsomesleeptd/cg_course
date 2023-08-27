@@ -11,7 +11,7 @@
 #include "../image_adapter/ImageAdapter.h"
 #include "../object/object.h"
 
-#include "../object/invisibleObject/lightSource/baseLightSource.h"
+#include "LightSource.h"
 
 __device__  void rayTrace(const Ray& tracedRay,
 	ColorRGB& finalColor,
@@ -140,23 +140,23 @@ __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 	int blockY = 10;
 	int nx = 500;
 	int ny = 500;
-	std::shared_ptr<ImageAdapter> image = std::make_shared<ImageAdapter>(nx, ny);
+	std::shared_ptr<ImageAdapter> image;
 	std::shared_ptr<Camera> camera = scene->getCamera();
-	std::shared_ptr<BaseLightSource> lightSource = scene->getLightSource();
-	thrust::device_vector < Sphere * > deviceObjects;
+	LightSource* lightSource = (LightSource*)(scene->getLightSource().get());
+	thrust::device_vector < CudaShape * > deviceObjects;
 
 	auto hostObjects = scene->getModels();
 	/*for (int i = 0; i < hostObjects.size(); i++)
 	{
 		deviceObjects.push_back(hostObjects[i].get());
 	}*/
-	CudaArray< Sphere *> deviceVector;
+	CudaArray< CudaShape *> deviceVector;
 	deviceVector.values =  thrust::raw_pointer_cast(deviceObjects.data());
 	deviceVector.n = deviceObjects.size();
 
 	dim3 blocks(nx / blockX + 1, ny / blockY + 1);
 	dim3 threads(blockX, blockY);
-	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, image.get(), deviceVector, lightSource.get());
+	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, image.get(), deviceVector, lightSource);
 
 	cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());

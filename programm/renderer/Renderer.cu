@@ -82,8 +82,8 @@ __device__  void rayTrace(const Ray& tracedRay,
 
 __device__  Ray createRay(int x, int y, Camera* currentCamera, ImageAdapter* image)
 {
-	float imageHeight = image->getHeight();
-	float imageWidth = image->getWidth();
+	float imageHeight = 500; //image->getHeight();
+	float imageWidth =  500; //image->getWidth();
 	VecD3 viewPoint = { 0, 0, -3 };
 	/*VecD3 l = viewPoint - float(imageWidth / 2);
 	VecD3 r = viewPoint + float(imageWidth / 2);
@@ -109,7 +109,7 @@ __device__ ColorRGB renderPixel(int x,
 	int y,
 	Scene* scene,
 	Camera* camera,
-	CudaArray<Sphere*> objects,
+	CudaArray<CudaShape*> objects,
 	LightSource* lightSource,
 	ImageAdapter* image)
 {
@@ -123,13 +123,13 @@ __global__ void renderSceneCuda(Scene* scene,
 	Camera* camera,
 	Renderer* renderer,
 	ImageAdapter* image,
-	CudaArray<Sphere*> objects, LightSource* lightSource)
+	CudaArray<CudaShape*> objects, LightSource* lightSource)
 {
 
 	int i = threadIdx.x + blockIdx.x * blockDim.x;
 	int j = threadIdx.y + blockIdx.y * blockDim.y;
-	//ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource);
-	//pixelColor.normalize();
+	ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource,image);
+	pixelColor.normalize();
 	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
 	//image->setPixelColor(i, j, pixelColor);
 }

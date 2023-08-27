@@ -5,6 +5,7 @@
 #ifndef LAB_03_CG_COURSE_PROGRAMM_COLOR_COLOR_H_
 #define LAB_03_CG_COURSE_PROGRAMM_COLOR_COLOR_H_
 
+
 #include  <cuda_runtime.h>
 
 struct ColorRGB

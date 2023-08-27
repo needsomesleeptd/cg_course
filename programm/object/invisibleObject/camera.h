@@ -30,7 +30,7 @@ class Camera : public BaseCamera
 	void setImageParams(int height, int width);
 	//void update(QKeyEvent* e, float time);
 
-	__device__ void accept(std::shared_ptr<Visitor> visitor) override;
+	 void accept(std::shared_ptr<Visitor> visitor) override;
 
  private:
 	std::shared_ptr<CameraStructureImp> _cameraStructure;

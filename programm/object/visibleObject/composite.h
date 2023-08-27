@@ -20,7 +20,7 @@ public:
 	bool remove(const Iterator &iter) override;
 
 
-	__device__ void accept(std::shared_ptr<Visitor> visitor) override;
+	 void accept(std::shared_ptr<Visitor> visitor) override;
 
 	Iterator begin() override;
 	Iterator end() override;

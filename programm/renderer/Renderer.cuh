@@ -45,8 +45,9 @@ __device__ ColorRGB renderPixel(int x,
 	int y,
 	Scene* scene,
 	Camera* camera,
-	CudaArray<CudaShape*>  objects,
-	BaseLightSource* lightSource);
+	CudaArray<CudaShape*> objects,
+	LightSource* lightSource,
+	ImageAdapter* image);
 
 __global__ void renderSceneCuda(Scene* scene,
 	Camera* camera,

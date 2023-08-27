@@ -62,7 +62,7 @@ __device__ Sphere::Sphere(const VecD3& center, double radius, const Material& ma
 {
 
 }
-__device__ void Sphere::accept(std::shared_ptr<Visitor> visitor)
+ void Sphere::accept(std::shared_ptr<Visitor> visitor)
 {
 	visitor->visit(*this);
 }

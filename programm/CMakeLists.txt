@@ -79,6 +79,7 @@ include_directories(
 )
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++11  -DNDEBUG")
+list(APPEND CUDA_NVCC_FLAGS -arch=sm_75 -Xcompiler -fopenmp -dc)
 message("CMAKE_CUDA_FLAGS: ${CMAKE_CUDA_FLAGS}")
 
 
@@ -98,7 +99,7 @@ set(CMAKE_CXX_STANDARD 17)
 CUDA_ADD_EXECUTABLE(lab_03 ${PROJECT_SOURCES})
 target_compile_options(lab_03 PUBLIC -fPIC)
 
-list(APPEND CUDA_NVCC_FLAGS -Xcompiler -fopenmp -dc)
+
 
 #set_source_files_properties(renderer/baseRenderer.h renderer/Renderer.cuh renderer/Renderer.cu PROPERTIES LANGUAGE CUDA)
 
@@ -130,10 +131,9 @@ target_include_directories(
 message(CUDA_LIBS==${CUDA_LIBRARIES})
 target_link_libraries(
         ${PROJECT_NAME}
-
         Qt5::Widgets
         ${CUDA_LIBRARIES}
-        ${CUDA_cudadevrt_LIBRARY}
+        #${CUDA_cudadevrt_LIBRARY}
 
 )
 

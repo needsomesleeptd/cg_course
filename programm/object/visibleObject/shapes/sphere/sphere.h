@@ -24,7 +24,7 @@ class Sphere : public BaseShape
 	__device__ void setColorParams(const ColorRGB& color);
 	__device__ Material getMaterial() override;
 	__device__ VecD3 getNormal(VecD3 intersectionPoint);
-	__device__ virtual void accept(std::shared_ptr<Visitor> visitor);
+	virtual void accept(std::shared_ptr<Visitor> visitor);
 
 
 };

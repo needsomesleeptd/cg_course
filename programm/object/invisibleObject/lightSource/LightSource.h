@@ -27,7 +27,7 @@ class LightSource : public BaseLightSource
 	__device__ double getIntensivity() override;
 	__device__ void setIntensivity(double newIntensivity);
 
-	__device__ void accept(std::shared_ptr<Visitor> visitor);
+	void accept(std::shared_ptr<Visitor> visitor);
 	__device__ ColorRGB getColor() override;
 	__device__ void setColor(const ColorRGB& color) override;
  private:

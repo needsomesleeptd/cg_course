@@ -33,7 +33,7 @@ class BaseObject
 		return false;
 	};
 
-	__device__ virtual void accept(std::shared_ptr<Visitor> visitor) = 0;
+	 virtual void accept(std::shared_ptr<Visitor> visitor) = 0;
 
 	virtual bool add(const std::shared_ptr<BaseObject>&)
 	{

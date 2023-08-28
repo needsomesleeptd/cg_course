@@ -154,13 +154,13 @@ __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 	int blockY = 10;
 	int nx = 600;
 	int ny = 600;
-	ImageAdapter hostImage;
+	ImageAdapter hostImage(nx,ny);
 	hostImage._width = nx;
 	hostImage._height = ny;
 	ImageAdapter* deviceImage;
 	cudaMalloc(&deviceImage, sizeof(ImageAdapter));
 	cudaMemcpy(deviceImage, &hostImage, sizeof(ImageAdapter), cudaMemcpyHostToDevice);
-	cudaMalloc((void**)&(deviceImage->colorMatrix),sizeof(ColorRGB) * nx * ny);
+	//cudaMalloc((void**)&(deviceImage->colorMatrix),sizeof(ColorRGB) * nx * ny);
 
 	std::shared_ptr<Camera> camera = scene->getCamera();
 	LightSource* lightSource = (LightSource*)(scene->getLightSource().get());
@@ -180,8 +180,15 @@ __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, deviceVector, lightSource,deviceImage);
 	cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());
-	//cudaMemcpy(hostImage.colorMatrix, deviceImage->colorMatrix, sizeof(ImageAdapter), cudaMemcpyDeviceToHost);
-	//std:: cout << hostImage.colorMatrix[0].R;
+
+	ImageAdapter* resultImage;
+	resultImage = (ImageAdapter*)malloc(sizeof(ImageAdapter));
+
+	cudaMemcpy(resultImage, deviceImage, sizeof(ImageAdapter), cudaMemcpyDeviceToHost);
+	void *deviceColorMap = resultImage->colorMatrix;
+	resultImage->colorMatrix = (ColorRGB*)malloc(sizeof(ColorRGB) * nx * ny);
+	cudaMemcpy(resultImage->colorMatrix, deviceColorMap, sizeof(ColorRGB) *nx * ny, cudaMemcpyDeviceToHost);
+
 }
 
 /*Renderer::Renderer(QGraphicsScene* scene)

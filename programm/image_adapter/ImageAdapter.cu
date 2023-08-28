@@ -3,7 +3,6 @@
 //
 
 #include "ImageAdapter.h"
-#include <iostream>
 
 __host__ __device__ void ImageAdapter::setPixelColor(int x, int y, ColorRGB color)
 {
@@ -25,28 +24,15 @@ __host__ __device__  ImageAdapter::ImageAdapter()
 {
 	_width = 1;
 	_height = 1;
+	//cpuErrorCheck(cudaMalloc((void**)&colorMatrix, 1 * sizeof(ColorRGB)));
 }
-
-__host__  ImageAdapter::~ImageAdapter()
-{
-	if (_isHost)
-		free(colorMatrix);
-	else
-		cudaFree(colorMatrix);
-}
-void ImageAdapter::DeviceMalloc(int width, int height)
-{
-	/*_width = width;
-	_height = height;*/
-	cpuErrorCheck(cudaMalloc((void**)&colorMatrix, _width * _height * sizeof(ColorRGB)));
-	//_isHost = false;
-}
-void ImageAdapter::HostMalloc(int width, int height)
+__host__ __device__  ImageAdapter::ImageAdapter(int width, int height)
 {
 	_width = width;
 	_height = height;
-	colorMatrix = (ColorRGB*)malloc(_width * _height * sizeof(ColorRGB));
-	_isHost = true;
+	cpuErrorCheck(cudaMalloc((void**)&colorMatrix, _width * _height * sizeof(ColorRGB)));
 }
-
-
+__host__  ImageAdapter::~ImageAdapter()
+{
+	cpuErrorCheck(cudaFree(colorMatrix));
+}

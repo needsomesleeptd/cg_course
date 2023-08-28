@@ -5,7 +5,7 @@
 #ifndef LAB_03_CG_COURSE_PROGRAMM_OBJECT_VISIBLEOBJECT_SHAPES_BASESHAPE_H_
 #define LAB_03_CG_COURSE_PROGRAMM_OBJECT_VISIBLEOBJECT_SHAPES_BASESHAPE_H_
 #include "object.h"
-#include "transform.h"
+#include "transform.cuh"
 #include "ray.h"
 #include "material.h"
 
@@ -13,12 +13,12 @@ class BaseShape : public VisibleObject
 {
  public:
 	BaseShape() = default;
-	__device__ virtual ~BaseShape() = default;
-	__device__ virtual void transform(const TransformParams& transformParams) = 0;
-	__device__ virtual Material getMaterial() = 0;
-	__device__ virtual double intersection(const Ray& ray) = 0;
-	__device__ virtual VecD3 getNormal(VecD3 intersectionPoint) = 0;
-	 virtual void accept(std::shared_ptr<Visitor> visitor) = 0;
+	virtual __device__ __host__ ~BaseShape() = default;
+	virtual __device__  void transform(const TransformParams& transformParams) = 0;
+	virtual __host__ __device__      Material getMaterial() = 0;
+	virtual __device__  double intersection(const Ray& ray) = 0;
+	virtual   __device__  VecD3 getNormal(VecD3 intersectionPoint) = 0;
+	virtual void accept(std::shared_ptr<Visitor> visitor) = 0;
 };
 
 class BaseShapeFactory

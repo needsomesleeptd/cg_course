@@ -1,7 +1,7 @@
 #ifndef LAB_03_CAMERASTRUCTURE_H
 #define LAB_03_CAMERASTRUCTURE_H
 
-#include "transform.h"
+#include "transform.cuh"
 
 const int defaultViewPortHeight = 500;
 const int defaultViewPortWidth = 500;

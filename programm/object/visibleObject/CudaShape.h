@@ -42,6 +42,15 @@ class CudaShape
 			break;
 		}
 	}
+	__device__ Material getMaterial()
+	{
+		switch (_shapeType)
+		{
+		case CudaShapeType::sphere:
+			return _sphere.getMaterial();
+			break;
+		}
+	}
 };
 
 #endif //LAB_03_CG_COURSE_PROGRAMM_OBJECT_VISIBLEOBJECT_CUDASHAPE_H_

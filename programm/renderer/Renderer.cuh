@@ -25,10 +25,8 @@ class Renderer : public BaseRenderer
 {
  public:
 	//explicit Renderer(QGraphicsScene* cene);
-	__device__ Ray
-	createRay(int x, int y, Camera* currentCamera);
-	__device__ ColorRGB
-	renderPixel(int x, int y, Scene* scene, Camera* camera) override;
+	__device__ Ray createRay(int x, int y, Camera* currentCamera);
+	__device__ ColorRGB renderPixel(int x, int y, Scene* scene, Camera* camera) override;
 	__host__ void renderScene(std::shared_ptr<Scene> scene) override;
 	__device__ void rayTrace(const Ray& tracedRay, ColorRGB& finalColor, Scene* scene, int curDepth) override;
 	void getImage(ImageAdapter* image);
@@ -37,14 +35,13 @@ class Renderer : public BaseRenderer
 
 };
 
-__device__ void rayTraceonst(Ray& tracedRay,
+__device__ void rayTrace(const Ray& tracedRay,
 	ColorRGB& finalColor,
 	Scene* scene,
 	int curDepth, CudaArray<CudaShape*> objects,
-	BaseLightSource* lightSource);
+	LightSource* lightSource);
 
-__device__ ColorRGB
-renderPixel(int x,
+__device__ ColorRGB renderPixel(int x,
 	int y,
 	Scene* scene,
 	Camera* camera,

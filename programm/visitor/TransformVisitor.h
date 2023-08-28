@@ -8,7 +8,7 @@
 
 #include "visitor.h"
 #include "LightSource.h"
-#include "transform.h"
+#include "transform.cuh"
 
 class TransformVisitor : public Visitor
 {

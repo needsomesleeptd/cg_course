@@ -10,17 +10,16 @@
 class ImageAdapter
 {
  public:
-	__host__  ImageAdapter();
-	__host__   explicit ImageAdapter(int width,int height);
+	__host__ __device__   ImageAdapter();
+	__host__  __device__   explicit ImageAdapter(int width,int height);
 	__host__  __device__ void setPixelColor(int x,int y,ColorRGB color);
 	__host__  __device__ int getWidth();
 	__host__  __device__ int getHeight();
 	__host__  __device__ ImageAdapter getImage();
 	__host__  __device__ ~ImageAdapter();
- private:
 	ColorRGB* colorMatrix;
-	int width;
-	int height;
+	int _width;
+	int _height;
 };
 
 #endif //LAB_03_CG_COURSE_PROGRAMM_IMAGE_ADAPTER_IMAGEADAPTER_H_

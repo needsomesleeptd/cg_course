@@ -13,34 +13,34 @@
 
 #include "LightSource.h"
 #include "../utils/cudaUtils.h"
-#include "../object/invisibleObject/lightSource/LightSource.h"
+#include "CudaShape.h"
 
 __device__  void rayTrace(const Ray& tracedRay,
 	ColorRGB& finalColor,
 	Scene* scene,
 	int curDepth, CudaArray<CudaShape*> objects,
-	BaseLightSource* lightSource)
+	LightSource* lightSource)
 {
-	CudaShape* closestShape;
+	CudaShape* closestShape = NULL;
 	float t = maxRange;
-	#pragma unroll
+
 	for (int i = 0; i < objects.n; i++)
 	{
 
-		float intersection_t = (objects[i])->intersection(tracedRay);
+		float intersection_t = (objects.values[i])->intersection(tracedRay);
 		//std::cout << intersection_t << std::endl;
 		if (intersection_t > 0 || fabs(intersection_t) < EPS)
 		{
 			if (intersection_t < t)
 				t = intersection_t;
-			closestShape = shape;
+			closestShape = objects.values[i];
 		}
 	}
 	if (abs(t - maxRange) < EPS)
 	{
 		return; //Returning background color
 	}
-	/*std::shared_ptr<BaseLightSource> currentLightSource = scene->getLightSource();
+	LightSource* currentLightSource = currentLightSource;
 	VecD3 intersectionPoint = tracedRay.getPoint(t);
 	VecD3 lightVector = normalise(intersectionPoint - currentLightSource->getPosition());
 	VecD3 shapeNormal = normalise(closestShape->getNormal(intersectionPoint));
@@ -71,7 +71,7 @@ __device__  void rayTrace(const Ray& tracedRay,
 			finalColor = currentLightSource->getColor() * specularDot * shapeMaterial._k_s + finalColor;
 		}
 	}
-	if (shapeMaterial._k_s > 0.0f)
+	/*if (shapeMaterial._k_s > 0.0f)
 	{
 		VecD3 N = closestShape->getNormal(intersectionPoint);
 		Ray reflected = tracedRay.calculateReflected(shapeNormal, intersectionPoint);
@@ -136,7 +136,7 @@ __global__ void renderSceneCuda(Scene* scene,
 	ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource, image);
 	pixelColor.normalize();
 	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
-	//image->setPixelColor(i, j, pixelColor);
+	image->colorMatrix[i * image->_width + j] = pixelColor;
 }
 
 __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
@@ -159,7 +159,7 @@ __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 	deviceVector.values = thrust::raw_pointer_cast(deviceObjects.data());
 	deviceVector.n = deviceObjects.size();
 
-	dim3 blocks(nx / blockX + 1, ny / blockY + 1);
+	dim3 blocks(nx / blockX , ny / blockY );
 	dim3 threads(blockX, blockY);
 	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, deviceVector, lightSource, image.get());
 

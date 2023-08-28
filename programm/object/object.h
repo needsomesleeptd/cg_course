@@ -19,7 +19,7 @@ class BaseObject
 	{
 		return -1.0;
 	};
-	__device__ virtual Material getMaterial()
+	__host__ __device__ virtual Material getMaterial()
 	{
 		return Material();
 	};

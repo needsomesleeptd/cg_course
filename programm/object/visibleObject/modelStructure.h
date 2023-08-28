@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "point.h"
-#include "transform.h"
+#include "transform.cuh"
 #include "edge.h"
 
 class ModelStructureImp {

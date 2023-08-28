@@ -27,7 +27,12 @@ __device__ double Sphere::intersection(const Ray& ray)
 		double t2 = (-b - discriminant_value) / (2 * a);
 		if (t1 < 0 && t2 < 0)
 			return -1.0;
-		float t = std::min(t1, t2);
+		float t;
+		if (t1 < t2)
+			t = t1;
+		else
+			t = t2;
+		//float t = std::min(t1, t2);
 		if (t < 0)
 		{
 			if (t1 < 0)
@@ -39,17 +44,17 @@ __device__ double Sphere::intersection(const Ray& ray)
 	}
 
 }
-__device__ void Sphere::setSpectralParams(float k_a, float k_d, float k_s)
+__host__ __device__ void Sphere::setSpectralParams(float k_a, float k_d, float k_s)
 {
 	_material._k_a = k_a;
 	_material._k_d = k_d;
 	_material._k_s = k_s;
 }
-__device__ void Sphere::setColorParams(const ColorRGB& color)
+__host__ __device__ void Sphere::setColorParams(const ColorRGB& color)
 {
 	_material._color = color;
 }
-__device__ Material Sphere::getMaterial()
+__host__ __device__ Material Sphere::getMaterial()
 {
 	return _material;
 }
@@ -57,7 +62,7 @@ __device__ VecD3 Sphere::getNormal(VecD3 intersectionPoint)
 {
 	return (intersectionPoint - _center) * float(_radius);
 }
-__device__ Sphere::Sphere(const VecD3& center, double radius, const Material& material)
+__host__ __device__ Sphere::Sphere(const VecD3& center, double radius, const Material& material)
 	: _center(center), _radius(radius), _material(material)
 {
 

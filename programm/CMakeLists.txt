@@ -39,8 +39,8 @@ set(PROJECT_SOURCES
         math_primitives/vector/vector.cpp math_primitives/vector/vector.h math_primitives/vector/vector_exceptions.h
         math_primitives/ray/ray.cu math_primitives/ray/ray.h
         visitor/TransformVisitor.h visitor/TransformVisitor.cpp visitor/visitor.h
-        object/primitives/transform.h
-        object/visibleObject/shapes/sphere/sphere.cpp object/visibleObject/shapes/sphere/sphere.h
+        object/primitives/transform.cuh
+        object/visibleObject/shapes/sphere/sphere.cu object/visibleObject/shapes/sphere/sphere.h
         object/visibleObject/shapes/baseShape.h
         object/object.h
         object/invisibleObject/cameraStructure.cpp  object/invisibleObject/cameraStructure.h
@@ -57,7 +57,7 @@ set(PROJECT_SOURCES
 
         object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 
-        color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h object/visibleObject/CudaShape.cpp object/visibleObject/CudaShape.h
+        color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h object/visibleObject/CudaShape.cu object/visibleObject/CudaShape.h
         renderer/baseRenderer.h
         renderer/Renderer.cuh
         renderer/Renderer.cu
@@ -78,8 +78,8 @@ include_directories(
         ${CUDA_TOOLKIT_ROOT_DIR}/samples/common/inc
 )
 
-set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++11  -DNDEBUG")
-list(APPEND CUDA_NVCC_FLAGS -arch=sm_75  -Xcompiler -fopenmp -dc)
+set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++17  -DNDEBUG")
+list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_75,code=sm_75  -Xcompiler -fopenmp -dc) #for RTX 2060 -arch=sm_75 ; for default -arch=sm_52
 message("CMAKE_CUDA_FLAGS: ${CMAKE_CUDA_FLAGS}")
 
 

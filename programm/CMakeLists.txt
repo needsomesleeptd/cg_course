@@ -79,7 +79,7 @@ include_directories(
 )
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++17  -DNDEBUG")
-list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_75,code=sm_75  -Xcompiler -fopenmp -dc) #for RTX 2060 -arch=sm_75 ; for default -arch=sm_52
+list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_75,code=sm_75  -Xcompiler -rdynamic -lineinfo  -dc) #for RTX 2060 -arch=sm_75 ; for default -arch=sm_52
 message("CMAKE_CUDA_FLAGS: ${CMAKE_CUDA_FLAGS}")
 
 
@@ -122,7 +122,7 @@ target_include_directories(
         ${header_dir_list}
 )
 
-#list(APPEND CUDA_LIBRARIES rendererLib)
+#list(APPEND CUDA_LIBRARIES libsanitizer-collection.so)
 
 
 

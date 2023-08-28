@@ -15,14 +15,15 @@
 #include "../utils/cudaUtils.h"
 #include "CudaShape.h"
 
-__device__  void rayTrace(const Ray& tracedRay,
-	ColorRGB& finalColor,
+__device__  ColorRGB rayTrace(const Ray& tracedRay,
+	ColorRGB& otherColor,
 	Scene* scene,
 	int curDepth, CudaArray<CudaShape*> objects,
 	LightSource* lightSource)
 {
 	CudaShape* closestShape = NULL;
 	float t = maxRange;
+	ColorRGB finalColor;
 
 	for (int i = 0; i < objects.n; i++)
 	{
@@ -38,7 +39,7 @@ __device__  void rayTrace(const Ray& tracedRay,
 	}
 	if (abs(t - maxRange) < EPS)
 	{
-		return; //Returning background color
+		return ; //Returning background color
 	}
 	LightSource* currentLightSource = currentLightSource;
 	VecD3 intersectionPoint = tracedRay.getPoint(t);
@@ -71,6 +72,7 @@ __device__  void rayTrace(const Ray& tracedRay,
 			finalColor = currentLightSource->getColor() * specularDot * shapeMaterial._k_s + finalColor;
 		}
 	}
+	return finalColor;
 	/*if (shapeMaterial._k_s > 0.0f)
 	{
 		VecD3 N = closestShape->getNormal(intersectionPoint);
@@ -86,8 +88,8 @@ __device__  void rayTrace(const Ray& tracedRay,
 
 __device__  Ray createRay(int x, int y, Camera* currentCamera, ImageAdapter* image)
 {
-	float imageHeight = 500; //image->getHeight();
-	float imageWidth = 500; //image->getWidth();
+	float imageHeight = 600; //image->getHeight();
+	float imageWidth = 600; //image->getWidth();
 	VecD3 viewPoint = { 0, 0, -3 };
 	/*VecD3 l = viewPoint - float(imageWidth / 2);
 	VecD3 r = viewPoint + float(imageWidth / 2);
@@ -119,7 +121,7 @@ __device__ ColorRGB renderPixel(int x,
 {
 	Ray tracedRay = createRay(x, y, camera, image);
 	ColorRGB finalColor;
-	rayTrace(tracedRay, finalColor, scene, 0, objects, lightSource);
+	finalColor = rayTrace(tracedRay, finalColor, scene, 0, objects, lightSource);
 	return finalColor;
 }
 
@@ -133,19 +135,33 @@ __global__ void renderSceneCuda(Scene* scene,
 
 	int i = threadIdx.x + blockIdx.x * blockDim.x;
 	int j = threadIdx.y + blockIdx.y * blockDim.y;
+	//printf("height = %d width = %d\n",image->_height,image->_width);
+	//printf("%d %d\n",i,j);
+	/*if (i >= image->_width || j >= image->_height)
+		return;*/
 	ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource, image);
 	pixelColor.normalize();
 	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
-	image->colorMatrix[i * image->_width + j] = pixelColor;
+
+	image->setPixelColor(i,j,pixelColor);
+	//printf("%p",image->colorMatrix);
+	//pixelColor.R = 1;
 }
 
 __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
 	int blockX = 10;
 	int blockY = 10;
-	int nx = 500;
-	int ny = 500;
-	std::shared_ptr<ImageAdapter> image = std::make_shared<ImageAdapter>(nx,ny);
+	int nx = 600;
+	int ny = 600;
+	ImageAdapter hostImage;
+	hostImage._width = nx;
+	hostImage._height = ny;
+	ImageAdapter* deviceImage;
+	cudaMalloc(&deviceImage, sizeof(ImageAdapter));
+	cudaMemcpy(deviceImage, &hostImage, sizeof(ImageAdapter), cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&(deviceImage->colorMatrix),sizeof(ColorRGB) * nx * ny);
+
 	std::shared_ptr<Camera> camera = scene->getCamera();
 	LightSource* lightSource = (LightSource*)(scene->getLightSource().get());
 	thrust::device_vector < CudaShape * > deviceObjects;
@@ -161,11 +177,11 @@ __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 
 	dim3 blocks(nx / blockX , ny / blockY );
 	dim3 threads(blockX, blockY);
-	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, deviceVector, lightSource, image.get());
-
+	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, deviceVector, lightSource,deviceImage);
 	cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());
-
+	//cudaMemcpy(hostImage.colorMatrix, deviceImage->colorMatrix, sizeof(ImageAdapter), cudaMemcpyDeviceToHost);
+	//std:: cout << hostImage.colorMatrix[0].R;
 }
 
 /*Renderer::Renderer(QGraphicsScene* scene)

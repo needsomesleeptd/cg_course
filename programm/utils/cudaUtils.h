@@ -13,23 +13,29 @@
 #include <iostream>
 
 #define gpuErrorCheck(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-__device__  inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+__device__ inline void gpuAssert(cudaError_t code, const char* file, int line, bool abort = true)
 {
 	if (code != cudaSuccess)
 	{
 		printf("GPU kernel assert: %s %s %d\n", cudaGetErrorString(code), file, line);
-		if (abort)  assert(0);
+		if (abort) assert(0);
 	}
 }
 
 #define cpuErrorCheck(val) cpuAssert( (val), #val, __FILE__, __LINE__ )
 
-inline void cpuAssert(cudaError_t result, char const *const func, const char *const file, int const line) {
-	if (result) {
+inline void cpuAssert(cudaError_t result, char const* const func, const char* const file, int const line)
+{
+	if (result)
+	{
 		std::cerr << "CUDA error = " << static_cast<unsigned int>(result) << " at " <<
-		          file << ":" << line << " '" << func << "' \n" <<  cudaGetErrorString(result);
+		          file << ":" << line << " '" << func << "' \n" << cudaGetErrorString(result);
 		cudaDeviceReset();
 		exit(99);
+	}
+	else
+	{
+		std:: cout<<  cudaGetErrorString(result) << "\n";
 	}
 }
 

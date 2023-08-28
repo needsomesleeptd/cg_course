@@ -30,13 +30,13 @@ class Renderer : public BaseRenderer
 	__host__ void renderScene(std::shared_ptr<Scene> scene) override;
 	__device__ void rayTrace(const Ray& tracedRay, ColorRGB& finalColor, Scene* scene, int curDepth) override;
 	void getImage(ImageAdapter* image);
- private:
+ //private:
 	//QGraphicsScene* _scene;
 
 };
 
-__device__ void rayTrace(const Ray& tracedRay,
-	ColorRGB& finalColor,
+ColorRGB rayTrace(const Ray& tracedRay,
+	ColorRGB& otherColor,
 	Scene* scene,
 	int curDepth, CudaArray<CudaShape*> objects,
 	LightSource* lightSource);

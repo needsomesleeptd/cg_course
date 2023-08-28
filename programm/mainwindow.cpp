@@ -86,7 +86,7 @@ void MainWindow::setupScene()
 
 	std::shared_ptr<BaseRenderer> renderer = std::make_shared<Renderer>();
 	_drawManager->setRenderer(renderer);
-
+	_drawManager->setDrawingScene(_scene);
 
 	std::shared_ptr<Camera> camera = CameraFactory({0,0,-5},{0,0,1}).create();
 	camera->setImageParams(_scene->height(),_scene->width());
@@ -98,6 +98,7 @@ void MainWindow::setupScene()
 void MainWindow::updateScene()
 {
 	_drawManager->drawScene(_sceneManager->getScene());
+
 
 }
 

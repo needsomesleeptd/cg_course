@@ -148,7 +148,7 @@ __global__ void renderSceneCuda(Scene* scene,
 	//pixelColor.R = 1;
 }
 
-__host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
+__host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
 	int blockX = 10;
 	int blockY = 10;
@@ -189,6 +189,9 @@ __host__ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 	resultImage->colorMatrix = (ColorRGB*)malloc(sizeof(ColorRGB) * nx * ny);
 	cudaMemcpy(resultImage->colorMatrix, deviceColorMap, sizeof(ColorRGB) *nx * ny, cudaMemcpyDeviceToHost);
 
+	resultImage->_width = nx;
+	resultImage->_height = ny;
+	return resultImage;
 }
 
 /*Renderer::Renderer(QGraphicsScene* scene)

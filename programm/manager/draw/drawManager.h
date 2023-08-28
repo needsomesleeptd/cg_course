@@ -7,7 +7,7 @@
 #include "object.h"
 #include "visitor.h"
 #include "baseRenderer.h"
-
+#include <QGraphicsScene>
 class Camera;
 
 class DrawManager: public BaseManager {
@@ -19,7 +19,9 @@ public:
 
 	void setCamera(std::shared_ptr<Camera> camera);
 	void setRenderer(std::shared_ptr<BaseRenderer> renderer);
+	void setDrawingScene(QGraphicsScene * drawingScene);
 	void drawScene(std::shared_ptr<Scene> scene);
+
 
 
 
@@ -27,6 +29,7 @@ public:
 private:
 	std::shared_ptr<Camera> _camera;
 	std::shared_ptr<BaseRenderer> _renderer;
+	QGraphicsScene* _drawingScene;
 
 };
 

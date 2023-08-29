@@ -16,8 +16,9 @@ class Sphere : public BaseShape
 	 VecD3 _center;
 	 Material _material;
  public:
-
+	__host__ __device__ Sphere() = default;
 	__host__ __device__ Sphere(const VecD3& center,double radius,const Material& material);
+//	~Sphere() override = default;
 	__device__ void transform(const TransformParams& transformParams) override;
 	__device__ double intersection(const Ray& ray) override;
 	__host__ __device__ void setSpectralParams(float k_a,float k_d,float k_s);
@@ -25,6 +26,8 @@ class Sphere : public BaseShape
 	__host__ __device__ Material getMaterial() override;
 	__device__ VecD3 getNormal(VecD3 intersectionPoint) override;
 	void accept(std::shared_ptr<Visitor> visitor) override;
+	CudaShapeType getShapeType()  override;
+	size_t getByteSize() override;
 
 
 };

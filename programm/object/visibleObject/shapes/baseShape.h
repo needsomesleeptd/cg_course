@@ -9,6 +9,11 @@
 #include "ray.h"
 #include "material.h"
 
+enum class CudaShapeType
+{
+	sphere
+};
+
 class BaseShape : public VisibleObject
 {
  public:
@@ -19,6 +24,9 @@ class BaseShape : public VisibleObject
 	virtual __device__  double intersection(const Ray& ray) = 0;
 	virtual   __device__  VecD3 getNormal(VecD3 intersectionPoint) = 0;
 	virtual void accept(std::shared_ptr<Visitor> visitor) = 0;
+	virtual CudaShapeType getShapeType() = 0;
+	virtual size_t getByteSize() = 0;
+
 };
 
 class BaseShapeFactory

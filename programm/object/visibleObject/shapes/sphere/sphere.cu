@@ -71,3 +71,11 @@ __host__ __device__ Sphere::Sphere(const VecD3& center, double radius, const Mat
 {
 	visitor->visit(*this);
 }
+CudaShapeType Sphere::getShapeType()
+{
+	return CudaShapeType::sphere;
+}
+size_t Sphere::getByteSize()
+{
+	return sizeof(Sphere);
+}

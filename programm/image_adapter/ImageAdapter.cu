@@ -22,15 +22,15 @@ __host__  __device__ ImageAdapter ImageAdapter::getImage()
 }
 __host__ __device__  ImageAdapter::ImageAdapter()
 {
-	_width = 1;
+	/*_width = 1;
 	_height = 1;
-	//cpuErrorCheck(cudaMalloc((void**)&colorMatrix, 1 * sizeof(ColorRGB)));
+	cpuErrorCheck(cudaMalloc((void**)&colorMatrix, 1 * sizeof(ColorRGB)));*/
 }
 __host__ __device__  ImageAdapter::ImageAdapter(int width, int height)
 {
-	_width = width;
+	/*_width = width;
 	_height = height;
-	cpuErrorCheck(cudaMalloc((void**)&colorMatrix, _width * _height * sizeof(ColorRGB)));
+	cpuErrorCheck(cudaMalloc((void**)&colorMatrix, _width * _height * sizeof(ColorRGB)));*/
 }
 __host__  ImageAdapter::~ImageAdapter()
 {

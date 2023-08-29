@@ -7,15 +7,10 @@
 
 #include "sphere.h"
 
-enum class CudaShapeType
-{
-	sphere
-};
+
 class CudaShape
 {
  public:
-
-	CudaShape(CudaShapeType shapeType,void *cudaShape);
 
 	CudaShapeType _shapeType;
 	union
@@ -23,6 +18,10 @@ class CudaShape
 		Sphere _sphere;
 	};
 
+	~CudaShape();
+	CudaShape(CudaShapeType shapeType,void *cudaShape);
+	CudaShape operator=(const CudaShape &other);
+	CudaShape(const CudaShape &other);
 	__device__ double intersection(const Ray& ray)
 	{
 		switch (_shapeType)

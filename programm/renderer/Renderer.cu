@@ -39,7 +39,7 @@ __device__  ColorRGB rayTrace(const Ray& tracedRay,
 	}
 	if (abs(t - maxRange) < EPS)
 	{
-		return ; //Returning background color
+		return; //Returning background color
 	}
 	LightSource* currentLightSource = currentLightSource;
 	VecD3 intersectionPoint = tracedRay.getPoint(t);
@@ -143,7 +143,7 @@ __global__ void renderSceneCuda(Scene* scene,
 	pixelColor.normalize();
 	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
 
-	image->setPixelColor(i,j,pixelColor);
+	image->setPixelColor(i, j, pixelColor);
 	//printf("%p",image->colorMatrix);
 	//pixelColor.R = 1;
 }
@@ -154,40 +154,71 @@ __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 	int blockY = 10;
 	int nx = 600;
 	int ny = 600;
-	ImageAdapter hostImage(nx,ny);
+	ImageAdapter hostImage;
 	hostImage._width = nx;
 	hostImage._height = ny;
 	ImageAdapter* deviceImage;
-	cudaMalloc(&deviceImage, sizeof(ImageAdapter));
-	cudaMemcpy(deviceImage, &hostImage, sizeof(ImageAdapter), cudaMemcpyHostToDevice);
-	//cudaMalloc((void**)&(deviceImage->colorMatrix),sizeof(ColorRGB) * nx * ny);
+
+	cpuErrorCheck(cudaMalloc((void**)&(hostImage.colorMatrix), sizeof(ColorRGB) * nx * ny));
+	cpuErrorCheck(cudaMalloc(&deviceImage, sizeof(ImageAdapter)));
+
+	cpuErrorCheck(cudaMemcpy(deviceImage, &hostImage, sizeof(ImageAdapter), cudaMemcpyHostToDevice));
+
 
 	std::shared_ptr<Camera> camera = scene->getCamera();
-	LightSource* lightSource = (LightSource*)(scene->getLightSource().get());
-	thrust::device_vector < CudaShape * > deviceObjects;
+	std::shared_ptr<LightSource> lightSourceHost = std::dynamic_pointer_cast<LightSource>(scene->getLightSource());
 
-	auto hostObjects = scene->getModels();
-	/*for (int i = 0; i < hostObjects.size(); i++)
+	LightSource* lightSourceDevice;
+	cpuErrorCheck(cudaMalloc((void**)&(lightSourceDevice), sizeof(LightSource)));
+	cpuErrorCheck(cudaMemcpy(lightSourceDevice, &lightSourceHost ,sizeof(LightSource), cudaMemcpyHostToDevice));
+
+	std::vector < CudaShape * > hostObjectsCuda;
+	std::vector<std::shared_ptr<BaseObject>> hostObjects = scene->getModels();
+
+	CudaArray<CudaShape> hostVector;
+	hostVector.n = hostObjects.size();
+	//hostVector.values = malloc(sizeof(CudaShape*)) * hostVector.n);
+
+	CudaArray<CudaShape*>* deviceVector;
+	//cpuErrorCheck(cudaMalloc((void**)&(deviceVector), sizeof(CudaArray)));
+
+	for (int i = 0; i < hostObjects.size(); i++)
 	{
-		deviceObjects.push_back(hostObjects[i].get());
-	}*/
-	CudaArray<CudaShape*> deviceVector;
-	deviceVector.values = thrust::raw_pointer_cast(deviceObjects.data());
-	deviceVector.n = deviceObjects.size();
+		std::shared_ptr<BaseShape> hostShape = std::dynamic_pointer_cast<BaseShape>(hostObjects[i]);
 
-	dim3 blocks(nx / blockX , ny / blockY );
+		/*void* deviceShape;
+		switch (hostShape.getShapeType())
+		{
+			case CudaShapeType::sphere:
+				cpuErrorCheck(cudaMalloc((void**)&(deviceShape), sizeof(Sphere)));
+				cpuErrorCheck(cudaMemcpy(deviceShape, hostShape.get() sizeof(Sphere), cudaMemcpyHostToDevice));
+			break;
+		}
+		CudaShape *cudaDeviceShape;
+		cpuErrorCheck(cudaMalloc((void**)(CudaDevice), sizeof(CudaArray)));*/
+		CudaShape hostCudaShape(CudaShapeType::sphere,hostShape.get());
+		hostVector.values[i] = hostCudaShape;
+	}
+	CudaArray<CudaShape> transferArray;
+	transferArray.n = hostObjects.size();
+	/*cpuErrorCheck(cudaMalloc((void**)&(transferArray), sizeof(CudaShape) * transferArray.n));
+	cpuErrorCheck(cudaMemcpy(lightSourceDevice, &lightSourceHost ,sizeof(LightSource), cudaMemcpyHostToDevice));
+
+	cpuErrorCheck(cudaMalloc((void**)&(deviceVector), sizeof(CudaArray)));*/
+
+	dim3 blocks(nx / blockX, ny / blockY);
 	dim3 threads(blockX, blockY);
-	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, deviceVector, lightSource,deviceImage);
+//	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, deviceVector, lightSourceDevice, deviceImage);
 	cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());
 
 	ImageAdapter* resultImage;
-	resultImage = (ImageAdapter*)malloc(sizeof(ImageAdapter));
-
+	resultImage = (ImageAdapter*)malloc(sizeof(ImageAdapter)); //Forced to allocate on heap because of destructor
+	//TODO::Create normal destructor for image
 	cudaMemcpy(resultImage, deviceImage, sizeof(ImageAdapter), cudaMemcpyDeviceToHost);
-	void *deviceColorMap = resultImage->colorMatrix;
+	void* deviceColorMap = resultImage->colorMatrix;
 	resultImage->colorMatrix = (ColorRGB*)malloc(sizeof(ColorRGB) * nx * ny);
-	cudaMemcpy(resultImage->colorMatrix, deviceColorMap, sizeof(ColorRGB) *nx * ny, cudaMemcpyDeviceToHost);
+	cudaMemcpy(resultImage->colorMatrix, deviceColorMap, sizeof(ColorRGB) * nx * ny, cudaMemcpyDeviceToHost);
 
 	resultImage->_width = nx;
 	resultImage->_height = ny;
@@ -210,8 +241,8 @@ __device__ Ray Renderer::createRay(int x, int y, Camera* currentCamera)
 __device__ ColorRGB Renderer::renderPixel(int x, int y, Scene* scene, Camera* camera)
 {
 	//TODO:: make this
-}
+};
 __device__ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, Scene* scene, int curDepth)
 {
 	//TODO:: make this
-}
+};

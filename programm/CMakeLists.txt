@@ -55,9 +55,9 @@ set(PROJECT_SOURCES
         manager/draw/drawManager.cpp manager/draw/drawManager.h
         manager/draw/drawManagerCreator.cpp manager/draw/drawManagerCreator.h
 
-        object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
+        object/invisibleObject/lightSource/LightSource.cu object/invisibleObject/lightSource/LightSource.cuh object/invisibleObject/lightSource/baseLightSource.h
 
-        color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h object/visibleObject/CudaShape.cu object/visibleObject/CudaShape.h
+        color/color.cu color/color.h image_adapter/ImageAdapter.cu image_adapter/ImageAdapter.h material/material.cpp material/material.h utils/cudaUtils.h object/visibleObject/CudaShape.cu object/visibleObject/CudaShape.cuh
         renderer/baseRenderer.h
         renderer/Renderer.cuh
         renderer/Renderer.cu
@@ -79,7 +79,7 @@ include_directories(
 )
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++17  -DNDEBUG")
-list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_75,code=sm_75  -Xcompiler -rdynamic -lineinfo  -dc) #for RTX 2060 -arch=sm_75 ; for default -arch=sm_52
+list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_75,code=sm_75  -Xcompiler -rdynamic -lineinfo  -dc  ) #for RTX 2060 -arch=sm_75 ; for default -arch=sm_52
 message("CMAKE_CUDA_FLAGS: ${CMAKE_CUDA_FLAGS}")
 
 

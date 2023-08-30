@@ -14,7 +14,7 @@
 #include "../color/color.h"
 #include "../image_adapter/ImageAdapter.h"
 //#include "QGraphicsScene"
-#include "CudaShape.h"
+#include "CudaShape.cuh"
 
 const float EPS = 1e-7;
 const float maxRange = 1e9;
@@ -38,21 +38,21 @@ class Renderer : public BaseRenderer
 ColorRGB rayTrace(const Ray& tracedRay,
 	ColorRGB& otherColor,
 	Scene* scene,
-	int curDepth, CudaArray<CudaShape*> objects,
+	int curDepth, CudaArray<CudaShape>* objects,
 	LightSource* lightSource);
 
 __device__ ColorRGB renderPixel(int x,
 	int y,
 	Scene* scene,
 	Camera* camera,
-	CudaArray<CudaShape*> objects,
+	CudaArray<CudaShape>* objects,
 	LightSource* lightSource,
 	ImageAdapter* image);
 
 __global__ void renderSceneCuda(Scene* scene,
 	Camera* camera,
 	Renderer* renderer,
-	CudaArray<CudaShape*> objects,
+	CudaArray<CudaShape>* objects,
 	LightSource* lightSource,
 	ImageAdapter* image);
 #endif //LAB_03_CG_COURSE_PROGRAMM_RENDERER_RENDERER_CUH_

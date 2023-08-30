@@ -34,5 +34,5 @@ __host__ __device__  ImageAdapter::ImageAdapter(int width, int height)
 }
 __host__  ImageAdapter::~ImageAdapter()
 {
-	cpuErrorCheck(cudaFree(colorMatrix));
+//	cpuErrorCheck(cudaFree(colorMatrix));
 }

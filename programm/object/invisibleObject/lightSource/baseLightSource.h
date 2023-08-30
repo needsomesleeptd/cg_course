@@ -13,12 +13,12 @@ class BaseLightSource : public InvisibleObject
  public:
 	BaseLightSource() = default;
 	virtual ~BaseLightSource() = default;
-	__device__ virtual VecD3 getPosition() = 0;
-	__device__ virtual double getIntensivity() = 0;
-	__device__ virtual void setPosition(const VecD3& newPosition) = 0;
-	__device__ virtual void setIntensivity(double newIntensivity) = 0;
-	__device__ virtual ColorRGB getColor() = 0;
-	__device__ virtual void setColor(const ColorRGB& color) = 0;
+	__host__ __device__ virtual VecD3 getPosition() = 0;
+	__host__ __device__ virtual double getIntensivity() = 0;
+	__host__ __device__ virtual void setPosition(const VecD3& newPosition) = 0;
+	__host__ __device__ virtual void setIntensivity(double newIntensivity) = 0;
+	__host__ __device__ virtual ColorRGB getColor() = 0;
+	__host__ __device__ virtual void setColor(const ColorRGB& color) = 0;
 };
 
 class BaseLightSourceFactory

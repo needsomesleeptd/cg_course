@@ -2,38 +2,38 @@
 // Created by Андрей on 09.08.2023.
 //
 
-#include "LightSource.h"
+#include "LightSource.cuh"
 
 
-__device__ LightSource::LightSource()
+__host__  __device__ LightSource::LightSource()
 {
 	_intensivity = 1;
 	_position =  VecD3({ 0.0, 0.0, 0.0 });
-	_color = ColorRGB(255,255,25);
+	_color = ColorRGB(1.0,1.0,1.0);
 }
-__device__ VecD3 LightSource::getPosition()
+__host__ __device__ VecD3 LightSource::getPosition()
 {
 	return  VecD3(_position); //TODO::Might slow down
 }
-__device__ void LightSource::setPosition(const  VecD3& newPosition)
+__host__  __device__ void LightSource::setPosition(const  VecD3& newPosition)
 {
 	_position = newPosition;
 }
-__device__ double LightSource::getIntensivity()
+__host__  __device__ double LightSource::getIntensivity()
 {
 	return _intensivity;
 }
-__device__ void LightSource::setIntensivity(double newIntensivity)
+__host__  __device__ void LightSource::setIntensivity(double newIntensivity)
 {
 	_intensivity = newIntensivity;
 }
-__device__ LightSource::LightSource(const  VecD3& position, double intensivity)
+__host__  __device__ LightSource::LightSource(const  VecD3& position, double intensivity)
 {
 	_position = position;
 	_intensivity = intensivity;
 }
 
-__device__ LightSourceFactory::LightSourceFactory(const  VecD3& position, double intensivity)
+LightSourceFactory::LightSourceFactory(const  VecD3& position, double intensivity)
 {
 	_position = position;
 	_intensivity = intensivity;

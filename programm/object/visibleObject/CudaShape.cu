@@ -2,7 +2,7 @@
 // Created by Андрей on 26.08.2023.
 //
 
-#include "CudaShape.h"
+#include "CudaShape.cuh"
 #include "shapes/baseShape.h"
 CudaShape::CudaShape(CudaShapeType shapeType, void* cudaShape)
 {
@@ -15,10 +15,7 @@ CudaShape::CudaShape(CudaShapeType shapeType, void* cudaShape)
 	}
 
 }
-CudaShape::~CudaShape()
-{
 
-}
 CudaShape CudaShape::operator=(const CudaShape& other)
 {
 	this->_shapeType  = other._shapeType;
@@ -40,5 +37,14 @@ CudaShape::CudaShape(const CudaShape& other)
 		break;
 	}
 
+}
+CudaShape::~CudaShape()
+{
+	switch (this->_shapeType)
+	{
+		case CudaShapeType::sphere:
+			(&_sphere)->Sphere::~Sphere();
+			break;
+	}
 }
 

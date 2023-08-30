@@ -7,7 +7,7 @@
 #define LAB_03_VISITOR_TRANSFORMVISITOR_H_
 
 #include "visitor.h"
-#include "LightSource.h"
+#include "LightSource.cuh"
 #include "transform.cuh"
 
 class TransformVisitor : public Visitor

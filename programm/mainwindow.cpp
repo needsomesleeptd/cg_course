@@ -3,7 +3,7 @@
 #include "sphere.h"
 #include "camera.h"
 #include "Renderer.cuh"
-#include "LightSource.h"
+#include "LightSource.cuh"
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow)

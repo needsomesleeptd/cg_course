@@ -7,6 +7,7 @@
 
 #include "baseLightSource.h"
 #include "vector.h"
+#include "color.h"
 
 class TransformVisitor;
 

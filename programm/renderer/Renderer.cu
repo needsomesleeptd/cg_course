@@ -14,14 +14,18 @@
 #include "LightSource.cuh"
 #include "../utils/cudaUtils.h"
 #include "CudaShape.cuh"
+#include "../object/invisibleObject/lightSource/LightSource.cuh"
+#include "../math_primitives/ray/ray.h"
+#include "material.h"
+
 #include <cuda_profiler_api.h>
 
 //const ColorRGB backGround = ColorRGB(0, 0, 0);
 
 __device__  ColorRGB rayTrace(const Ray& tracedRay,
 	ColorRGB& otherColor,
-	Scene* scene,
-	int curDepth, CudaArray<CudaShape>* objects,
+	int curDepth,
+	CudaArray<CudaShape>* objects,
 	LightSource* lightSource)
 {
 	CudaShape* closestShape;
@@ -54,7 +58,7 @@ __device__  ColorRGB rayTrace(const Ray& tracedRay,
 	//printf("Position  == %f",currentLightSource->getPosition().x());
 	VecD3 lightVector = normalise(intersectionPoint - currentLightSource->getPosition());
 	//lightSource->getColor();
-	/*printf("after light");
+
 	VecD3 shapeNormal = normalise(closestShape->getNormal(intersectionPoint));
 
 	Material shapeMaterial = closestShape->getMaterial();
@@ -83,7 +87,7 @@ __device__  ColorRGB rayTrace(const Ray& tracedRay,
 			//float spec = powf( specularDot, 20 ) * shapeMaterial._k_s;
 			finalColor = currentLightSource->getColor() * specularDot * shapeMaterial._k_s + finalColor;
 		}
-	}*/
+	}
 
 	return finalColor;
 	/*if (shapeMaterial._k_s > 0.0f)
@@ -101,8 +105,8 @@ __device__  ColorRGB rayTrace(const Ray& tracedRay,
 
 __device__  Ray createRay(int x, int y, Camera* currentCamera, ImageAdapter* image)
 {
-	float imageHeight = 600; //image->getHeight();
-	float imageWidth = 600; //image->getWidth();
+	float imageHeight = image->_height; //image->getHeight();
+	float imageWidth = image->_width; //image->getWidth();
 	VecD3 viewPoint = { 0, 0, -3 };
 	/*VecD3 l = viewPoint - float(imageWidth / 2);
 	VecD3 r = viewPoint + float(imageWidth / 2);
@@ -126,7 +130,6 @@ __device__  Ray createRay(int x, int y, Camera* currentCamera, ImageAdapter* ima
 
 __device__ ColorRGB renderPixel(int x,
 	int y,
-	Scene* scene,
 	Camera* camera,
 	CudaArray<CudaShape>* objects,
 	LightSource* lightSource,
@@ -134,13 +137,11 @@ __device__ ColorRGB renderPixel(int x,
 {
 	Ray tracedRay = createRay(x, y, camera, image);
 	ColorRGB finalColor;
-	finalColor = rayTrace(tracedRay, finalColor, scene, 0, objects, lightSource);
+	finalColor = rayTrace(tracedRay, finalColor, 0, objects, lightSource);
 	return finalColor;
 }
 
-__global__ void renderSceneCuda(Scene* scene,
-	Camera* camera,
-	Renderer* renderer,
+__global__ void renderSceneCuda(Camera* camera,
 	CudaArray<CudaShape>* objects,
 	LightSource* lightSource,
 	ImageAdapter* image)
@@ -152,7 +153,7 @@ __global__ void renderSceneCuda(Scene* scene,
 	//printf("%d %d\n",i,j);
 	if (i >= image->_width || j >= image->_height)
 		return;
-	ColorRGB pixelColor = renderPixel(i, j, scene, camera, objects, lightSource, image);
+	ColorRGB pixelColor = renderPixel(i, j, camera, objects, lightSource, image);
 	pixelColor.normalize();
 	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
 
@@ -163,10 +164,10 @@ __global__ void renderSceneCuda(Scene* scene,
 
 __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
-	int blockX = 20;
-	int blockY = 20;
-	int nx = 100;
-	int ny = 100;
+	int blockX = 1;
+	int blockY = 1;
+	int nx = 600;
+	int ny = 600;
 	ImageAdapter hostImage;
 	hostImage._width = nx;
 	hostImage._height = ny;
@@ -223,7 +224,7 @@ __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 
 	dim3 blocks(nx / blockX, ny / blockY);
 	dim3 threads(blockX, blockY);
-	renderSceneCuda<<<blocks, threads>>>(scene.get(), camera.get(), this, deviceVector, lightSourceDevice, deviceImage);
+	renderSceneCuda<<<blocks, threads>>>(camera.get(), deviceVector, lightSourceDevice, deviceImage);
 	cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());
 

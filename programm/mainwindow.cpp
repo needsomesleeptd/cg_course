@@ -106,6 +106,6 @@ void MainWindow::keyPressEvent(QKeyEvent* e)
 {
 	//_sceneManager->getScene()->getCamera()->update(e, 1.0f);
 
-	updateScene();
+	//updateScene();
 
 }

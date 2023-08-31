@@ -79,7 +79,7 @@ include_directories(
 )
 
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -std=c++17  -DNDEBUG")
-list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_75,code=sm_75  -Xcompiler -rdynamic -lineinfo  -dc  ) #for RTX 2060 -arch=sm_75 ; for default -arch=sm_52
+list(APPEND CUDA_NVCC_FLAGS -gencode arch=compute_75,code=sm_75  -Xcompiler -rdynamic   -dc  -g -G ) #for RTX 2060 -arch=sm_75 ; for default -arch=sm_52
 message("CMAKE_CUDA_FLAGS: ${CMAKE_CUDA_FLAGS}")
 
 
@@ -88,9 +88,9 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-set(QT_DIR "/opt/Qt5.12.0")
-set(QT_SUB_DIR "5.12.0")
-find_package(Qt5 COMPONENTS Widgets Gui OpenGL HINTS ${QT_DIR}/${QT_SUB_DIR}/gcc_64/lib/cmake/Qt5)
+#set(QT_DIR "/opt/Qt5.12.0")
+#set(QT_SUB_DIR "5.12.0")
+find_package(Qt5 COMPONENTS Widgets Gui OpenGL)#HINTS ${QT_DIR}/${QT_SUB_DIR}/gcc_64/lib/cmake/Qt5)
 
 
 set(CMAKE_CXX_STANDARD 17)

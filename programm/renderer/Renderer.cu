@@ -14,6 +14,7 @@
 #include "LightSource.cuh"
 #include "../utils/cudaUtils.h"
 #include "CudaShape.cuh"
+#include <cuda_profiler_api.h>
 
 //const ColorRGB backGround = ColorRGB(0, 0, 0);
 
@@ -52,7 +53,8 @@ __device__  ColorRGB rayTrace(const Ray& tracedRay,
 	VecD3 intersectionPoint = tracedRay.getPoint(t);
 	//printf("Position  == %f",currentLightSource->getPosition().x());
 	VecD3 lightVector = normalise(intersectionPoint - currentLightSource->getPosition());
-	printf("after light");
+	//lightSource->getColor();
+	/*printf("after light");
 	VecD3 shapeNormal = normalise(closestShape->getNormal(intersectionPoint));
 
 	Material shapeMaterial = closestShape->getMaterial();
@@ -81,7 +83,7 @@ __device__  ColorRGB rayTrace(const Ray& tracedRay,
 			//float spec = powf( specularDot, 20 ) * shapeMaterial._k_s;
 			finalColor = currentLightSource->getColor() * specularDot * shapeMaterial._k_s + finalColor;
 		}
-	}
+	}*/
 
 	return finalColor;
 	/*if (shapeMaterial._k_s > 0.0f)
@@ -161,15 +163,15 @@ __global__ void renderSceneCuda(Scene* scene,
 
 __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
-	int blockX = 10;
-	int blockY = 10;
-	int nx = 600;
-	int ny = 600;
+	int blockX = 20;
+	int blockY = 20;
+	int nx = 100;
+	int ny = 100;
 	ImageAdapter hostImage;
 	hostImage._width = nx;
 	hostImage._height = ny;
 	ImageAdapter* deviceImage;
-
+	cudaProfilerStart();
 	cpuErrorCheck(cudaMalloc((void**)&(hostImage.colorMatrix), sizeof(ColorRGB) * nx * ny));
 	cpuErrorCheck(cudaMalloc(&deviceImage, sizeof(ImageAdapter)));
 
@@ -232,6 +234,14 @@ __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 	void* deviceColorMap = resultImage->colorMatrix;
 	resultImage->colorMatrix = (ColorRGB*)malloc(sizeof(ColorRGB) * nx * ny);
 	cudaMemcpy(resultImage->colorMatrix, deviceColorMap, sizeof(ColorRGB) * nx * ny, cudaMemcpyDeviceToHost);
+
+	cudaProfilerStop();
+
+	cudaFree(hostImage.colorMatrix);
+	cudaFree(deviceImage);
+	cudaFree(transferArray.values);
+	cudaFree(deviceVector);
+	cudaFree(lightSourceDevice);
 
 	resultImage->_width = nx;
 	resultImage->_height = ny;

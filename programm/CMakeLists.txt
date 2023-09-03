@@ -153,3 +153,7 @@ if ( TARGET Qt5::Core )
     set( CMAKE_CXX_COMPILE_OPTIONS_PIE "-fPIC" )
 
 endif()
+
+# For profilings export paths onlye for 12 version
+#LD_LIBRARY_PATH=/usr/local/cuda-12.2/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+#export PATH=/usr/local/cuda-12.2/bin${PATH:+:${PATH}}

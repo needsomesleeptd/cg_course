@@ -10,12 +10,14 @@
 #include "color.h"
 
 class TransformVisitor;
+class Renderer;
 
 class LightSource : public BaseLightSource
 {
  public:
 	//friend void TransformVisitor::visit(LightSource& lightSorce) const;
 	friend TransformVisitor;
+	friend Renderer;
 
 	__host__ __device__ LightSource();
 	__host__  __device__ LightSource(const  VecD3& position,double intensivity);
@@ -31,9 +33,25 @@ class LightSource : public BaseLightSource
 	void accept(std::shared_ptr<Visitor> visitor);
 	__host__  __device__ ColorRGB getColor() override;
 	__host__  __device__ void setColor(const ColorRGB& color) override;
+
+	__device__ double intersection(const Ray& ray) override
+	{
+		return -1.0;
+	};
+
+	 bool add(const std::shared_ptr<BaseObject>&) override
+	{
+		return false;
+	};
+	 bool remove(const Iterator&) override
+	{
+		return false;
+	};
+
+
  private:
 	 VecD3 _position;
-	 double _intensivity;
+	 float _intensivity;
 	 ColorRGB _color;
 };
 

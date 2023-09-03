@@ -31,6 +31,8 @@ __host__  __device__ LightSource::LightSource(const  VecD3& position, double int
 {
 	_position = position;
 	_intensivity = intensivity;
+	ColorRGB intensivityColor(_intensivity,_intensivity,_intensivity);
+	setColor(intensivityColor);
 }
 
 LightSourceFactory::LightSourceFactory(const  VecD3& position, double intensivity)

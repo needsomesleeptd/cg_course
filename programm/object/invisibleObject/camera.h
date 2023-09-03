@@ -6,12 +6,14 @@
 #include "baseCamera.h"
 
 class TransformVisitor;
+class Renderer;
 class Camera : public BaseCamera
 {
  public:
 
 	//friend void TransformVisitor::visit(const Camera& camera);
 	friend TransformVisitor;
+	friend Renderer;
 
 
 

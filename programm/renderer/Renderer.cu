@@ -17,6 +17,7 @@
 #include "../object/invisibleObject/lightSource/LightSource.cuh"
 #include "../math_primitives/ray/ray.h"
 #include "material.h"
+#include "camera.h"
 
 #include <cuda_profiler_api.h>
 
@@ -46,12 +47,16 @@ __device__  ColorRGB rayTrace(const Ray& tracedRay,
 			}
 		}
 	}
-	//printf("%f", t);
+	//0x55b4c14f9288
+	//printf("\nobjects = %p\n lightSource = %p\n\n",objects,lightSource);
+	//printf("\nobject1 = %p\n object2 = %p\n\n",objects,lightSource);
 	if (abs(t - maxRange) < EPS)
 	{
 		return  ColorRGB(0, 0, 0); //Returning background color
 	}
-
+	//printf("light source = %f",lightSource->getColor().R);
+	//printf("function = %p\n",lightSource->getColor());
+	//lightSource->getColor();
 	LightSource* currentLightSource = lightSource;
 
 	VecD3 intersectionPoint = tracedRay.getPoint(t);
@@ -143,7 +148,7 @@ __device__ ColorRGB renderPixel(int x,
 
 __global__ void renderSceneCuda(Camera* camera,
 	CudaArray<CudaShape>* objects,
-	LightSource* lightSource,
+	LightSource** lightSource,
 	ImageAdapter* image)
 {
 
@@ -153,7 +158,7 @@ __global__ void renderSceneCuda(Camera* camera,
 	//printf("%d %d\n",i,j);
 	if (i >= image->_width || j >= image->_height)
 		return;
-	ColorRGB pixelColor = renderPixel(i, j, camera, objects, lightSource, image);
+	ColorRGB pixelColor = renderPixel(i, j, camera, objects, *lightSource, image);
 	pixelColor.normalize();
 	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
 
@@ -162,29 +167,51 @@ __global__ void renderSceneCuda(Camera* camera,
 	//pixelColor.R = 1;
 }
 
+
+__global__ void createLightSource(
+	LightSource** lightSource,VecD3 position,float intensivity)
+{
+	if (threadIdx.x == 0 && blockIdx.x == 0)
+	{
+		(*lightSource) = new LightSource(position,intensivity);
+	}
+}
+
 __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
-	int blockX = 1;
-	int blockY = 1;
-	int nx = 600;
-	int ny = 600;
+	int blockX = 5;
+	int blockY = 5;
+	int nx = 1000;
+	int ny = 1000;
 	ImageAdapter hostImage;
 	hostImage._width = nx;
 	hostImage._height = ny;
 	ImageAdapter* deviceImage;
-	cudaProfilerStart();
+
 	cpuErrorCheck(cudaMalloc((void**)&(hostImage.colorMatrix), sizeof(ColorRGB) * nx * ny));
 	cpuErrorCheck(cudaMalloc(&deviceImage, sizeof(ImageAdapter)));
 
 	cpuErrorCheck(cudaMemcpy(deviceImage, &hostImage, sizeof(ImageAdapter), cudaMemcpyHostToDevice));
 
 
-	std::shared_ptr<Camera> camera = scene->getCamera();
+	std::shared_ptr<Camera> cameraHost = scene->getCamera();
+
+	Camera* cameraDevice;
+	cpuErrorCheck(cudaMalloc((void**)&(cameraDevice), sizeof(Camera)));
+	cpuErrorCheck(cudaMemcpy(cameraDevice, cameraHost.get(), sizeof(Camera), cudaMemcpyHostToDevice));
+
 	std::shared_ptr<LightSource> lightSourceHost = std::dynamic_pointer_cast<LightSource>(scene->getLightSource());
 
-	LightSource* lightSourceDevice;
-	cpuErrorCheck(cudaMalloc((void**)&(lightSourceDevice), sizeof(LightSource)));
-	cpuErrorCheck(cudaMemcpy(lightSourceDevice, lightSourceHost.get() ,sizeof(LightSource), cudaMemcpyHostToDevice));
+	//LightSource* lightSourceDevice;
+	//cudaMalloc((void**)&lightSourceDevice, sizeof(LightSource));
+	//createLightSource<<<1, 1>>>(&lightSourceDevice, VecD3(0,0,0), 1);
+	LightSource** lightSourceDevice;
+	cpuErrorCheck(cudaMalloc((void **)&lightSourceDevice, sizeof(LightSource**)));
+	createLightSource<<<1,1>>>(lightSourceDevice,VecD3(0,0,0), 1);
+	cpuErrorCheck(cudaGetLastError());
+	cpuErrorCheck(cudaDeviceSynchronize());
+	/*cpuErrorCheck(cudaMalloc((void**)&(lightSourceDevice), sizeof(LightSource)));
+	cpuErrorCheck(cudaMemcpy(lightSourceDevice, lightSourceHost.get() ,sizeof(LightSource), cudaMemcpyHostToDevice));*/
 
 
 	std::vector<std::shared_ptr<BaseObject>> hostObjects = scene->getModels();
@@ -224,7 +251,7 @@ __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 
 	dim3 blocks(nx / blockX, ny / blockY);
 	dim3 threads(blockX, blockY);
-	renderSceneCuda<<<blocks, threads>>>(camera.get(), deviceVector, lightSourceDevice, deviceImage);
+	renderSceneCuda<<<blocks, threads>>>(cameraDevice, deviceVector, lightSourceDevice, deviceImage);
 	cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());
 
@@ -236,7 +263,7 @@ __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 	resultImage->colorMatrix = (ColorRGB*)malloc(sizeof(ColorRGB) * nx * ny);
 	cudaMemcpy(resultImage->colorMatrix, deviceColorMap, sizeof(ColorRGB) * nx * ny, cudaMemcpyDeviceToHost);
 
-	cudaProfilerStop();
+
 
 	cudaFree(hostImage.colorMatrix);
 	cudaFree(deviceImage);

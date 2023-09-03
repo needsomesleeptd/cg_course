@@ -50,6 +50,6 @@ __device__ ColorRGB renderPixel(int x,
 
 __global__ void renderSceneCuda(Camera* camera,
 	CudaArray<CudaShape>* objects,
-	LightSource* lightSource,
+	LightSource** lightSource,
 	ImageAdapter* image);
 #endif //LAB_03_CG_COURSE_PROGRAMM_RENDERER_RENDERER_CUH_

@@ -4,6 +4,14 @@
 #include "camera.h"
 #include "Renderer.h"
 #include "LightSource.h"
+#include <random>
+#include <stdlib.h>
+
+float GenerateRandom()
+{
+
+	return rand() / (RAND_MAX + 1.);
+}
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow)
@@ -75,13 +83,24 @@ void MainWindow::setupScene()
 	Material materialGreen(0.1,0.3,0.8,green);
 
 
-	//std::shared_ptr<Sphere>
+	//Generating random spheres;
+	/*int spheresCount = 10;
+	for (int i = 0; i < spheresCount; i++)
+	{
+		ColorRGB randomColor(GenerateRandom(),GenerateRandom(),GenerateRandom());
+		Material randomMaterial(GenerateRandom(),GenerateRandom(),GenerateRandom(),randomColor);
+		std::shared_ptr<Sphere> sphereRandom = std::make_shared<Sphere>(VecD3({i,i,i}),1.0,randomMaterial);
+		_sceneManager->getScene()->addModel(sphereRandom);
+	}*/
 	std::shared_ptr<Sphere> sphereRed = std::make_shared<Sphere>(VecD3({1.0,1.0,0}),1.0,materialRed);
 	std::shared_ptr<Sphere> sphereGreen = std::make_shared<Sphere>(VecD3({1.0,-5.0,0}),1.0,materialGreen);
+
 	_sceneManager->getScene()->addModel(sphereGreen);
 	_sceneManager->getScene()->addModel(sphereRed);
+
+
 	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0,0,0),1).create();
-	lightsource->setColor(ColorRGB(0.5,0.5,0.5));
+	lightsource->setColor(ColorRGB(0.2,0.5,0.8));
 	_sceneManager->getScene()->setLightSource(lightsource);
 
 	std::shared_ptr<BaseRenderer> renderer = std::make_shared<Renderer>(_scene);

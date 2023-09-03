@@ -1,259 +1,3 @@
-%\documentclass[a4paper,14pt, unknownkeysallowed]{extreport}
-%\documentclass[a4paper,14pt, unknownkeysallowed]{extreport}
-\documentclass[a4paper,14pt,unknownkeysallowed]{extreport}
-
-\usepackage{cmap} % Улучшенный поиск русских слов в полученном pdf-файле
-\usepackage[T2A]{fontenc} % Поддержка русских букв
-\usepackage[utf8x]{inputenc} % Кодировка utf8
-\usepackage[english,russian]{babel} % Языки: русский, английский
-\usepackage{enumitem}
-
-
-\usepackage{threeparttable}
-
-\usepackage[14pt]{extsizes}
-
-\usepackage{caption}
-\captionsetup{labelsep=endash}  
-\captionsetup[figure]{name={Рисунок}}
-
-% \usepackage{ctable}
-% \captionsetup[table]{justification=raggedleft,singlelinecheck=off}
-
-\usepackage{amsmath}
-
-\usepackage{geometry}
-
-\usepackage{svg}
-
-\geometry{left=30mm}
-\geometry{right=10mm}
-\geometry{top=20mm}
-\geometry{bottom=20mm}
-
-\usepackage{titlesec}
-\titleformat{\section}
-	{\normalsize\bfseries}
-	{\thesection}
-	{1em}{}
-\titlespacing*{\chapter}{0pt}{-30pt}{8pt}
-\titlespacing*{\section}{\parindent}{*4}{*4}
-\titlespacing*{\subsection}{\parindent}{*4}{*4}
-
-\usepackage{setspace}
-\onehalfspacing% Полуторный интервал
-
-\frenchspacing
-\usepackage{indentfirst} % Красная строка
-
-\usepackage{titlesec}
-\titleformat{\chapter}{\LARGE\bfseries}{\thechapter}{20pt}{\LARGE\bfseries}
-\titleformat{\section}{\Large\bfseries}{\thesection}{20pt}{\Large\bfseries}
-
-\usepackage{multirow}
-\usepackage{listings}
-\usepackage{xcolor}
-
-% Для листинга кода:
-\lstset{%
-	language=c++,   					% выбор языка для подсветки	
-	basicstyle=\small\sffamily,			% размер и начертание шрифта для подсветки кода
-	numbers=left,						% где поставить нумерацию строк (слева\справа)
-	numberstyle=\tiny,		     		% размер шрифта для номеров строк
-	stepnumber=1,						% размер шага между двумя номерами строк
-	numbersep=5pt,						% как далеко отстоят номера строк от подсвечиваемого кода
-	frame=single,						% рисовать рамку вокруг кода
-	tabsize=4,							% размер табуляции по умолчанию равен 4 пробелам
-	captionpos=t,						% позиция заголовка вверху [t] или внизу [b]
-	breaklines=true,					
-	breakatwhitespace=true,				% переносить строки только если есть пробел
-	backgroundcolor=\color{white},
-	basicstyle=\footnotesize\ttfamily,
-	keywordstyle=\color{blue},
-	stringstyle=\color{red},
-	commentstyle=\color{gray}
-	showspaces=false,
-    showstringspaces=false
-}
-
-
-
-\usepackage{pgfplots}
-\usetikzlibrary{datavisualization}
-\usetikzlibrary{datavisualization.formats.functions}
-
-
-
-
-\usepackage{graphicx}
-\graphicspath{ {images/} }
-\newcommand{\img}[3] {
-	\begin{figure}[h!]
-		\center{\includegraphics[height=#1]{img/#2}}
-		\caption{#3}
-		\label{img:#2}
-	\end{figure}
-}
-
-
-\usepackage[justification=centering]{caption} % Настройка подписей float объектов
-
-\usepackage[unicode,pdftex]{hyperref} % Ссылки в pdf
-\hypersetup{hidelinks}
-
-\usepackage{csvsimple}
-
-\newcommand{\code}[1]{\texttt{#1}}
-
-\usepackage{longtable}
-
-\usepackage{array}
-\usepackage{booktabs}
-\usepackage{floatrow}
-\usepackage{ulem}
-
-\floatsetup[longtable]{LTcapwidth=table}
-
-\def\UrlBreaks{\do\/\do-\do\_}
-
-\makeatletter
-\renewcommand*\l@chapter[2]{%
-  \ifnum \c@tocdepth >\m@ne
-    \addpenalty{-\@highpenalty}%
-    \vskip 1.0em \@plus\p@
-    \setlength\@tempdima{1.5em}%
-    \begingroup
-      \parindent \z@ \rightskip \@pnumwidth
-      \parfillskip -\@pnumwidth
-      \leavevmode \bfseries
-      \advance\leftskip\@tempdima
-      \hskip -\leftskip
-      #1\nobreak\normalfont\leaders\hbox{$\m@th
-        \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
-        mu$}\hfill\nobreak\hb@xt@\@pnumwidth{\hss #2}\par
-      \penalty\@highpenalty
-    \endgroup
-  \fi}
-\makeatother
-
-
-\usepackage{array}
-\newenvironment{signstabular}[1][1]{
-	\renewcommand*{\arraystretch}{#1}
-	\tabular
-}{
-	\endtabular
-}
-
-\begin{document}
-
-\noindent\begin{minipage}{0.05\textwidth}
-	\includegraphics[scale=0.3]{images/bmstu.png}
-\end{minipage}
-\hfill
-\begin{minipage}{0.85\textwidth}\raggedleft
-	\begin{center}
-		\fontsize{12pt}{0.3\baselineskip}\selectfont \textbf{Министерство науки и высшего образования Российской Федерации \\ Федеральное государственное бюджетное образовательное учреждение \\ высшего образования \\ <<Московский государственный технический университет \\ имени Н.Э. Баумана \\ (национальный исследовательский университет)>> \\ (МГТУ им. Н.Э. Баумана)}
-	\end{center}
-\end{minipage}
-
-\begin{center}
-	\fontsize{12pt}{0.1\baselineskip}\selectfont
-	\noindent\makebox[\linewidth]{\rule{\textwidth}{4pt}} \makebox[\linewidth]{\rule{\textwidth}{1pt}}
-\end{center}
-
-\begin{flushleft}
-	\fontsize{12pt}{0.8\baselineskip}\selectfont 
-	
-	ФАКУЛЬТЕТ \uline{<<\textbf{Информатика и системы управления}>> \hfill}
-
-	КАФЕДРА \uline{\mbox{\hspace{4mm}} <<\textbf{Программное обеспечение ЭВМ и информационные технологии}>> \hfill}
-\end{flushleft}
-
-\vfill
-
-\begin{center}
-	\fontsize{20pt}{\baselineskip}\selectfont
-
-	\textbf{РАСЧЕТНО-ПОЯСНИТЕЛЬНАЯ ЗАПИСКА}
-
-	\textbf{\textit{К ВЫПУСКНОЙ КВАЛИФИКАЦИОННОЙ РАБОТЕ}}
-
-	\textbf{\textit{НА ТЕМУ:}}
-\end{center}
-
-\begin{center}
-	\fontsize{18pt}{0.6cm}\selectfont 
-	
-	<<Моделирование геометрических тел простой формы с изменяемым коэффициентом отражения>>
-	
-\end{center}
-
-\vfill
-
-\begin{table}[h!]
-	\fontsize{12pt}{0.7\baselineskip}\selectfont
-	\centering
-	\begin{signstabular}[0.7]{p{7.25cm} >{\centering\arraybackslash}p{4cm} >{\centering\arraybackslash}p{4cm}}
-		Студент группы \textbf{ИУ7-54Б} & \uline{\mbox{\hspace*{4cm}}} & \uline{\hfill \textbf{Разин А.В.} \hfill} \\
-		& \scriptsize (Подпись, дата) & \scriptsize (И.О. Фамилия)
-	\end{signstabular}
-
-	\vspace{\baselineskip}
-
-	\begin{signstabular}[0.7]{p{7.25cm} >{\centering\arraybackslash}p{4cm} >{\centering\arraybackslash}p{4cm}}
-		Руководитель ВКР & \uline{\mbox{\hspace*{4cm}}} & \uline{\hfill \textbf{Куров А.В.} \hfill} \\
-		& \scriptsize (Подпись, дата) & \scriptsize (И.О. Фамилия)
-	\end{signstabular}
-
-	\vspace{\baselineskip}
-
-	\begin{signstabular}[0.7]{p{7.25cm} >{\centering\arraybackslash}p{4cm} >{\centering\arraybackslash}p{4cm}}
-		Нормоконтролер & \uline{\mbox{\hspace*{4cm}}} & \uline{\hfill \textbf{Кузнецова О.В.} \hfill} \\
-		& \scriptsize (Подпись, дата) & \scriptsize (И.О. Фамилия)
-	\end{signstabular}
-\end{table}
-
-\vfill
-
-\begin{center}
-	\normalsize \textit{\textbf{2023} г.}
-\end{center}
-
-
-\thispagestyle{empty} %Удаление
-\renewcommand{\contentsname}{Содержание} 
-\tableofcontents
-
-
-\setcounter{page}{2}
-\chapter{Введение}
-
-Компьютерная графика играет важнейшую роль в современной жизни. 
-Она позволяет нам видеть различные задачи в совершенно новом свете, а также создавать и исследовать визуально привлекательные и живые изображения.
-С ее помощью мы можем представлять друг другу информацию с помощью цветного и анимированного содержимого. 
-Получение качественного изображения необходимо во многих областях, включая медицину, искусство и игры.
-Особенно важной становится задача генерации реалистичного изображения, с развитием технологий люди привыкают к все более
-правдоподобной картинке. Чаще всего люди подмечают нереалистичность изображения при наблюдении света: его отражения и преломления.
-
-
-Целью данной работы является разработка программного обеспечения, моделирующего отражения от геометрических тел.Для достижения поставленной цели требуется
-решить следующие задачи:
-\begin{enumerate}
-	\item Формализировать представление объектов сцены и описать их
-	\item Проанализировать алгоритмы построения реалистичных изображений и теней
-	\item Выбрать наилучшие алгоритмы для достижения цели  из рассмотренных
-	\item Проанализировать полученную  модель взаимодействия света с объектами
-	\item Выбрать програмные средства для реализации модели
-	\item Реализовать полученную модель
-	\item Создать интерфейс
-	\item Провести замеры временных характеристик полученной модели
-\end{enumerate}
-
-
-
-
-
 \chapter{Аналитическая часть}
 \section[Формализация объектов синтезируемой сцены]{Формализация объектов синтезируемой сцены}
 \label{sec:obj_formalasation}
@@ -271,18 +15,18 @@
 	\item \textbf{Объекты сцены}
 	
 	Объектами сцены являются трехмерные примитивы:
-	\begin{enumerate}[label*=\arabic*.]
+	\begin{enumerate}
 		\item \textbf{Шар}
 		
 		Для описания шара потребуется:
-		\begin{enumerate}[label*=\arabic*.]
+		\begin{enumerate}
 			\item Радиус
 			\item Координаты центра
 		\end{enumerate}
 		\item  \textbf{Куб}
 		
 		Для описания куба потребуется:
-		\begin{enumerate}[label*=\arabic*.]
+		\begin{enumerate}
 			\item Координаты центра
 			\item Координаты вершин относительно центра
 			\item Индексы соединенных вершин(Ребра)
@@ -290,15 +34,15 @@
 		\item  \textbf{Конус}
 		
 		Для описания конуса потребуется:
-		\begin{enumerate}[label*=\arabic*.]
+		\begin{enumerate}
 			\item Координаты центра окружности основания конуса
 			\item Радиус основания конуса
 			\item Координата верхней точки конуса
 		\end{enumerate}
-		\item  \textbf{Цилиндр}
+		\item  \textbf{цилиндр}
 		
 		Для описания цилиндра потребуется:
-		\begin{enumerate}[label*=\arabic*.]
+		\begin{enumerate}
 			\item Координаты центра нижнего основания цилиндра
 			\item Координата центра верхнего основания конуса
 			\item Радиус цилиндра
@@ -309,13 +53,10 @@
 	\end{enumerate}
 
 	\item \textbf{Камера}
-	
 	В данном случае камера может описываться:
-	\begin{enumerate}[label*=\arabic*.]
+	\begin{enumerate}
 		\item Координатами своего положения
 		\item Вектором направления взгляда
-		\item Правым вектором пространства камеры
-		\item Верхним вектором пространства камеры
 	\end{enumerate}
 	
 \end{enumerate}
@@ -328,10 +69,10 @@
 происходит от внешней поверхности объекта, оно является направленным и зависит от положения наблюдателя.
 Так как отражение происходит от внешней части объекта ,то отраженный свет сохраняет свойства падающего, например в случае если белый свет отражается
 от красного тела, отраженный свет также будет нести в себе часть красного цвета.
-Для расчета интенсивности света данных отражений существует несколько моделей:
+Для расчета интенсивности света данных отражений существует несколько моделей:\cite{Rodgers}
 \begin{enumerate}
 	\item Модель Ламберта
-	\item Модель Фонга \cite{Rodgers}
+	\item Модель Фонга
 \end{enumerate}
 
 \subsection{Модель Ламберта}
@@ -606,11 +347,11 @@ $K$ в данном случае - произвольная постоянная
 	\item $k_t$ - коэффициент пропускания
 	\item $n$ - степень пространственного распределения Фонга
 \end{enumerate}
-В данном случае знак $ \hat{} $  означает что данный вектор нормализован.
+В данном случае знак $ \hat{} $  означает что данный вектор нормализован
 Значения коэффициентов определяются внешней средой,свойствами материала объектов и длинной волн света
 Таким образом возможно посчитать интенсивность света для отраженной и преломленной части луча.
 После чего полученные вычисления необходимо выполнить еще раз для отраженного и преломленного луча и т.~д.
-, а также сложить полученные интенсивности.
+и сложить полученные интенсивности.
 Теоретически свет может отражаться бесконечно, так что стоит ограничить число рассматриваемых отражений либо определенным числом,
 либо не рассматривать лучи с интенсивностью меньше определенного значения
 Таким образом данный алгоритм имеет асимптотику $O(N \cdot C \cdot 2^{K})$ , где \textbf{N} - количество тел,\textbf{C} - количество испускаемых лучей,
@@ -620,15 +361,15 @@ $K$ в данном случае - произвольная постоянная
 
 \textbf{Достоинства алгоритма}:
 \begin{enumerate}
-	\item Создание реалистичных изображений \cite{Rodgers,modern_ray_tracing,SSR}
-	\item Возможность наблюдения физических явлений, так как алгоритм симулирует поведение света в реальной жизни \cite{Rodgers,modern_ray_tracing,SSR}
+	\item Создание реалистичных изображений \cite{SSR,Rodgers,modern_ray_tracing}
+	\item Возможность наблюдения физических явлений, так как алгоритм симулирует поведение света в реальной жизни \cite{SSR,Rodgers,modern_ray_tracing}
 \end{enumerate}
 
 
 \textbf{Недостатки алгоритма}:
 \begin{enumerate}
-	\item Время работы \cite{Rodgers,modern_ray_tracing,SSR}
-	\item Количество требуемой памяти, так как в памяти необходимо хранить все отраженные и преломленные лучи, полученные при предыдущих расчетах \cite{Rodgers,modern_ray_tracing,SSR}
+	\item Время работы \cite{SSR,Rodgers,modern_ray_tracing}
+	\item Количество требуемой памяти, так как в памяти необходимо хранить все отраженные и преломленные лучи, полученные при предыдущих расчетах \cite{SSR,Rodgers,modern_ray_tracing}
 \end{enumerate}
 
 
@@ -752,274 +493,3 @@ $K$ в данном случае - произвольная постоянная
 	\item Положение примитива
 	\item Угол поворота примитива
 \end{enumerate}
-
-\chapter{Конструкторская часть}
-
-
-\section{Общий алгоритм построения изображения}
-Рассмотрим алгоритм построения кадра, пока что не рассматривая конкретную реализацию алгоритма трассировки лучей на картинке~\ref{fig:frame_algo}.
-Заметим, что при перемещении наблюдателя, необходимо заново приводить все рассматриваемые объекты к пространству камеры.
-
-\begin{figure}[H]
-	\centering
-	\includesvg[height=1.5\textwidth]{images/frame_algo}
-	\caption{Общий алгоритм построения кадра}
-	\label{fig:frame_algo}
-\end{figure}
-
-
-
-\section{Алгоритм обратной трассировки лучей}
-Алгоритм трассировки лучей для 1 пикселя приведен на картинке~\ref{fig:raytrace_algo_pixel}. Входными данными для него являются: описания объектов, число пикселей на экране,
-интенсивность источника света.
-
-\begin{figure}[H]
-	\centering
-	\includesvg[height=1.5\textwidth]{images/raytrace_pixel}
-	\caption{Алгоритм трассировки лучей для 1 пикселя}
-	\label{fig:raytrace_algo_pixel}
-\end{figure}
-
-Теоретически свет может отражаться бесконечно, введение ограничения на максимальное число поколений луча позволит ограничить время построения изображения.
-Необходимо отметить, что каждый луч при пересечении с поверхностью образует 2 луча: преломленный и отраженный, таким образом можно построить дерево расчета лучей.
-Пример такого дерева приведен на картинке~\ref{fig:raytrace_tree}, на данном дереве левая ветвь соответствует лучам, полученным в результате отражения, правая - в результате преломеления,
-стрелками указан обход дерева, при спуске по дереву луч строится, при поднятии по дереву интенсивность вычисляется. Можно заметить что максимальное поколение лучей является максимальной высотой получаемого дерева.
-
-В данном случае при помещении луча в стек кладутся его следующие параметры:
-\begin{enumerate}
-	\item Вычисленная интенсивность 
-	\item Параметры луча для составления его уравнения 
-	\item Текущее поколение \cite{Rodgers}
-\end{enumerate}
-
-
-
-\begin{figure}[h]
-	\centering
-	\includesvg[scale=0.8]{images/raytrace_tree}
-	\caption{Пример дерева трассировки луча}
-	\label{fig:raytrace_tree}
-\end{figure}
-
-\subsection{Расчет интенсивности света в соответствии с выбранной моделью}
-На картинке~\ref{fig:raytrace_algo_pixel} необходимо рассчитать интенсивность света, рассмотрим как это будет происходить в соответствии с моделью освещения Уиттеда. (см~\ref{fig:global_reflections})
-\begin{figure}[h]
-	\centering
-	\includesvg[height=1.3\textwidth,width=1\textwidth]{images/Yuitted_model}
-	\caption{Алгоритм вычисления интенсивности света для модели Уиттеда}
-	\label{fig:yuitted_model_algo}
-\end{figure}
-Если изображение цветное то приведенный блок (см.~\ref{fig:yuitted_model_algo}) выполняется трижды - для каждого из основных цветов. Идея данного алгоритма проста:
-в случае если вектор от источника света к рассматриваемой точке пересекает непрозрачное тело, источник света не освещает данную точку и мы переходим к следующему,
-если существует пересечение с прозрачными объектами, то они поглотят часть света и его интенсивность снизится. Заметим, что в данной реализации преломление света в прозрачных телах не учитывается.
-Считается, что нормаль к поверхности в заданной точке можно получить из описания объекта. (см.~\ref{sec:obj_formalasation}).
-Рисунок~\ref{fig:yuitted_model_algo} соответствует этапу <<Вычислить интенсивность света \(I\) в данной точке>> в алгоритме обратной трассировки лучей (см.~\ref{fig:raytrace_algo_pixel}).
-Данная модель освещения может быть модифицирована для учета преломления света. \cite{Rodgers}
-
-\subsection{Нахождение пересечения с объектами сцены}
-Один из самых трудозатратных этапов данного алгоритма  - поиск пересечения с объектами сцены. Необходимо быстро определять координаты точки пересечения испущенного луча 
-с данными примитивами.
-
-
-Для начала необходимо ввести уравнение самого луча (см.~\ref{eq:ray}).
-\begin{equation} 
-	P(t) = \vec{E} +t\vec{D},t \ge 0
-	\label{eq:ray_vector_eq}
-\end{equation}
-Также уравнение~\ref{eq:ray_vector_eq} имеет запись
-\begin{equation}
-	\label{eq:ray_scalar_eq}
-	\begin{aligned}
-		x(t) = x_E + t x_D \\
-		y(t) = y_E + t y_D \\
-		z(t) = z_E + t z_D.
-	\end{aligned}
-\end{equation}
-Таким образом луч определяется: точкой обзора - $\vec{E} = (x_E,y_E,z_E)$ и вектором направления - $\vec{D} = (x_D,y_D,z_D)$. Значение $t$  определяет направление луча: в случае если $t ge 0$,
-точка на луче находится после точки обзора, иначе - за.Таким образом для поиска наиближайшей точки пересечения, необходимо найти наименьшее неотрицательное значение $t$.\cite{Rodgers,primitives_raytracing_equations} 
-
-
-\textbf{Уравнение сферы}
-Сфера с единичным радиусом может быть задана следующим образом:
-\begin{equation}
-	\vec{P} \cdot \vec{P}=1
-	\label{eq:sphere_eq}
-\end{equation}
-Для получения условия пересечений достаточно подставить уравнение луча из~\ref{eq:ray_vector_eq} в~\ref{eq:sphere_eq} и решить полученное уравнение относительно t.
-\begin{equation}
-	t=\frac{-b\pm\sqrt{b^2-4ac}}{2a}
-	\label{eq:sphere_solved}
-\end{equation}
-После проведенных преобразований будет получена формула~\ref{eq:sphere_solved}, где:
-\begin{enumerate}
-	\item $a = \vec{D} \cdot \vec{D}$ 
-	\item $b = 2\vec{E} \cdot \vec{D}$ 
-	\item $c = \vec{E} \cdot \vec{E} - 1$
-\end{enumerate}
-В случае если вещественные решения уравнения~\ref{eq:sphere_solved} отсутствуют, то пересечения луча также отсутствуют, если только одно решение  - существует одно
-пересечение и т.~д. Если значение отрицательное то точка пересечения находится за точкой наблюдения и нас не интересует.\cite{primitives_raytracing_equations}
-
-\textbf{Уравнение цилиндра}
-Уравнение~\ref{eq:cylinder_eq} задает бесконечный цилиндр.
-\begin{equation}
-	x^2 + y^2=1
-	\label{eq:cylinder_eq}
-\end{equation}
-Для ограничения цилиндра необходимо ввести требования к значению $z$ цилиндра:
-\begin{equation}
-	x^2 + y^2=1,z_{min} < z  < z_{max}	
-	\label{eq:cylinder_eq_demanding}
-\end{equation}
-Для нахождения пересечений подставим~\ref{eq:ray_scalar_eq} в ~\ref{eq:cylinder_eq}, после чего получим уравнение~\ref{eq:inf_cylinder_solved}
-\begin{equation}
-	t=\frac{-b\pm\sqrt{b^2-4ac}}{2a}
-	\label{eq:inf_cylinder_solved}
-\end{equation}
-В формуле~\ref{eq:inf_cylinder_solved}:
-\begin{enumerate}
-	\item $a = x_{D}^2 + y_{D}^2$ 
-	\item $b = 2x_Ex_D+2y_Ey_D$ 
-	\item $c = x_{E}^2+y_{E}^2 - 1$
-\end{enumerate}
-
-После вычисления значения по данной формуле, будет получено  одно или несколько значений $t$, для конечного циллиандра необходимо вычислить значения $z$ по
-формуле~\ref{eq:ray_scalar_eq} ($z_1 = z_E + t_1z_D,z_2 = z_E + t_2z_D$), после чего проверить соответствуют ли полученные значения $z$ условию $z_{min} < z  < z_{max}$.
-Также необходимо проверить пересечения луча с верхней и нижней окружностями цилиндра, для этого можно воспользоваться формулами:
-\begin{equation}
-	\label{eq:cylinder_caps}
-	\begin{aligned}
-		x^2 + y^2=1,z = z_{min}\\
-		x^2 + y^2=1,z = z_{max}
-	\end{aligned}
-\end{equation}
-Если $z_1,z_2$ лежат с разных сторон от $z_{\min}$, то луч проходит через ближайшую окружность цилиндра и вычислить значение $t$ можно следующим способом:
-\begin{equation}
-	t_3=\frac{z_{\min}-z_E}{z_D}.
-	\label{eq:cylinder_caps_solved}
-\end{equation}
-Аналогично находится и точка пересечения с дальней окружностью ($z_{\max}$) цилиндра.\cite{primitives_raytracing_equations}
-
-
-\textbf{Уравнение конуса}
-Конус задается уравнением \ref{eq:cone_eq}
-\begin{equation}
-	x^2+y^2=z^2.
-	\label{eq:cone_eq}
-\end{equation}
-После введения данного уравнения точка пересечения вычисляется аналогично точке пересечения с цилиндром. Нельзя забывать, что также как и в работе с цилиндром, для
-ограничения фигуры необходимо вводить условия $z_{\min} < z < z_{\max}$.
-
-\textbf{Уравнение плоскости}
-Плоскость может определяться вектором нормали $\vec{N}$, и вершиной на плоскости $Q$. Таким образом точка $P$ принадлежит плоскости, если 
-\begin{equation}
-	\vec{N} \cdot (\vec{P} - \vec{Q}) = 0
-	\label{eq:plane_eq}
-\end{equation}
-
-Для нахождения пересечения необхрдимо подставить~\ref{eq:ray_vector_eq} в~\ref{eq:plane_eq}. После выполнения преобразований будет получено
-выражение \ref{eq:plane_eq_solved}.
-\begin{equation}
-	t=\frac{\vec{N} \cdot (\vec{Q} - \vec{E})}{\vec{N} \cdot \vec{D}}
-	\label{eq:plane_eq_solved}
-\end{equation}
-В случае, если $t \ge 0$ тогда точка пересечения $\vec{E} + t\vec{D}$. Если $\vec{N} \cdot \vec{D} = 0$ тогда луч параллелен плоскости и
-точка пересечения отсутствует.\cite{primitives_raytracing_equations}
-
-
-\textbf{Трансорфмация примитивов}
-Заметим что в записанных нами формулах наложены ограничения на положение фигур:
-\begin{enumerate}
-	\item Сфера и цилиндр были расмотрены только с единичным радиусом
-	\item Цилиндр и конус совмещены по оси с осью $z$
-	\item Конус имеет единичнный уклон
-\end{enumerate}
-Для поиска пересечения необходимо найти преобразования, периводящие примитив из начала координат и данных условий в требуемые (перенос, поворот, масштабирование).
-После чего применить обратные преобразования к построенному лучу.
-Пусть объект $\hat{B}$ проходит трансформацию $TRS$, чтобы попасть в требуемую позицию $B = TRS\hat{B}$, в таком случае обратное преобразование луча будет выглядеть
-следующим образом (см.~\ref{eq:primitives_transformation}).
-\begin{equation}
-	\label{eq:primitives_transformation}
-	\begin{aligned}
-		\hat{E} = S^{-1}R^{-1}T^{-1}\vec{E}\\
-		\hat{D} = S^{-1}R^{-1}\vec{D}.
-	\end{aligned}
-\end{equation}
-После нахожднния пересечения преобразованного луча с исходным объектом будет получено значение $t$, что позволяет посчитать $\vec{P} = \vec{E} +t\vec{D}$.
-
-\section{Перспектива}
-Для получения перспективы необходимо cкорректировать направление каждого луча. Перед тем как получить наше изображение необходимо спроецировать его на картинную плоскость.
-%TODO:описать что такое картинная плоскость и найти картинку получше
-все лучи должны исходить из одной точки и проходить через полученные соответствующие пиксели (см.~\ref{fig:perspective_view}).Для описания координатной системы камеры введены:
-вектора $-w$ - вектор направления взгляда, $\mathrm{e}$ - точка наблюдения, $\mathrm{v}$ - вектор направленный <<вверх>> (англ. up vector), необходимый для построения базиса.
-В данном случае картинная плоскость находится на удалении $d$ в направлении взгляда $\mathrm{-w}$, каждый луч будет иметь различное направление в зависимости от пересекаемого пикселя.
-\begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.3]{raytracing_perspective}
-	\caption{Перспективный вид}
-	\label{fig:perspective_view}
-\end{figure}
-Соответственно необходимо корректировать вектор направления испускаемых лучей (см.~\ref{eq:ray_vector_eq}) следующим образом:
-\begin{equation}
-	D = -d\mathrm{w} + u\mathrm{n} + u\mathrm{v}
-\end{equation}
-где $u,v$ получены из расчета луча для каждого пикселя (см.~\ref{eq:pixel_rays}).
-\begin{equation}
-	\begin{aligned}
-		u = l + (x + 0.5)\frac{r - l}{n_x}\\
-		v = b + (y + 0.5)\frac{t - b}{n_y}
-	\end{aligned}
-	\label{eq:pixel_rays}
-\end{equation}
-В выражениях \ref{eq:pixel_rays} символы соответственно означают:
-\begin{enumerate}
-	\item $l,r$ - позиции левого  и правого краев изображения соответственно
-	\item $t,b$ - позицции верхнего и нижнего краев изображения соответственно
-	\item $x,y$ - координаты пикселя
-	\item $n_x,n_y$ - количество пикселей по соответствующим осям изображения
-\end{enumerate}
-После выполненных преобразований будет получено представления луча, для которого будут вычисляться
-пересечения с объектами.\cite{perspective_raytracing}
-
-\section{Вывод}
-В данном разделе был разобрана реализация выбранного алгоритма построения изображения, а также рассмотрены случаи поиска пересечений лучей  к конкретным примитивам.Была затронута 
-тема построения перспективы для выбранного алгоритма и математическое обоснование его работы.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\begin{thebibliography}{9}
-	\bibitem{Rodgers}
-	Роджерс Д. Алгоритмические основы машинной графики. - 1-е изд. - Москва: Мир, 1989. - 512 с.
-	\bibitem{global_model}
-	Модель глобального освещения с трассировкой лучей [Электронный ресурс]. – Режим доступа: https://vunivere.ru/work71759/page3 (дата обращения 15.07.23)
-	\bibitem{modern_ray_tracing}
-	Современное состояние методов расчета глобальной освещенности в задачах реалистичной компьютерной графики [Электронный ресурс]. – Режим доступа: https://cyberleninka.ru/article/n/sovremennoe-sostoyanie-metodov-raschyota-globalnoy-osveschyonnosti-v-zadachah-realistichnoy-kompyuternoy-grafiki/viewer (дата обращения 15.07.23)
-	\bibitem{SSR}
-	Screen Space Reflection Techniques [Электронный ресурс]. – Режим доступа: https://ourspace.uregina.ca/handle/10294/9245 (дата обращения 15.07.23)
-	\bibitem{reflexion_types}
-	Отражение в играх. Как работают, различия и развитие технологий [Электронный ресурс]. – Режим доступа: https://clck.ru/34zZCf (дата обращения 15.07.23)
-	\bibitem{simple_reflexion_types}
-	Простые модели освещения  [Электронный ресурс]. – Режим доступа: https://grafika.me/node/344 (дата обращения 15.07.23)
-	\bibitem{primitives_raytracing_equations}
-	Ray tracing primitives  [Электронный ресурс]. – Режим доступа: https://www.cl.cam.ac.uk/teaching/1999/AGraphHCI/SMAG/node2.html (дата обращения 20.07.23)
-	\bibitem{perspective_raytracing}
-	Ray tracing  [Электронный ресурс]. – Режим доступа: https://www.mauriciopoppe.com/notes/computer-graphics/ray-tracing/ (дата обращения 23.07.23)
-
-
-\end{thebibliography}
-
-\addcontentsline{toc}{chapter}{Список литературы}
-
-
-
-\end{document}

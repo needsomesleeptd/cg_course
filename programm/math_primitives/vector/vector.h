@@ -7,8 +7,11 @@
 #include "base_math_primitive.h"
 #include "glmWrapper.h"
 
-using MatD4 = Matrix4;
 
+using MatD4 = Matrix4;
+using VecD3 = Vector3;
+using VecD4 = Vector4;
+/*
 class VecD4
 {
 
@@ -149,6 +152,17 @@ class VecD3
 	{
 		return VecD3(-e[0], -e[1], -e[2]);
 	}
+
+	__host__ __device__ inline VecD3 operator-(float t)
+	{
+		return VecD3(e[0] - t, e[1] - t, e[2] - t);
+	}
+
+	__host__ __device__ inline VecD3 operator+(float t)
+	{
+		return VecD3(e[0] + t, e[1] + t, e[2] + t);
+	}
+
 	__host__ __device__ inline float operator[](int i) const
 	{
 		return e[i];
@@ -254,6 +268,9 @@ __host__ __device__ inline VecD3& VecD3::operator+=(const VecD3& v)
 	e[2] += v.e[2];
 	return *this;
 }
+
+
+
 
 __host__ __device__ inline VecD3& VecD3::operator*=(const VecD3& v)
 {
@@ -427,7 +444,7 @@ __host__ __device__ inline VecD4 normalise(VecD4 v)
 	return v / v.length();
 }
 
-
+*/
 
 
 #endif //DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_VECTOR_VECTOR_H_

@@ -18,7 +18,7 @@ void Camera::setCoordinates(Point &coordinates) {
 	_cameraStructure->setCoordinates(coordinates);
 }
 */
-Camera::Camera(const VecD3& coordinates, const VecD3& direction)
+__host__ __device__ Camera::Camera(const VecD3& coordinates, const VecD3& direction)
 	: _cameraStructure(std::make_shared<CameraStructureImp>(coordinates, direction))
 {
 }

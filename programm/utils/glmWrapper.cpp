@@ -1,6 +1,6 @@
 #include "glmWrapper.h"
-
-/*Matrix4 translate(const Matrix4&mat, const Vector3& offset) {
+/*
+Matrix4 translate(const Matrix4&mat, const Vector3& offset) {
 	return glm::translate(mat, offset);
 }
 
@@ -23,13 +23,13 @@ Vector3 normalize(const Vector3& vec) {
 Matrix4 perspective(float rad, float aspect, float zNear, float zFar) {
 	return glm::perspective(rad, aspect, zNear, zFar);
 }
-*/
-/*float dot(VecD3 a, VecD3 b)
+
+float dot(Vector3 a, Vector3 b)
 {
 	return glm::dot(a, b);
 }
 
-VecD3 normalise(VecD3 a)
+Vector3 normalise(Vector3 a)
 {
 	return glm::normalize(a);
 }*/

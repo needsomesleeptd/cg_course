@@ -15,12 +15,12 @@ class CameraStructureImp
 	explicit CameraStructureImp(const VecD3& coordinates, const VecD3& direction);
 	~CameraStructureImp() = default;
 
-	[[nodiscard]]  VecD3 getCoordinates() const;
-	[[nodiscard]]  VecD3 getViewDirection() const;
-	[[nodiscard]]  VecD3 getUp() const;
-	[[nodiscard]]  VecD3 getRight() const;
-	[[nodiscard]]  MatD4 getInverseProjectionMatrix();
-	[[nodiscard]]  MatD4 getInverseViewMatrix();
+	__host__ __device__  [[nodiscard]]  VecD3 getCoordinates() const;
+	__host__ __device__  [[nodiscard]]  VecD3 getViewDirection() const;
+	__host__ __device__  [[nodiscard]]  VecD3 getUp() const;
+	__host__ __device__  [[nodiscard]]  VecD3 getRight() const;
+	__host__ __device__  [[nodiscard]]  MatD4 getInverseProjectionMatrix();
+	__host__ __device__  [[nodiscard]]  MatD4 getInverseViewMatrix();
 
 
 

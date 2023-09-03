@@ -48,7 +48,7 @@ __device__ ColorRGB renderPixel(int x,
 	LightSource* lightSource,
 	ImageAdapter* image);
 
-__global__ void renderSceneCuda(Camera* camera,
+__global__ void renderSceneCuda(Camera** camera,
 	CudaArray<CudaShape>* objects,
 	LightSource** lightSource,
 	ImageAdapter* image);

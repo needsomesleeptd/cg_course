@@ -12,11 +12,11 @@ class BaseCamera : public InvisibleObject
 {
  public:
 	BaseCamera() = default;
-	virtual VecD3 getViewPoint() = 0;
-	virtual VecD3 getViewDirection() = 0;
-	virtual VecD3 getUpVector() = 0;
-	virtual MatD4  getInverseProjectionMatrix() = 0;
-	virtual MatD4  getInverseViewMatrix() = 0;
+	__host__ __device__  virtual VecD3 getViewPoint() = 0;
+	__host__ __device__  virtual VecD3 getViewDirection() = 0;
+	__host__ __device__  virtual VecD3 getUpVector() = 0;
+	__host__ __device__  virtual MatD4  getInverseProjectionMatrix() = 0;
+	__host__ __device__ virtual MatD4  getInverseViewMatrix() = 0;
 	virtual ~BaseCamera() = default;
 };
 

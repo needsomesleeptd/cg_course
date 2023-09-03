@@ -18,15 +18,15 @@ class Camera : public BaseCamera
 
 
 	Camera() = default;
-	explicit Camera(const  VecD3& coordinates, const  VecD3& direction);
+	__host__ __device__ explicit Camera(const  VecD3& coordinates, const  VecD3& direction);
 	explicit Camera(std::shared_ptr<CameraStructureImp> cameraStructure);
 	~Camera() override = default;
 
-	VecD3 getViewPoint() override;
-	VecD3 getViewDirection() override;
-	VecD3 getUpVector() override;
-	MatD4  getInverseProjectionMatrix() override;
-	MatD4  getInverseViewMatrix() override;
+	__host__ __device__ VecD3 getViewPoint() override;
+	__host__ __device__  VecD3 getViewDirection() override;
+	__host__ __device__  VecD3 getUpVector() override;
+	__host__ __device__  MatD4  getInverseProjectionMatrix() override;
+	__host__ __device__  MatD4  getInverseViewMatrix() override;
 
 
 	void setImageParams(int height, int width);

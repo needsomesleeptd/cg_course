@@ -61,10 +61,10 @@ __device__  ColorRGB rayTrace(const Ray& tracedRay,
 
 	VecD3 intersectionPoint = tracedRay.getPoint(t);
 	//printf("Position  == %f",currentLightSource->getPosition().x());
-	VecD3 lightVector = normalise(intersectionPoint - currentLightSource->getPosition());
+	VecD3 lightVector = glm::normalize(intersectionPoint - currentLightSource->getPosition());
 	//lightSource->getColor();
 
-	VecD3 shapeNormal = normalise(closestShape->getNormal(intersectionPoint));
+	VecD3 shapeNormal = glm::normalize(closestShape->getNormal(intersectionPoint));
 
 	Material shapeMaterial = closestShape->getMaterial();
 	float ambientIntensivity = shapeMaterial._k_a * currentLightSource->getIntensivity();
@@ -112,12 +112,12 @@ __device__  Ray createRay(int x, int y, Camera* currentCamera, ImageAdapter* ima
 {
 	float imageHeight = image->_height; //image->getHeight();
 	float imageWidth = image->_width; //image->getWidth();
-	VecD3 viewPoint = { 0, 0, -3 };
-	/*VecD3 l = viewPoint - float(imageWidth / 2);
+	VecD3 viewPoint = currentCamera->getViewPoint();
+	VecD3 l = viewPoint - float(imageWidth / 2);
 	VecD3 r = viewPoint + float(imageWidth / 2);
 
 	VecD3 up = viewPoint - float(imageHeight / 2);
-	VecD3 down = viewPoint + float(imageHeight / 2);*/
+	VecD3 down = viewPoint + float(imageHeight / 2);
 
 	//VecD3 u_deformation = float(x) * (r - l) / float(imageWidth);
 	//VecD3 v_deformation = float(y) * (up - down) / float(imageHeight);//TODO::fix ray origin
@@ -126,8 +126,8 @@ __device__  Ray createRay(int x, int y, Camera* currentCamera, ImageAdapter* ima
 	glm::vec2 coord = { (float)x / (float)imageWidth, (float)y / (float)imageWidth };
 	coord = coord * 2.0f - 1.0f; // -1 -> 1
 
-	VecD4 target = VecD4(coord.x, coord.y, 1, 1);
-	VecD3 rayDirection = normalise(VecD3(target) / target.w()); // World space //TODO::Check this
+	VecD4 target = currentCamera->getInverseProjectionMatrix() * VecD4(coord.x, coord.y, 1, 1);
+	VecD3 rayDirection = VecD3(currentCamera->getInverseViewMatrix() * VecD4(glm::normalize(VecD3(target) / target.w), 0)); // World space
 	return Ray(viewPoint, rayDirection);
 	/*VecD3 dir =VecD3(4*x,3*y,0) - viewPoint;
 	return Ray(viewPoint,dir);*/
@@ -146,7 +146,7 @@ __device__ ColorRGB renderPixel(int x,
 	return finalColor;
 }
 
-__global__ void renderSceneCuda(Camera* camera,
+__global__ void renderSceneCuda(Camera** camera,
 	CudaArray<CudaShape>* objects,
 	LightSource** lightSource,
 	ImageAdapter* image)
@@ -158,7 +158,7 @@ __global__ void renderSceneCuda(Camera* camera,
 	//printf("%d %d\n",i,j);
 	if (i >= image->_width || j >= image->_height)
 		return;
-	ColorRGB pixelColor = renderPixel(i, j, camera, objects, *lightSource, image);
+	ColorRGB pixelColor = renderPixel(i, j, *camera, objects, *lightSource, image);
 	pixelColor.normalize();
 	//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
 
@@ -177,12 +177,30 @@ __global__ void createLightSource(
 	}
 }
 
+__global__ void destroyLightSource(
+	LightSource** lightSource)
+{
+	delete *lightSource;
+}
+
+
+__global__ void createCamera(
+	Camera** camera,VecD3 coordinates,VecD3 direction)
+{
+	if (threadIdx.x == 0 && blockIdx.x == 0)
+	{
+		(*camera) = new Camera(coordinates,direction);
+	}
+}
+
+
+
 __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
 	int blockX = 5;
 	int blockY = 5;
-	int nx = 1000;
-	int ny = 1000;
+	int nx = 600;
+	int ny = 600;
 	ImageAdapter hostImage;
 	hostImage._width = nx;
 	hostImage._height = ny;
@@ -196,20 +214,27 @@ __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 
 	std::shared_ptr<Camera> cameraHost = scene->getCamera();
 
-	Camera* cameraDevice;
-	cpuErrorCheck(cudaMalloc((void**)&(cameraDevice), sizeof(Camera)));
-	cpuErrorCheck(cudaMemcpy(cameraDevice, cameraHost.get(), sizeof(Camera), cudaMemcpyHostToDevice));
+
 
 	std::shared_ptr<LightSource> lightSourceHost = std::dynamic_pointer_cast<LightSource>(scene->getLightSource());
 
-	//LightSource* lightSourceDevice;
-	//cudaMalloc((void**)&lightSourceDevice, sizeof(LightSource));
-	//createLightSource<<<1, 1>>>(&lightSourceDevice, VecD3(0,0,0), 1);
+
+	//creating lightSource
 	LightSource** lightSourceDevice;
 	cpuErrorCheck(cudaMalloc((void **)&lightSourceDevice, sizeof(LightSource**)));
-	createLightSource<<<1,1>>>(lightSourceDevice,VecD3(0,0,0), 1);
+	createLightSource<<<1,1>>>(lightSourceDevice,VecD3(1,1,1),1.0f);
 	cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());
+
+	//creating Camera
+	Camera** cameraDevice;
+	cpuErrorCheck(cudaMalloc((void **)&cameraDevice, sizeof(Camera**))); //TODO::make camera class transparent
+	createCamera<<<1,1>>>(cameraDevice,cameraHost->_cameraStructure->getCoordinates(),cameraHost->_cameraStructure->getViewDirection());
+	cpuErrorCheck(cudaGetLastError());
+	cpuErrorCheck(cudaDeviceSynchronize());
+
+
+
 	/*cpuErrorCheck(cudaMalloc((void**)&(lightSourceDevice), sizeof(LightSource)));
 	cpuErrorCheck(cudaMemcpy(lightSourceDevice, lightSourceHost.get() ,sizeof(LightSource), cudaMemcpyHostToDevice));*/
 
@@ -269,6 +294,8 @@ __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 	cudaFree(deviceImage);
 	cudaFree(transferArray.values);
 	cudaFree(deviceVector);
+
+	destroyLightSource<<<1, 1>>>(lightSourceDevice);
 	cudaFree(lightSourceDevice);
 
 	resultImage->_width = nx;

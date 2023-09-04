@@ -10,3 +10,4 @@ cmakeBuildFiles
 *.fdb*
 *.gz
 *.toc
+*.fls

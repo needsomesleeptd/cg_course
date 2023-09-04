@@ -235,8 +235,6 @@ __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 
 
 
-	/*cpuErrorCheck(cudaMalloc((void**)&(lightSourceDevice), sizeof(LightSource)));
-	cpuErrorCheck(cudaMemcpy(lightSourceDevice, lightSourceHost.get() ,sizeof(LightSource), cudaMemcpyHostToDevice));*/
 
 
 	std::vector<std::shared_ptr<BaseObject>> hostObjects = scene->getModels();
@@ -277,7 +275,7 @@ __host__ ImageAdapter* Renderer::renderScene(std::shared_ptr<Scene> scene)
 	dim3 blocks(nx / blockX, ny / blockY);
 	dim3 threads(blockX, blockY);
 	renderSceneCuda<<<blocks, threads>>>(cameraDevice, deviceVector, lightSourceDevice, deviceImage);
-	cpuErrorCheck(cudaGetLastError());
+	//cpuErrorCheck(cudaGetLastError());
 	cpuErrorCheck(cudaDeviceSynchronize());
 
 	ImageAdapter* resultImage;

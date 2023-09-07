@@ -36,7 +36,7 @@
 			closestShape = std::dynamic_pointer_cast<BaseShape>(shape);
 		}
 	}
-	if ((t - maxRange) < 0)
+	if (fabs(t - maxRange) < EPS)
 	{
         return;
     }
@@ -129,4 +129,18 @@
 
 Алгоритм \ref{lst:sphere_intersection} аналогичен алгоритму, приведенному в \ref{eq:sphere_solved}, в случае отсутствия пересечения возвратится отрицательный
 результат.
+
 \section{Полученные изображения}
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.4]{numerous_spheres}
+	\caption{Рендер нескольких сфер вместе с плоскостью}
+	\label{fig:numerous_spheres}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.4]{sphere_reflection}
+	\caption{Рендер одной сферы с плоскостью}
+	\label{fig:numerous_spheres}
+\end{figure}

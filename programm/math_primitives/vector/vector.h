@@ -9,9 +9,9 @@
 
 
 using MatD4 = Matrix4;
-using VecD3 = Vector3;
-using VecD4 = Vector4;
-/*
+//using VecD3 = Vector3;
+//using VecD4 = Vector4;
+
 class VecD4
 {
 
@@ -444,7 +444,7 @@ __host__ __device__ inline VecD4 normalise(VecD4 v)
 	return v / v.length();
 }
 
-*/
+
 
 
 #endif //DZ2_CG_COURSE_PROGRAMM_MATH_PRIMITIVES_VECTOR_VECTOR_H_

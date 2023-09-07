@@ -33,10 +33,6 @@ inline void cpuAssert(cudaError_t result, char const* const func, const char* co
 		cudaDeviceReset();
 		exit(99);
 	}
-	else
-	{
-		std:: cout<<  cudaGetErrorString(result) << "\n";
-	}
 }
 
 template<typename T>

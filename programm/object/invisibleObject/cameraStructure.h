@@ -12,7 +12,7 @@ class CameraStructureImp
 {
  public:
 	CameraStructureImp() = default;
-	explicit CameraStructureImp(const VecD3& coordinates, const VecD3& direction);
+	__host__ __device__ explicit CameraStructureImp(const VecD3& coordinates, const VecD3& direction);
 	~CameraStructureImp() = default;
 
 	__host__ __device__  [[nodiscard]]  VecD3 getCoordinates() const;
@@ -24,16 +24,16 @@ class CameraStructureImp
 
 
 
-	void setCoordinates(const VecD3& coordinates);
-	void transform(const TransformParams& transformParams);
+	__host__ __device__ void setCoordinates(const VecD3& coordinates);
+	__host__ __device__ void transform(const TransformParams& transformParams);
 
 	//[[nodiscard]] Matrix4 getViewDirection();
 	//[[nodiscard]] Matrix4 getProjection() const;
-	void move(const VecD3& moveParams);
-	void setDirection(const VecD3& direction);
-	void updateView();
-	void updateProjection();
-	void setViewPortParams(int height, int width);
+	__host__ __device__ void move(const VecD3& moveParams);
+	__host__ __device__ void setDirection(const VecD3& direction);
+	__host__ __device__ void updateView();
+	__host__ __device__ void updateProjection();
+	__host__ __device__ void setViewPortParams(int height, int width);
 
  private:
 	VecD3 _coordinates{ 0.0, 0.0, 0.0 };

@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "sphere.h"
+#include "plane.h"
 #include "camera.h"
 #include "Renderer.h"
 #include "LightSource.h"
@@ -95,12 +96,15 @@ void MainWindow::setupScene()
 	std::shared_ptr<Sphere> sphereRed = std::make_shared<Sphere>(VecD3({1.0,1.0,0}),1.0,materialRed);
 	std::shared_ptr<Sphere> sphereGreen = std::make_shared<Sphere>(VecD3({1.0,-5.0,0}),1.0,materialGreen);
 
+
+	std::shared_ptr<Plane> planeRed = std::make_shared<Plane>(VecD3{0.0,0.0,-10.0},VecD3{0.0,1.0,0.0},materialGreen);
 	_sceneManager->getScene()->addModel(sphereGreen);
 	_sceneManager->getScene()->addModel(sphereRed);
+	_sceneManager->getScene()->addModel(planeRed);
 
 
 	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0,0,0),1).create();
-	lightsource->setColor(ColorRGB(0.2,0.5,0.8));
+	lightsource->setColor(ColorRGB(1,1,1));
 	_sceneManager->getScene()->setLightSource(lightsource);
 
 	std::shared_ptr<BaseRenderer> renderer = std::make_shared<Renderer>(_scene);

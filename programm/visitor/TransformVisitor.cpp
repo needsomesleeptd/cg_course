@@ -3,7 +3,7 @@
 //
 #include "TransformVisitor.h"
 #include "camera.h"
-
+#include "plane.h"
 
 
 
@@ -39,6 +39,10 @@ void TransformVisitor::visit(LightSource& lightSorce) const
 {
 	//lightSorce._position = _transformParams.getMoveParams();
 	//lightSorce._intensivity = _transformParams.getScaleParams()[0];//TODO:: is a hack
+}
+void TransformVisitor::visit(const Plane& plane)
+{
+	//plane.transform(_transformParams);
 }
 
 

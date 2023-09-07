@@ -6,9 +6,10 @@
 #include "scene.h"
 
 #include <iostream>
+#include <QGraphicsItem>
+#include <QPixmap>
 ColorRGB Renderer::renderPixel(int x, int y, std::shared_ptr<Scene> scene)
 {
-
 
 	Ray tracedRay = createRay(x, y, scene->getCamera());
 	ColorRGB finalColor = backGround;
@@ -72,8 +73,8 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 		if (curDepth < maxDepth)
 		{
 			ColorRGB rcol(0, 0, 0);
-			rayTrace(reflected, rcol, scene,curDepth + 1);
-			finalColor = rcol * shapeMaterial._k_s  * closestShape->getMaterial()._color + finalColor;
+			rayTrace(reflected, rcol, scene, curDepth + 1);
+			finalColor = rcol * shapeMaterial._k_s * closestShape->getMaterial()._color + finalColor;
 		}
 	}
 }
@@ -97,11 +98,17 @@ Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)
 	coord = coord * 2.0f - 1.0f; // -1 -> 1
 
 	glm::vec4 target = currentCamera->getInverseProjectionMatrix() * glm::vec4(coord.x, coord.y, 1, 1);
-	glm::vec3 rayDirection = glm::vec3(currentCamera->getInverseViewMatrix() * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0)); // World space
+	glm::vec3 rayDirection = glm::vec3(currentCamera->getInverseViewMatrix()
+		* glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0)); // World space
 	return Ray(viewPoint, rayDirection);
 	/*VecD3 dir =VecD3(4*x,3*y,0) - viewPoint;
 	return Ray(viewPoint,dir);*/
 }
+
+
+
+
+
 void Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
 	std::shared_ptr<ImageAdapter> image = std::make_shared<ImageAdapter>(_scene->width(), _scene->height());
@@ -116,9 +123,22 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 			image->setPixelColor(i, j, pixelColor);
 		}
 	}
-	QPixmap pixmap;
-	pixmap.convertFromImage(*image->getImage());
-	_scene->addPixmap(pixmap);
+	QGraphicsItem* pixmapPtr;
+	pixmapPtr = _scene->itemAt(0, 0, QTransform());
+	if (!pixmapPtr)
+	{
+		QPixmap pixmap;
+		pixmap.convertFromImage(*image->getImage());
+		_scene->addPixmap(pixmap);
+	}
+	else
+	{
+		QGraphicsPixmapItem* canvasPixmap = qgraphicsitem_cast<QGraphicsPixmapItem*>(pixmapPtr);
+		QPixmap pixmap;
+		pixmap.convertFromImage(*image->getImage());
+		canvasPixmap->setPixmap(pixmap);
+		_scene->update();
+	}
 }
 
 Renderer::Renderer(QGraphicsScene* scene)

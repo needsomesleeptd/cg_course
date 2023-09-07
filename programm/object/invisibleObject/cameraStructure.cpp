@@ -31,10 +31,12 @@ void CameraStructureImp::transform(const TransformParams& transformParams)
 }
 
 
+#include <iostream>
 
 void CameraStructureImp::move(const  VecD3& moveParams)
 {
 	_coordinates += moveParams;
+	std::cout<< _coordinates.x  <<" "<< _coordinates.y <<" "<< _coordinates.z << "\n";
 }
 
 /*void CameraStructureImp::updateVectors()

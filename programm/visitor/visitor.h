@@ -8,7 +8,7 @@ class Camera;
 class Composite;
 class LightSource;
 class Sphere;
-
+class Plane;
 
 class Visitor {
 public:
@@ -19,6 +19,7 @@ public:
 	virtual void visit(const Composite &composite) = 0;
 	virtual void visit(LightSource& lightSource) const = 0;
 	virtual void visit(const Sphere &sphere) = 0;
+	virtual void visit(const  Plane &plane) = 0;
 };
 
 class VisitorFactory {

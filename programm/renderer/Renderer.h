@@ -12,9 +12,9 @@
 #include <QGraphicsScene>
 
 
-const float EPS = 1e-7;
+
 const float maxRange = 1e9;
-const int maxDepth = 12;
+const int maxDepth = 2;
 const ColorRGB backGround = ColorRGB(0,0,0);
 
 

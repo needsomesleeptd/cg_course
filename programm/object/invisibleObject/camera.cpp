@@ -66,6 +66,14 @@ void Camera::update(QKeyEvent* e, float time)
 		_cameraStructure->move(-1.0f * _cameraStructure->getRight() * movementspeed * time);
 		moved = true;
 		break;
+	case Qt::Key_Space:
+		_cameraStructure->move(1.0f * _cameraStructure->getUp() * movementspeed * time);
+		moved = true;
+		break;
+	case Qt::Key_Control:
+		_cameraStructure->move(-1.0f * _cameraStructure->getUp() * movementspeed * time);
+		moved = true;
+		break;
 
 	}
 	if (moved)

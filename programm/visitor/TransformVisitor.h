@@ -20,6 +20,7 @@ class TransformVisitor : public Visitor
 	void visit(const Composite& composite) override;
 	void visit(const Sphere& sphere) override;
 	void visit(LightSource& lightSorce) const override;
+	void visit(const  Plane &plane) override;
 	void setParams(const TransformParams& transformParams);
 
 

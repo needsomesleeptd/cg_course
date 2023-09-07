@@ -17,7 +17,7 @@ double Sphere::intersection(const Ray& ray)
 	float b = 2.0f * dot(origin, ray.D);
 	float c = dot(origin, origin) - _radius * _radius;
 	float discriminant = b * b - 4 * a * c;
-	//std::cout << ray.E[0] << ray.E[1] << ray.E[2] << " " << ray.D[0] << ray.D[1] << ray.D[2] << " " << discriminant << std::endl;
+//	std::cout << ray.E[0] << ray.E[1] << ray.E[2] << " " << ray.D[0] << ray.D[1] << ray.D[2] << " " << discriminant << std::endl;
 	if (discriminant < 0)
 		return -1.0; //TODO::might need a special flag of intersection
 	else

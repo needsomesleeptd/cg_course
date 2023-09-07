@@ -11,6 +11,7 @@ struct ColorRGB
 	ColorRGB() = default;
 	ColorRGB(float R_, float G_, float B_);
 	ColorRGB operator*(float value);
+	ColorRGB operator/(float value);
 	ColorRGB operator+(const ColorRGB& color);
 	ColorRGB operator*(const ColorRGB& color);
 	void normalize();

@@ -16,6 +16,27 @@ ColorRGB Renderer::renderPixel(int x, int y, std::shared_ptr<Scene> scene)
 	rayTrace(tracedRay, finalColor, scene, 0);
 	return finalColor;
 }
+
+
+
+
+bool hasIntersection(const Ray& tracedRay,std::shared_ptr<Scene> scene)
+{
+	for (auto shape : scene->getModels())
+	{
+
+		float intersection_t = shape->intersection(tracedRay);
+		//std::cout << intersection_t << std::endl;
+		if (intersection_t > 0 || fabs(intersection_t) < EPS)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
 void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene, int curDepth)
 {
 	std::shared_ptr<BaseShape> closestShape;
@@ -38,6 +59,11 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 	std::shared_ptr<BaseLightSource> currentLightSource = scene->getLightSource();
 	VecD3 intersectionPoint = tracedRay.getPoint(t);
 	VecD3 lightVector = normalise(intersectionPoint - currentLightSource->getPosition());
+
+	Ray lightRay(intersectionPoint,lightVector);
+	if (hasIntersection(lightRay,scene))
+		return;
+
 	VecD3 shapeNormal = normalise(closestShape->getNormal(intersectionPoint));
 
 	Material shapeMaterial = closestShape->getMaterial();
@@ -77,6 +103,8 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 			finalColor = rcol * shapeMaterial._k_s * closestShape->getMaterial()._color + finalColor;
 		}
 	}
+	float rayLength = (intersectionPoint - tracedRay.E).length();
+	finalColor = finalColor / rayLength;
 }
 
 Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)

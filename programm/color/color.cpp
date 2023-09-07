@@ -33,3 +33,7 @@ ColorRGB ColorRGB::operator*(const ColorRGB& color)
 {
 	return {this->R * color.R, this->G * color.G, this->B * color.B};
 }
+ColorRGB ColorRGB::operator/(float value)
+{
+	return {this->R / value, this->G / value, this->B / value};
+}

@@ -8,7 +8,7 @@
 #include "transform.h"
 #include "ray.h"
 #include "material.h"
-const float EPS = 1e-8;
+const float EPS = 1e-9;
 
 class BaseShape : public VisibleObject
 {

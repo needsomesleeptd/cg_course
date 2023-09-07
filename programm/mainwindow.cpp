@@ -85,14 +85,14 @@ void MainWindow::setupScene()
 
 
 	//Generating random spheres;
-	/*int spheresCount = 10;
+	int spheresCount = 5;
 	for (int i = 0; i < spheresCount; i++)
 	{
 		ColorRGB randomColor(GenerateRandom(),GenerateRandom(),GenerateRandom());
 		Material randomMaterial(GenerateRandom(),GenerateRandom(),GenerateRandom(),randomColor);
-		std::shared_ptr<Sphere> sphereRandom = std::make_shared<Sphere>(VecD3({i,i,i}),1.0,randomMaterial);
+		std::shared_ptr<Sphere> sphereRandom = std::make_shared<Sphere>(VecD3({-i,-i,-i}),1.0,randomMaterial);
 		_sceneManager->getScene()->addModel(sphereRandom);
-	}*/
+	}
 	std::shared_ptr<Sphere> sphereRed = std::make_shared<Sphere>(VecD3({1.0,1.0,0}),1.0,materialRed);
 	std::shared_ptr<Sphere> sphereGreen = std::make_shared<Sphere>(VecD3({1.0,-5.0,0}),1.0,materialGreen);
 
@@ -103,7 +103,7 @@ void MainWindow::setupScene()
 	_sceneManager->getScene()->addModel(planeRed);
 
 
-	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0,0,0),1).create();
+	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(-10,0,0),1).create();
 	lightsource->setColor(ColorRGB(1,1,1));
 	_sceneManager->getScene()->setLightSource(lightsource);
 

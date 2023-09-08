@@ -78,10 +78,12 @@ void MainWindow::setupScene()
 
 	auto cont = ui->graphicsView->contentsRect();
 	_scene->setSceneRect(0, 0, cont.width(), cont.height());
-	ColorRGB red(0.4,0,0);
-	ColorRGB green(0,0.5,0.2);
-	Material materialRed(0.1,0.8,0.3,red);
-	Material materialGreen(0.1,0.3,0.8,green);
+	ColorRGB red(1.0f,0,0);
+	ColorRGB green(0,1.0f,0.0);
+	ColorRGB blue(0,0.0,1.0f);
+	Material materialRed(0.1,1.0,0.3,red);
+	Material materialGreen(0.1,0.3,0.5,green);
+	Material materialBlue(0.3,0.1,0.2,blue);
 
 
 	//Generating random spheres;
@@ -89,7 +91,7 @@ void MainWindow::setupScene()
 	for (int i = 0; i < spheresCount; i++)
 	{
 		ColorRGB randomColor(GenerateRandom(),GenerateRandom(),GenerateRandom());
-		Material randomMaterial(GenerateRandom(),GenerateRandom(),GenerateRandom(),randomColor);
+		Material randomMaterial(0.4,GenerateRandom(),GenerateRandom(),randomColor);
 		std::shared_ptr<Sphere> sphereRandom = std::make_shared<Sphere>(VecD3({-i,-i,-i}),1.0,randomMaterial);
 		_sceneManager->getScene()->addModel(sphereRandom);
 	}
@@ -97,7 +99,7 @@ void MainWindow::setupScene()
 	std::shared_ptr<Sphere> sphereGreen = std::make_shared<Sphere>(VecD3({1.0,-5.0,0}),1.0,materialGreen);
 
 
-	std::shared_ptr<Plane> planeRed = std::make_shared<Plane>(VecD3{0.0,0.0,-10.0},VecD3{0.0,1.0,0.0},materialGreen);
+	std::shared_ptr<Plane> planeRed = std::make_shared<Plane>(VecD3{0.0,0.0,-10.0},VecD3{0.0,1.0,0.0},materialBlue);
 	_sceneManager->getScene()->addModel(sphereGreen);
 	_sceneManager->getScene()->addModel(sphereRed);
 	_sceneManager->getScene()->addModel(planeRed);

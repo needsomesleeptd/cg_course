@@ -15,7 +15,7 @@ class BaseObject
  public:
 	BaseObject() = default;
 	virtual ~BaseObject() = default;
-	virtual double intersection(const Ray& ray)
+	virtual float intersection(const Ray& ray)
 	{
 		return -1.0;
 	};

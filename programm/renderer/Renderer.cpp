@@ -17,25 +17,21 @@ ColorRGB Renderer::renderPixel(int x, int y, std::shared_ptr<Scene> scene)
 	return finalColor;
 }
 
-
-
-
-bool hasIntersection(const Ray& tracedRay,std::shared_ptr<Scene> scene)
+bool hasIntersection(const Ray& tracedRay, std::shared_ptr<Scene> scene)
 {
 	for (auto shape : scene->getModels())
 	{
 
 		float intersection_t = shape->intersection(tracedRay);
-		//std::cout << intersection_t << std::endl;
-		if (intersection_t > 0 || fabs(intersection_t) < EPS)
-		{
+		if (intersection_t > 0.0f)
+			return false;
+		if (intersection_t < EPS && intersection_t > 0) // due to self intersection
+			return false;
+		else if (intersection_t > 0)
 			return true;
-		}
 	}
 	return false;
 }
-
-
 
 void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene, int curDepth)
 {
@@ -46,12 +42,13 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 
 		float intersection_t = shape->intersection(tracedRay);
 		//std::cout << intersection_t << std::endl;
-		if (intersection_t > 0 || fabs(intersection_t) < EPS)
+		if (intersection_t > 0 || abs(intersection_t) < EPS)
 		{
 			t = std::min(t, intersection_t);
 			closestShape = std::dynamic_pointer_cast<BaseShape>(shape);
 		}
 	}
+
 	if (abs(t - maxRange) < EPS)
 	{
 		return; //Returning background color
@@ -60,8 +57,8 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 	VecD3 intersectionPoint = tracedRay.getPoint(t);
 	VecD3 lightVector = normalise(intersectionPoint - currentLightSource->getPosition());
 
-	Ray lightRay(intersectionPoint,lightVector);
-	if (hasIntersection(lightRay,scene))
+	Ray lightRay(intersectionPoint, lightVector);
+	if (hasIntersection(lightRay, scene))
 		return;
 
 	VecD3 shapeNormal = normalise(closestShape->getNormal(intersectionPoint));
@@ -133,10 +130,6 @@ Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)
 	return Ray(viewPoint,dir);*/
 }
 
-
-
-
-
 void Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
 	std::shared_ptr<ImageAdapter> image = std::make_shared<ImageAdapter>(_scene->width(), _scene->height());
@@ -146,7 +139,7 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 		for (int j = 0; j < image->getHeight(); j++)
 		{
 			ColorRGB pixelColor = renderPixel(i, j, scene);
-			pixelColor.normalize();
+			//pixelColor.normalize();
 			//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
 			image->setPixelColor(i, j, pixelColor);
 		}

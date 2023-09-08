@@ -13,9 +13,9 @@
 
 
 
-const float maxRange = 1e9;
+const float maxRange = 1e6;
 const int maxDepth = 2;
-const ColorRGB backGround = ColorRGB(0,0,0);
+const ColorRGB backGround = ColorRGB(1,1,1);
 
 
 class Renderer : public BaseRenderer

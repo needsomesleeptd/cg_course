@@ -8,7 +8,7 @@ void Plane::transform(const TransformParams& transformParams)
 {
 	//TODO:: implement this
 }
-double Plane::intersection(const Ray& ray)
+float Plane::intersection(const Ray& ray)
 {
 	 float normalDDot = dot(_normal , ray.D);
 	 if (fabs(normalDDot) < EPS)

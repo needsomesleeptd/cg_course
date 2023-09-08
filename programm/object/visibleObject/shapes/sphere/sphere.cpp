@@ -10,7 +10,7 @@ void Sphere::transform(const TransformParams& transformParams)
 	_center += transformParams.getMoveParams();
 	_radius += transformParams.getScaleParams()[0];
 }
-double Sphere::intersection(const Ray& ray)
+float Sphere::intersection(const Ray& ray)
 {
 	VecD3 origin  = ray.E - this->_center;
 	float a = dot(ray.D, ray.D);

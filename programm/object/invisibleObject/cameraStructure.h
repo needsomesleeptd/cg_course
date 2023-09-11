@@ -54,9 +54,9 @@ class CameraStructureImp
 	int _viewPortHeight = defaultViewPortWidth;
 
 
-	float _verticalFOV = 45.0f;
+	float _verticalFOV = 50.0f;
 
-	float _nearCLip = 0.1f;
+	float _nearCLip = 1.0f;
 
 	float _farClip = 100.0f;
 

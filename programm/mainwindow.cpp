@@ -91,8 +91,8 @@ void MainWindow::setupScene()
 	for (int i = 0; i < spheresCount; i++)
 	{
 		ColorRGB randomColor(GenerateRandom(),GenerateRandom(),GenerateRandom());
-		Material randomMaterial(0.4,GenerateRandom(),GenerateRandom(),randomColor);
-		std::shared_ptr<Sphere> sphereRandom = std::make_shared<Sphere>(VecD3({-i,-i,-i}),1.0,randomMaterial);
+		Material randomMaterial(GenerateRandom(),GenerateRandom(),GenerateRandom(),randomColor);
+		std::shared_ptr<Sphere> sphereRandom = std::make_shared<Sphere>(VecD3({-i,-i,0}),1.0,randomMaterial);
 		_sceneManager->getScene()->addModel(sphereRandom);
 	}
 	std::shared_ptr<Sphere> sphereRed = std::make_shared<Sphere>(VecD3({1.0,1.0,0}),1.0,materialRed);

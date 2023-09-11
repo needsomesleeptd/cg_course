@@ -8,6 +8,8 @@
 #include <iostream>
 #include <QGraphicsItem>
 #include <QPixmap>
+
+
 ColorRGB Renderer::renderPixel(int x, int y, std::shared_ptr<Scene> scene)
 {
 
@@ -101,7 +103,7 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 		}
 	}
 	float rayLength = (intersectionPoint - tracedRay.E).length();
-	finalColor = finalColor / rayLength;
+	finalColor = finalColor / (rayLength + k);
 }
 
 Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)
@@ -134,6 +136,7 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
 	std::shared_ptr<ImageAdapter> image = std::make_shared<ImageAdapter>(_scene->width(), _scene->height());
 	auto objects = scene->getModels();//TODO::remove dynamic casting
+	
 	for (int i = 0; i < image->getWidth(); i++)
 	{
 		for (int j = 0; j < image->getHeight(); j++)

@@ -11,10 +11,10 @@ void Plane::transform(const TransformParams& transformParams)
 float Plane::intersection(const Ray& ray)
 {
 	 float normalDDot = dot(_normal , ray.D);
-	 if (fabs(normalDDot) < EPS)
-		 return -1.0; //no Intersection
+	 /*if (fabs(normalDDot) < EPS)
+		 return -1.0; //no Intersection*/
 
-	 float t = dot(_normal , (_point - ray.E)) / normalDDot;
+	 float t = (-1 -dot(_normal , (_point - ray.E))) / normalDDot;
 	 //std::cout<< t << "\n";
 	 return t;
 }
@@ -41,3 +41,5 @@ void Plane::accept(std::shared_ptr<Visitor> visitor)
 {
 	visitor->visit(*this);
 }
+//bidirectional path tracing
+//imgui

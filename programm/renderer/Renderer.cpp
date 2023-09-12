@@ -83,7 +83,7 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 	{
 
 		Ray reflected = tracedRay.calculateReflected(shapeNormal, intersectionPoint);
-		float specularDot = dot(reflected.D, tracedRay.D);
+		float specularDot = pow(dot(reflected.D, tracedRay.D),20);
 		//std::cout << " diffuseLight" << diffuseLight << std::endl;
 		if (specularDot > 0.0)
 		{

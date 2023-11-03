@@ -55,7 +55,9 @@ set(PROJECT_SOURCES
 
         renderer/Renderer.cpp renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 
-        renderer/baseRenderer.h color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h material/material.cpp material/material.h object/visibleObject/shapes/plane/plane.cpp object/visibleObject/shapes/plane/plane.h)
+        renderer/baseRenderer.h color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h material/material.cpp material/material.h object/visibleObject/shapes/plane/plane.cpp object/visibleObject/shapes/plane/plane.h
+        Input/Input.h Input/Input.cpp
+        )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(lab_03

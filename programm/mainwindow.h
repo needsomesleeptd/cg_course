@@ -13,20 +13,22 @@
 #include "sceneManager.h"
 #include "sceneManagerCreator.h"
 
-
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui
+{
+	class MainWindow;
+}
 QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow
 {
-Q_OBJECT
+ Q_OBJECT
 
-public:
-	MainWindow(QWidget *parent = nullptr);
+ public:
+	MainWindow(QWidget* parent = nullptr);
 	~MainWindow();
 
-protected:
+ protected:
 	//void resizeEvent(QResizeEvent *event) override;
 	void setupScene();
 	void updateScene();
@@ -34,10 +36,10 @@ protected:
 	void CanDeleteCam();
 	void IsModelsExist();
 
-private:
-	Ui::MainWindow *ui;
+ private:
+	Ui::MainWindow* ui;
 
-	QGraphicsScene *_scene;
+	QGraphicsScene* _scene;
 	std::shared_ptr<DrawManager> _drawManager;
 	std::shared_ptr<SceneManager> _sceneManager;
 	/*std::shared_ptr<Facade> _facade;
@@ -82,7 +84,11 @@ private:
 	void onRemoveCameraButtonClicked();
 	void onAddCameraButtonClicked();
 	void changeCam();
-	void keyPressEvent(QKeyEvent *event) override;
+
+	void mouseReleaseEvent(QMouseEvent* event) override;
+	void keyPressEvent(QKeyEvent* event) override;
+	void keyReleaseEvent(QKeyEvent* event) override;
+	void mousePressEvent(QMouseEvent* event) override;
 };
 
 #endif // MAINWINDOW_H

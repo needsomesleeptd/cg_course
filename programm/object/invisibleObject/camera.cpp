@@ -1,5 +1,10 @@
 #include "camera.h"
 #include <QKeyEvent>
+#include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include  "Input.h"
 /*
 Point Camera::getCoordinates() const noexcept {
 	return _cameraStructure->getCoordinates();
@@ -38,49 +43,78 @@ void Camera::setImageParams(int height, int width)
 {
 	_cameraStructure->setViewPortParams(height, width);
 }
-void Camera::update(QKeyEvent* e, float time)
+void Camera::update(float time)
 {
-	float movementspeed = 1.0f;
-	float rotationspeed = 1.0f;
-	int key = e->key();
+	Input::update();
+	//std::cout << Input::mouseDelta().x() << Input::mouseDelta().y() << std::endl;
+	float delta_x = Input::mouseDelta().x() * 0.002f;
+	float delta_y = Input::mouseDelta().y() * 0.002f;
+
+	glm::vec2 delta = { delta_x, delta_y };
+
+	const float transSpeed = 1.5f;
+	const float rotSpeed = 0.5f;
 	bool moved = false;
-	switch (key)
+	if (Input::buttonPressed(Qt::RightButton))
 	{
+		std::cout << "Right is pressed";
 
-	case Qt::Key_W:
-		_cameraStructure->move(_cameraStructure->getViewDirection() * movementspeed * time);
-		moved = true;
-		break;
+		// Handle rotations
+		/*m_camera.rotate(-rotSpeed * Input::mouseDelta().x(), _cameraStructure->getUp());
+		m_camera.rotate(-rotSpeed * Input::mouseDelta().y(), _cameraStructure->getRight());*/
 
-	case Qt::Key_A:
-		_cameraStructure->move(_cameraStructure->getRight() * movementspeed * time);
-		moved = true;
-		break;
+		VecD3 translation = { 0.0, 0.0, 0.0 };
 
-	case Qt::Key_S:
-		_cameraStructure->move(-1.0f * _cameraStructure->getViewDirection() * movementspeed * time);
-		moved = true;
-		break;
+		if (Input::keyPressed(Qt::Key_W))
+		{
 
-	case Qt::Key_D:
-		_cameraStructure->move(-1.0f * _cameraStructure->getRight() * movementspeed * time);
-		moved = true;
-		break;
-	case Qt::Key_Space:
-		_cameraStructure->move(1.0f * _cameraStructure->getUp() * movementspeed * time);
-		moved = true;
-		break;
-	case Qt::Key_Control:
-		_cameraStructure->move(-1.0f * _cameraStructure->getUp() * movementspeed * time);
-		moved = true;
-		break;
+			translation += _cameraStructure->getViewDirection();
+		}
+		if (Input::keyPressed(Qt::Key_S))
+		{
+			translation -= _cameraStructure->getViewDirection();
+		}
+		if (Input::keyPressed(Qt::Key_A))
+		{
+			translation -= _cameraStructure->getRight();
+		}
+		if (Input::keyPressed(Qt::Key_D))
+		{
+			translation += _cameraStructure->getRight();
+		}
+		if (Input::keyPressed(Qt::Key_Control))
+		{
+			translation -= _cameraStructure->getUp();
+		}
+		if (Input::keyPressed(Qt::Key_Space))
+		{
+			translation += _cameraStructure->getUp();
+		}
+		std::cout << translation.x << " " << translation.y << " " << translation.z << std::endl;
+		//_cameraStructure->move(_cameraStructure->getUp() * 2.5f);
+		std::cout << translation.x << " " << translation.y << " " << translation.z << std::endl;
 
+		if (delta.x != 0.0f || delta.y != 0.0f)
+		{
+			float pitchDelta = delta.y * rotSpeed;
+			float yawDelta = delta.x * rotSpeed;
+
+			glm::quat q = -glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, _cameraStructure->getRight()),
+				glm::angleAxis(-yawDelta, glm::vec3(0.f, 1.0f, 0.0f))));
+
+			_cameraStructure->_forward = glm::rotate(q, _cameraStructure->getViewDirection());
+			moved = true;
+		}
+
+		if (moved)
+		{
+			_cameraStructure->updateView();
+			_cameraStructure->updateProjection();
+		}
 	}
-	if (moved)
-	{
-		_cameraStructure->updateView();
-		_cameraStructure->updateProjection();
-	}
+	//std::cout << translation.x << " " << translation.y << " " << translation.z << std::endl;
+
+	//}
 }
 MatD4 Camera::getInverseProjectionMatrix()
 {
@@ -91,7 +125,9 @@ MatD4 Camera::getInverseViewMatrix()
 	return _cameraStructure->getInverseViewMatrix();
 }
 
-CameraFactory::CameraFactory(const VecD3& position, const VecD3& direction)
+CameraFactory::CameraFactory(
+	const VecD3& position,
+	const VecD3& direction)
 	: _position(position), _direction(direction)
 {
 

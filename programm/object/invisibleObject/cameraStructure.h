@@ -8,7 +8,7 @@ const int defaultViewPortWidth = 500;
 const float nearClip = 0.1f;
 const float farClip = 100.0f;
 
-class CameraStructureImp
+struct CameraStructureImp
 {
  public:
 	CameraStructureImp() = default;
@@ -35,7 +35,6 @@ class CameraStructureImp
 	void updateProjection();
 	void setViewPortParams(int height, int width);
 
- private:
 	VecD3 _coordinates{ 0.0, 0.0, 0.0 };
 
 	VecD3 _forward{ 0.0f, 0.0f, 1.0f };

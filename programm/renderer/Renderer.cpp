@@ -10,6 +10,12 @@
 #include <QPixmap>
 
 
+#include <GL/freeglut.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+
 ColorRGB Renderer::renderPixel(int x, int y, std::shared_ptr<Scene> scene)
 {
 
@@ -117,6 +123,9 @@ Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)
 	VecD3 up = viewPoint - float(imageHeight / 2);
 	VecD3 down = viewPoint + float(imageHeight / 2);
 
+	GLuint tbo;
+
+
 	//VecD3 u_deformation = float(x) * (r - l) / float(imageWidth);
 	//VecD3 v_deformation = float(y) * (up - down) / float(imageHeight);//TODO::fix ray origin
 	/*VecD3 ray_origin = viewPoint + u_deformation * VecD3(1, 0, 0) + v_deformation * VecD3(0, 1, 0);
@@ -128,8 +137,7 @@ Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)
 	glm::vec3 rayDirection = glm::vec3(currentCamera->getInverseViewMatrix()
 		* glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0)); // World space
 	return Ray(viewPoint, rayDirection);
-	/*VecD3 dir =VecD3(4*x,3*y,0) - viewPoint;
-	return Ray(viewPoint,dir);*/
+
 }
 
 void Renderer::renderScene(std::shared_ptr<Scene> scene)

@@ -25,6 +25,9 @@ class Sphere : public BaseShape
 	Material getMaterial() override;
 	VecD3 getNormal(VecD3 intersectionPoint);
 	virtual void accept(std::shared_ptr<Visitor> visitor);
+	double getRadius();
+	VecD3 getCenter();
+
 
 
 };

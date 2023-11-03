@@ -66,3 +66,11 @@ void Sphere::accept(std::shared_ptr<Visitor> visitor)
 {
 	visitor->visit(*this);
 }
+double Sphere::getRadius()
+{
+	return _radius;
+}
+VecD3 Sphere::getCenter()
+{
+	return _center;
+}

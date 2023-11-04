@@ -103,7 +103,7 @@ void MainWindow::setupScene()
 		planeRed = std::make_shared<Plane>(VecD3{ 0.0, 0.0, -10.0 }, VecD3{ 0.0, 1.0, 0.3 }, materialBlue);
 	_sceneManager->getScene()->addModel(sphereGreen);
 	_sceneManager->getScene()->addModel(sphereRed);
-	//_sceneManager->getScene()->addModel(planeRed);
+	_sceneManager->getScene()->addModel(planeRed);
 
 	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(-10, 0, 0), 1).create();
 	lightsource->setColor(ColorRGB(1, 1, 1));
@@ -179,8 +179,10 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
 	else
 	{
 		Input::registerKeyPress(event->key());
+		_sceneManager->getScene()->getCamera()->update(1);
+		updateScene();
 	}
-	updateScene();
+
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent* event)
@@ -192,6 +194,8 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event)
 	else
 	{
 		Input::registerKeyRelease(event->key());
+		_sceneManager->getScene()->getCamera()->update(1);
+		updateScene();
 	}
 }
 

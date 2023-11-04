@@ -65,7 +65,7 @@ void CameraStructureImp::updateView()
 }
 
 
-VecD3 CameraStructureImp::setDirection(const VecD3 & direction)
+void CameraStructureImp::setDirection(const VecD3 & direction)
 {
 	_forward = direction;
 }

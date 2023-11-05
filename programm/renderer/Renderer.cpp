@@ -4,12 +4,14 @@
 
 #include "Renderer.h"
 #include "scene.h"
+#include "sphere.h"
 
 #include <iostream>
 #include <QGraphicsItem>
 #include <QPixmap>
 
-
+//#include <SOIL2/SOIL2.h>
+#include <GL/glew.h>
 #include <GL/freeglut.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -123,7 +125,7 @@ Ray Renderer::createRay(int x, int y, std::shared_ptr<Camera> currentCamera)
 	VecD3 up = viewPoint - float(imageHeight / 2);
 	VecD3 down = viewPoint + float(imageHeight / 2);
 
-	GLuint tbo;
+	//GLuint tbo;
 
 
 	//VecD3 u_deformation = float(x) * (r - l) / float(imageWidth);
@@ -144,8 +146,18 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 {
 	std::shared_ptr<ImageAdapter> image = std::make_shared<ImageAdapter>(_scene->width(), _scene->height());
 	auto objects = scene->getModels();//TODO::remove dynamic casting
-	
-	for (int i = 0; i < image->getWidth(); i++)
+	//objects[0]
+
+	std::vector<Sphere> spheres;
+	GLuint spheresTextureBuffer;
+	GLuint tbo0;
+/*	glGenBuffers(1, &tbo0);
+	glBindBuffer(GL_TEXTURE_BUFFER, tbo0);
+	glBufferData(GL_TEXTURE_BUFFER, spheres.size() * sizeof(spheres), &spheres[0], GL_STATIC_DRAW);
+	glGenTextures(1, &spheresTextureBuffer);
+	glBindTexture(GL_TEXTURE_BUFFER, spheresTextureBuffer);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_RGB32F, tbo0);*/
+/*	for (int i = 0; i < image->getWidth(); i++)
 	{
 		for (int j = 0; j < image->getHeight(); j++)
 		{
@@ -154,8 +166,8 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 			//std::cout << pixelColor.R <<" "<< pixelColor.G << " "<< pixelColor.B << std::endl;
 			image->setPixelColor(i, j, pixelColor);
 		}
-	}
-	QGraphicsItem* pixmapPtr;
+	}*/
+	/*QGraphicsItem* pixmapPtr;
 	pixmapPtr = _scene->itemAt(0, 0, QTransform());
 	if (!pixmapPtr)
 	{
@@ -170,7 +182,7 @@ void Renderer::renderScene(std::shared_ptr<Scene> scene)
 		pixmap.convertFromImage(*image->getImage());
 		canvasPixmap->setPixmap(pixmap);
 		_scene->update();
-	}
+	}*/
 }
 
 Renderer::Renderer(QGraphicsScene* scene)

@@ -47,10 +47,7 @@ void Camera::update(float time)
 {
 	Input::update();
 	//std::cout << Input::mouseDelta().x() << Input::mouseDelta().y() << std::endl;
-	float delta_x = Input::mouseDelta().x() * 0.02f;
-	float delta_y = Input::mouseDelta().y() * 0.02f;
 
-	glm::vec2 delta = { delta_x, delta_y };
 
 	const float transSpeed = 1.5f;
 	const float rotSpeed = 0.5f;
@@ -77,15 +74,15 @@ void Camera::update(float time)
 	{
 		translation -= _cameraStructure->getRight();
 	}
-	if (Input::keyPressed(Qt::Key_D))
+	if (Input::keyTriggered(Qt::Key_D))
 	{
 		translation += _cameraStructure->getRight();
 	}
-	if (Input::keyPressed(Qt::Key_Control))
+	if (Input::keyTriggered(Qt::Key_Control))
 	{
 		translation -= _cameraStructure->getUp();
 	}
-	if (Input::keyPressed(Qt::Key_Space))
+	if (Input::keyTriggered(Qt::Key_Space))
 	{
 		translation += _cameraStructure->getUp();
 	}
@@ -94,6 +91,10 @@ void Camera::update(float time)
 	std::cout << translation.x << " " << translation.y << " " << translation.z << std::endl;
 	if (Input::buttonPressed(Qt::RightButton))
 	{
+		float delta_x = Input::mouseDelta().x() * 0.02f;
+		float delta_y = Input::mouseDelta().y() * 0.02f;
+
+		glm::vec2 delta = { delta_x, delta_y };
 		if (delta.x != 0.0f || delta.y != 0.0f)
 		{
 			float pitchDelta = delta.y * rotSpeed;

@@ -14,18 +14,25 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QGraphicsView" name="graphicsView">
+   <widget class="RayCastCanvas" name="graphicsView">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
-      <width>1081</width>
-      <height>841</height>
+      <y>20</y>
+      <width>691</width>
+      <height>511</height>
      </rect>
     </property>
    </widget>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>RayCastCanvas</class>
+   <extends>QOpenGLWidget</extends>
+   <header>RayCastingCanvas.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -9,6 +9,7 @@
 #include <random>
 #include <stdlib.h>
 #include <iostream>
+#include "cone.h"
 
 float GenerateRandom()
 {
@@ -71,14 +72,14 @@ MainWindow::~MainWindow()
 void MainWindow::setupScene()
 {
 	//connect(this, SIGNAL(frameSwapped()), this, SLOT(updateScene()));
-	_scene = new QGraphicsScene(this);
+	/*_scene = new QGraphicsScene(this);
 
 	ui->graphicsView->setScene(_scene);
 	ui->graphicsView->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-	ui->graphicsView->setStyleSheet("QGraphicsView {background-red: white}");
+	ui->graphicsView->setStyleSheet("QGraphicsView {background-red: white}");*/
 
-	auto cont = ui->graphicsView->contentsRect();
-	_scene->setSceneRect(0, 0, cont.width(), cont.height());
+	//auto cont = ui->graphicsView->contentsRect();
+	//_scene->setSceneRect(0, 0, cont.width(), cont.height());
 	ColorRGB red(1.0f, 0, 0);
 	ColorRGB green(0, 1.0f, 0.0);
 	ColorRGB blue(0, 0.0, 1.0f);
@@ -96,6 +97,7 @@ void MainWindow::setupScene()
 		std::shared_ptr<Sphere> sphereRandom = std::make_shared<Sphere>(VecD3({-i,-i,0}),1.0,randomMaterial);
 		_sceneManager->getScene()->addModel(sphereRandom);
 	}*/
+	std::shared_ptr<Cone> cone = std::make_shared<Cone>(VecD3({ 0.0, 0.0, 1.0 }), VecD3({ 1.0, 0.0,  0.0}),1.0, materialRed);
 	std::shared_ptr<Sphere> sphereRed = std::make_shared<Sphere>(VecD3({ 1.0, 1.0, 0 }), 1.0, materialRed);
 	std::shared_ptr<Sphere> sphereGreen = std::make_shared<Sphere>(VecD3({ 1.0, -5.0, 0 }), 1.0, materialGreen);
 
@@ -103,7 +105,8 @@ void MainWindow::setupScene()
 		planeRed = std::make_shared<Plane>(VecD3{ 0.0, 0.0, -10.0 }, VecD3{ 0.0, 1.0, 0.3 }, materialBlue);
 	_sceneManager->getScene()->addModel(sphereGreen);
 	_sceneManager->getScene()->addModel(sphereRed);
-	_sceneManager->getScene()->addModel(planeRed);
+	_sceneManager->getScene()->addModel(cone);
+	//_sceneManager->getScene()->addModel(planeRed);
 
 	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(-10, 0, 0), 1).create();
 	lightsource->setColor(ColorRGB(1, 1, 1));
@@ -113,10 +116,10 @@ void MainWindow::setupScene()
 	_drawManager->setRenderer(renderer);
 
 	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -5 }, { 0, 0, 1 }).create();
-	camera->setImageParams(_scene->height(), _scene->width());
+	//camera->setImageParams(_scene->height(), _scene->width());
 	_drawManager->setCamera(camera);
 	_sceneManager->getScene()->addCamera(camera);
-	updateScene();
+	//updateScene();
 
 }
 void MainWindow::updateScene()

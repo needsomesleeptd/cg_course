@@ -28,8 +28,6 @@ class Sphere : public BaseShape
 	double getRadius();
 	VecD3 getCenter();
 
-
-
 };
 
 

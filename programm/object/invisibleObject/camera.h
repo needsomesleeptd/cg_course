@@ -6,12 +6,14 @@
 #include "baseCamera.h"
 
 class TransformVisitor;
+class RayCastCanvas;
 class Camera : public BaseCamera
 {
  public:
 
 	//friend void TransformVisitor::visit(const Camera& camera);
 	friend TransformVisitor;
+	friend RayCastCanvas;
 
 
 

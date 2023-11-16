@@ -85,10 +85,6 @@ class MainWindow : public QMainWindow
 	void onAddCameraButtonClicked();
 	void changeCam();
 
-	void mouseReleaseEvent(QMouseEvent* event) override;
-	void keyPressEvent(QKeyEvent* event) override;
-	void keyReleaseEvent(QKeyEvent* event) override;
-	void mousePressEvent(QMouseEvent* event) override;
 };
 
 #endif // MAINWINDOW_H

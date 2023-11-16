@@ -77,7 +77,7 @@ in vec3 interpolated_vertex;
 out vec4 FragColor;
 
 uniform Light light;
-//uniform Camera camera;
+uniform Camera camera;
 //uniform vec2 scale;
 //uniform vec3 light_pos;
 //uniform int vector_size;*/
@@ -89,12 +89,14 @@ uniform Light light;
 /*layout(std430,binding = 1) buffer PlaneBuffer{
     Plane plane_data[];
 };*/
-Camera camera = Camera(vec3(0.0,0.0,-2),vec3(0.0,0.0,1.0),vec3(0.0,1.0,0.0),vec3(1.0,0.0,0.0),mat4(1));
+//Camera camera = Camera(vec3(0.0,0.0,-2),vec3(0.0,0.0,1.0),vec3(0.0,1.0,0.0),vec3(1.0,0.0,0.0),mat4(1));
+//camera.inverseProjectionMatrix = mat4(1);
+//uniform Camera camera;
 
 Material material = Material(vec3(0.3, 0.4, 0.4), 0.0, 0.8, 0.5);
-vec2 scale = vec2(0.5,0.5);
+vec2 scale = vec2(1,1);
 
-Sphere sphere = Sphere(vec3(-0.5, 0, 0), 0.5, material);
+Sphere sphere = Sphere(vec3(-0.5, 0, 0),0.8, material);
 
 vec3 light_pos = vec3(1, 0.3, 0.3);
 Ray GenerateRay(Camera camera) {
@@ -302,10 +304,16 @@ void main(void) {
     sq[4] = Square(vec3(10, 0, 0), vec3(20, 0, 0), vec3(20, 0, 10), vec3(10, 0, 10), 0, vec3(0.52, 0, 0.52));
     sq[5] = Square(vec3(10, 10, 0), vec3(20, 10, 0), vec3(20, 10, 10), vec3(10, 10, 10), 0, vec3(0.52, 0, 0.52));*/
 
-
-    Ray ray = GenerateRay(camera);
-    FragColor = RayTrace(ray);
-    float time = 1.0;
+    //if (camera.position.z > -2.0f)
+    //{
+        Ray ray = GenerateRay(camera);
+        FragColor = RayTrace(ray);
+        float time = 1.0;
+    //}
+    //else
+    //{
+//        FragColor = vec4(0.5, 0.5, 0.0, 0.5);
+//    }
 /*if (IntersectSphere(sphere, ray, time) && time < intersect.time) {
 
     }*/

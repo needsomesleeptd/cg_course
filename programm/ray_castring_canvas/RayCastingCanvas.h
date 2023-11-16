@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <QtMath>
-
+#include <QOpenGLWindow>
 #include <QOpenGLWidget>
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
@@ -34,57 +34,61 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
  Q_OBJECT
  public:
-	explicit RayCastCanvas(QWidget *parent = nullptr);
+	explicit RayCastCanvas(QWidget* parent = nullptr);
 	~RayCastCanvas();
 
-	void setStepLength(const GLfloat step_length) {
+	void setStepLength(const GLfloat step_length)
+	{
 		m_stepLength = step_length;
 		update();
 	}
 
-	void setVolume(const QString& volume) {
+	void setVolume(const QString& volume)
+	{
 		//m_raycasting_volume->load_volume(volume);
 		update();
 	}
 
-	void setThreshold(const double threshold) {
+	void setThreshold(const double threshold)
+	{
 		//auto range = m_raycasting_volume ? getRange() : std::pair<double, double>{0.0, 1.0};
 		//m_threshold = threshold / (range.second - range.first);
 		update();
 	}
 
-	void setMode(const QString& mode) {
+	void setMode(const QString& mode)
+	{
 		m_active_mode = mode;
 		update();
 	}
 
-	void setBackground(const QColor& colour) {
+	void setBackground(const QColor& colour)
+	{
 		m_background = colour;
 		update();
 	}
 
-
-
-	QColor getBackground(void) {
+	QColor getBackground(void)
+	{
 		return m_background;
 	}
-
-
 
  signals:
 	// NOPE
 
  public slots:
-	virtual void mouseMoveEvent(QMouseEvent *event);
-	virtual void mousePressEvent(QMouseEvent *event);
-	virtual void mouseReleaseEvent(QMouseEvent *event);
-	virtual void wheelEvent(QWheelEvent * event);
+	void update();
 
  protected:
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int width, int height);
 	void initShaders();
+
+	void mouseReleaseEvent(QMouseEvent* event) override;
+	void keyPressEvent(QKeyEvent* event) override;
+	void keyReleaseEvent(QKeyEvent* event) override;
+	void mousePressEvent(QMouseEvent* event) override;
 
  private:
 
@@ -99,8 +103,8 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	QVector2D m_viewportSize;
 	QVector3D m_rayOrigin; /*!< Camera position in model space coordinates. */
 
-	QVector3D m_lightPosition {3.0, 0.0, 3.0};    /*!< In camera coordinates. */
-	QVector3D m_diffuseMaterial {1.0, 1.0, 1.0};  /*!< Material colour. */
+	QVector3D m_lightPosition{ 3.0, 0.0, 3.0 };    /*!< In camera coordinates. */
+	QVector3D m_diffuseMaterial{ 1.0, 1.0, 1.0 };  /*!< Material colour. */
 	GLfloat m_stepLength;                         /*!< Step length for ray march. */
 	GLfloat m_threshold;                          /*!< Isosurface intensity threshold. */
 	QColor m_background;                          /*!< Viewport background colour. */
@@ -119,13 +123,12 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	QOpenGLBuffer m_vertex;
 	QOpenGLVertexArrayObject m_object;
 
-
 	GLuint scaled_width();
 	GLuint scaled_height();
 
-	void raycasting(const QString& shader);
+
 
 	QPointF pixel_pos_to_view_pos(const QPointF& p);
-	void add_shader(const QString& name, const QString& vector, const QString& fragment);
+
 };
 #endif //LAB_03_CG_COURSE_PROGRAMM_RAY_CASTRING_CANVAS_RAYCASTINGCANVAS_H_

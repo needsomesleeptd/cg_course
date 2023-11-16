@@ -5,10 +5,7 @@
 #include "camera.h"
 #include "Renderer.h"
 #include "LightSource.h"
-#include "Input.h"
-#include <random>
 #include <stdlib.h>
-#include <iostream>
 #include "cone.h"
 
 float GenerateRandom()
@@ -97,7 +94,7 @@ void MainWindow::setupScene()
 		std::shared_ptr<Sphere> sphereRandom = std::make_shared<Sphere>(VecD3({-i,-i,0}),1.0,randomMaterial);
 		_sceneManager->getScene()->addModel(sphereRandom);
 	}*/
-	std::shared_ptr<Cone> cone = std::make_shared<Cone>(VecD3({ 0.0, 0.0, 1.0 }), VecD3({ 1.0, 0.0,  0.0}),1.0, materialRed);
+	/*std::shared_ptr<Cone> cone = std::make_shared<Cone>(VecD3({ 0.0, 0.0, 1.0 }), VecD3({ 1.0, 0.0,  0.0}),1.0, materialRed);
 	std::shared_ptr<Sphere> sphereRed = std::make_shared<Sphere>(VecD3({ 1.0, 1.0, 0 }), 1.0, materialRed);
 	std::shared_ptr<Sphere> sphereGreen = std::make_shared<Sphere>(VecD3({ 1.0, -5.0, 0 }), 1.0, materialGreen);
 
@@ -117,8 +114,8 @@ void MainWindow::setupScene()
 
 	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -5 }, { 0, 0, 1 }).create();
 	//camera->setImageParams(_scene->height(), _scene->width());
-	_drawManager->setCamera(camera);
-	_sceneManager->getScene()->addCamera(camera);
+	_drawManager->setCamera(camera);*/
+	//_sceneManager->getScene()->addCamera(camera);
 	//updateScene();
 
 }
@@ -169,50 +166,6 @@ void MainWindow::updateScene()
 	//m_transform.rotate(1.0f, QVector3D(0.4f, 0.3f, 0.3f));
 
 	// Schedule a redraw
-	_drawManager->drawScene(_sceneManager->getScene());
+	//_drawManager->drawScene(_sceneManager->getScene());
 
-}
-
-void MainWindow::keyPressEvent(QKeyEvent* event)
-{
-	/*if (event->isAutoRepeat())
-	{
-		event->ignore();
-	}
-	else
-	{
-		Input::registerKeyPress(event->key());
-		_sceneManager->getScene()->getCamera()->update(1);
-		updateScene();
-	}*/
-
-}
-
-void MainWindow::keyReleaseEvent(QKeyEvent* event)
-{
-	/*if (event->isAutoRepeat())
-	{
-		event->ignore();
-	}
-	else
-	{
-		Input::registerKeyRelease(event->key());
-		_sceneManager->getScene()->getCamera()->update(1);
-		updateScene();
-	}*/
-}
-
-void MainWindow::mousePressEvent(QMouseEvent* event)
-{
-	//std::cout << "Press event";
-	/*Input::registerMousePress(event->button());
-	_sceneManager->getScene()->getCamera()->update(1);
-	updateScene();*/
-}
-
-void MainWindow::mouseReleaseEvent(QMouseEvent* event)
-{
-	/*Input::registerMouseRelease(event->button());
-	_sceneManager->getScene()->getCamera()->update(1);
-	updateScene();*/
 }

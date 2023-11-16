@@ -175,7 +175,7 @@ void MainWindow::updateScene()
 
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
-	if (event->isAutoRepeat())
+	/*if (event->isAutoRepeat())
 	{
 		event->ignore();
 	}
@@ -184,13 +184,13 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
 		Input::registerKeyPress(event->key());
 		_sceneManager->getScene()->getCamera()->update(1);
 		updateScene();
-	}
+	}*/
 
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent* event)
 {
-	if (event->isAutoRepeat())
+	/*if (event->isAutoRepeat())
 	{
 		event->ignore();
 	}
@@ -199,20 +199,20 @@ void MainWindow::keyReleaseEvent(QKeyEvent* event)
 		Input::registerKeyRelease(event->key());
 		_sceneManager->getScene()->getCamera()->update(1);
 		updateScene();
-	}
+	}*/
 }
 
 void MainWindow::mousePressEvent(QMouseEvent* event)
 {
 	//std::cout << "Press event";
-	Input::registerMousePress(event->button());
+	/*Input::registerMousePress(event->button());
 	_sceneManager->getScene()->getCamera()->update(1);
-	updateScene();
+	updateScene();*/
 }
 
 void MainWindow::mouseReleaseEvent(QMouseEvent* event)
 {
-	Input::registerMouseRelease(event->button());
+	/*Input::registerMouseRelease(event->button());
 	_sceneManager->getScene()->getCamera()->update(1);
-	updateScene();
+	updateScene();*/
 }

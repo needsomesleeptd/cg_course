@@ -16,10 +16,17 @@ struct Ray {
     vec3 direction;
 };
 
+struct Material {
+    vec3 _color;
+    float k_a;
+    float k_d;
+    float k_s;
+};
+
 struct Sphere {
     vec3 center;
     float radius;
-    int material_ind;
+    Material material;
 };
 
 struct Plane {
@@ -30,12 +37,7 @@ struct Plane {
 
 
 
-struct Material {
-    vec3 _color;
-    float k_a;
-    float k_d;
-    float k_s;
-};
+
 
 struct Intersection {
     float time;
@@ -43,7 +45,7 @@ struct Intersection {
     vec3 normal;
     vec3 color;
     vec4 light_coeffs;
-    int material_ind;
+    Material material;
 };
 
 
@@ -70,18 +72,18 @@ struct Triangle {
 };
 
 
-in vec3 interpolated_vertex;
+in vec4 interpolated_vertex;
 out vec4 FragColor;
-
+/*
 uniform Light light;
 uniform Camera camera;
 uniform vec2 scale;
 uniform vec3 light_pos;
-uniform int vector_size;
+//uniform int vector_size;*/
 
-layout(std430, binding = 0) buffer SphereBuffer {
+/*layout(std430, binding = 0) buffer SphereBuffer {
     vec3 sphere_data[];
-};
+};*/
 
 /*layout(std430,binding = 1) buffer PlaneBuffer{
     Plane plane_data[];
@@ -90,9 +92,10 @@ layout(std430, binding = 0) buffer SphereBuffer {
 Material material = Material(vec3(0.3, 0.4, 0.4), 0.4, 0.3, 0.3);
 
 
+Sphere sphere = Sphere(vec3(-10,0,0),0.5,material);
 
 // vec3 light_pos = vec3(10, -5, -5);
-
+/*
 Ray GenerateRay(Camera camera) {
     vec2 coords = interpolated_vertex.xy * normalize(scale);
     vec3 direction = camera.view + camera.right * coords.x + camera.up * coords.y;
@@ -189,7 +192,7 @@ bool Intersect(Ray ray, float start, float final, inout Intersection intersect) 
     float time = start;
     intersect.time = final;
 
-    for (int i = 0;i < vector_size; i++) {
+    /*for (int i = 0;i < vector_size; i++) {
         if (IntersectSphere(sphere_data[i], ray, time) && time < intersect.time) {
             intersect.time = time;
             intersect.point = ray.origin + ray.direction * time;
@@ -197,11 +200,11 @@ bool Intersect(Ray ray, float start, float final, inout Intersection intersect) 
             intersect.color = sphere_data[i].color;
             intersect.material_ind = sphere_data[i].material_ind;
             intersect.light_coeffs = material.light_coeffs;
-
             result = true;
         }
-    }
-    for (int i = 0;i < 4; i++) {
+    }*/
+    //return result;
+    /*for (int i = 0;i < 4; i++) {
         if (IntersectTriangle(ray, tri[i].v1, tri[i].v2, tri[i].v3, time) && time < intersect.time) {
             intersect.point = ray.origin + ray.direction * time;
             intersect.normal = normalize(cross(tri[i].v1 - tri[i].v2, tri[i].v3 - tri[i].v2));
@@ -211,8 +214,8 @@ bool Intersect(Ray ray, float start, float final, inout Intersection intersect) 
             intersect.time = time;
             result = true;
         }
-    }
-    for (int i = 0;i < 6; i++) {
+    }*/
+    /*for (int i = 0;i < 6; i++) {
         if (IntersectSquare(ray, sq[i].v1, sq[i].v2, sq[i].v3, sq[i].v4, time) && time < intersect.time) {
             intersect.point = ray.origin + ray.direction * time;
             intersect.normal = normalize(cross(sq[i].v1 - sq[i].v2, sq[i].v3 - sq[i].v2));
@@ -223,10 +226,10 @@ bool Intersect(Ray ray, float start, float final, inout Intersection intersect) 
             result = true;
         }
     }
-    return result;
-}
+    return result;*/
+//}
 
-float Shadow(vec3 pos_light, Intersection intersect) {
+/*float Shadow(vec3 pos_light, Intersection intersect) {
     float shad = 1.0;
     vec3 direction = normalize(pos_light - intersect.point);
     float dist_light = distance(pos_light, intersect.point);
@@ -260,22 +263,32 @@ vec4 RayTrace(Ray primary_ray) {
     intersect.time = INF;
     float start = 0;
     float final = INF;
-
-    if (Intersect(ray, start, final, intersect)) {
+    if (IntersectSphere(sphere,ray, final))
+    {
+        //intersect.time = time;
+        intersect.point = ray.origin + ray.direction * intersect.time;
+        intersect.normal = normalize(intersect.point - sphere.center);
+        intersect.color = sphere.material._color;
+        intersect.material = sphere.material;
+        intersect.light_coeffs = vec4(material.k_a,material.k_d,material.k_s,0.0);
         float shadowing = Shadow(light_pos, intersect);
         resColor += vec4(Phong(intersect, light_pos, shadowing), 0);
     }
-    return resColor;
-}
+    /*if (Intersect(ray, start, final, intersect)) {
+        float shadowing = Shadow(light_pos, intersect);
+        resColor += vec4(Phong(intersect, light_pos, shadowing), 0);
+    }*/
+    //return resColor;
+//}
 
 
-Triangle tri[4];
-Square sq[6];
+/*Triangle tri[4];
+Square sq[6];*/
 
 void main(void) {
     //FragColor = vec4(abs(interpolated_vertex.xy), 0, 1.0);
 
-    tri[0] = Triangle(vec3(-10, -10, -30), vec3(10, -10, -30), vec3(0, 5, -25), 0, vec3(1, 1, 0));
+    /*tri[0] = Triangle(vec3(-10, -10, -30), vec3(10, -10, -30), vec3(0, 5, -25), 0, vec3(1, 1, 0));
     tri[1] = Triangle(vec3(-10, -10, -30), vec3(10, -10, -30), vec3(0, -10, -10), 0, vec3(1, 1, 0));
     tri[2] = Triangle(vec3(0, 5, -25), vec3(10, -10, -30), vec3(0, -10, -10), 0, vec3(1, 1, 0));
     tri[3] = Triangle(vec3(0, 5, -25), vec3(0, -10, -10), vec3(-10, -10, -30), 0, vec3(1, 1, 0));
@@ -285,10 +298,18 @@ void main(void) {
     sq[2] = Square(vec3(20, 0, 10), vec3(10, 0, 10), vec3(10, 10, 10), vec3(20, 10, 10), 0, vec3(0.52, 0, 0.52));
     sq[3] = Square(vec3(10, 0, 10), vec3(10, 0, 0), vec3(10, 10, 0), vec3(10, 10, 10), 0, vec3(0.52, 0, 0.52));
     sq[4] = Square(vec3(10, 0, 0), vec3(20, 0, 0), vec3(20, 0, 10), vec3(10, 0, 10), 0, vec3(0.52, 0, 0.52));
-    sq[5] = Square(vec3(10, 10, 0), vec3(20, 10, 0), vec3(20, 10, 10), vec3(10, 10, 10), 0, vec3(0.52, 0, 0.52));
+    sq[5] = Square(vec3(10, 10, 0), vec3(20, 10, 0), vec3(20, 10, 10), vec3(10, 10, 10), 0, vec3(0.52, 0, 0.52));*/
 
 
-    Ray ray = GenerateRay(camera);
-    FragColor = RayTrace(ray);
+    //Ray ray = GenerateRay(camera);
+    //FragColor = RayTrace(ray);
+
+    /*if (IntersectSphere(sphere, ray, time) && time < intersect.time) {
+
+    }*/
+//    gl_FragColor = vec4(0.5,0.5,0.0,0.5);
+    //gl_Position = interpolated_vertex;
+    FragColor = interpolated_vertex;
+
     //FragColor = vec4(abs(ray.direction.xy), 0, 1.0);
 }

@@ -19,12 +19,12 @@ MainWindow::MainWindow(QWidget* parent)
 {
 	ui->setupUi(this);
 
-	_sceneManager = SceneManagerCreator().createManager();
+	//_sceneManager = SceneManagerCreator().createManager();
 
 	//_sceneManager->setScene()
-	_drawManager = DrawManagerCreator().createManager();
+	//_drawManager = DrawManagerCreator().createManager();
 
-	setupScene();
+	//setupScene();
 
 
 

@@ -37,7 +37,7 @@ struct CameraStructureImp
 
 	VecD3 _coordinates{ 0.0, 0.0, 0.0 };
 
-	VecD3 _forward{ 0.0f, 0.0f, -1.0f };
+	VecD3 _forward{ 0.0f, 0.0f, 1.0f };
 
 	VecD3 _up{ 0.0f, 1.0f, 0.0f};
 

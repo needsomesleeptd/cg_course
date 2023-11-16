@@ -82,7 +82,7 @@ void RayCastCanvas::initializeGL()
 	_drawManager = DrawManagerCreator().createManager();
 
 
-	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -2 }, { 0, 0, 1 }).create();
+	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -2.0f }, { 0.0f, 0.0f, 1.0f }).create();
 	//camera->setImageParams(_scene->height(), _scene->width());
 	//_drawManager->setCamera(camera);
 	_sceneManager->getScene()->addCamera(camera);
@@ -161,9 +161,11 @@ void RayCastCanvas::paintGL()
 	VecD3 cam_pos = camera->getViewPoint();
 	VecD3 cam_dir = camera->getViewDirection();
 	VecD3 cam_up = camera->getUpVector();
-	VecD3 cam_r = cam_dir * cam_up;
-	QMatrix4x4 temp;
-	temp.fill(1);
+
+	VecD3 cam_r = camera->_cameraStructure->getRight();
+
+	QMatrix4x4 inverseProject(&camera->getInverseProjectionMatrix()[0][0]);
+	QMatrix4x4 inverseView(&camera->getInverseViewMatrix()[0][0]);
 	// Render using our shader
 	m_program->bind();
 	//camera
@@ -171,14 +173,16 @@ void RayCastCanvas::paintGL()
 	m_program->setUniformValue("camera.view", QVector3D(cam_dir.x, cam_dir.y, cam_dir.z));
 
 	m_program->setUniformValue("camera.up", QVector3D(cam_up.x, cam_up.y, cam_up.z));
-	m_program->setUniformValue("camera.side", QVector3D(cam_r.x, cam_r.y, cam_r.z));
-	m_program->setUniformValue("camera.inverseProjectionMatrix", temp);
-
+	m_program->setUniformValue("camera.right", QVector3D(cam_r.x, cam_r.y, cam_r.z));
+	m_program->setUniformValue("camera.inverseProjectionMatrix", inverseProject);
+	m_program->setUniformValue("camera.inverseViewMatrix", inverseView);
 	//lights
 
 	m_program->setUniformValue("light.position", to_q_vec(light->getPosition()));
 	m_program->setUniformValue("light.intensivity", QVector3D(1,1,1));
 
+	//scale
+	m_program->setUniformValue("scale",QVector2D(QWidget::width(),QWidget::height()));
 
 
 

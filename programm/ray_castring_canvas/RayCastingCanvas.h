@@ -14,6 +14,8 @@
 #include <QOpenGLExtraFunctions>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLFunctions_4_3_Core>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLBuffer>
 
 #include "sphere.h"
 #include "plane.h"
@@ -23,6 +25,10 @@
 #include "Input.h"
 #include "drawManager.h"
 #include "sceneManager.h"
+#include "sceneManagerCreator.h"
+#include "drawManagerCreator.h"
+
+#include "vertex.h"
 
 class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
@@ -107,9 +113,11 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	std::shared_ptr<DrawManager> _drawManager;
 	std::shared_ptr<SceneManager> _sceneManager;
 
-	QOpenGLShaderProgram m_program;
+	QOpenGLShaderProgram* m_program;
 	QString m_active_mode;
 
+	QOpenGLBuffer m_vertex;
+	QOpenGLVertexArrayObject m_object;
 
 
 	GLuint scaled_width();

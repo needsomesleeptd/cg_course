@@ -19,8 +19,8 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>691</width>
-      <height>511</height>
+      <width>1131</width>
+      <height>801</height>
      </rect>
     </property>
    </widget>
@@ -30,7 +30,7 @@
   <customwidget>
    <class>RayCastCanvas</class>
    <extends>QOpenGLWidget</extends>
-   <header>RayCastingCanvas.h</header>
+   <header>RayCastCanvas.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -4,6 +4,18 @@
 
 #include <QOpenGLFunctions_4_3_Core>
 #include "RayCastingCanvas.h"
+
+static const Vertex sg_vertexes[] = {
+	Vertex( QVector3D( -1.0f,  -1.0f, 0.0f), QVector3D(0.0f, 0.0f, 0.0f) ),
+	Vertex( QVector3D(1.0f, -1.0f, 0.0f), QVector3D(0.0f, 0.0f, 0.0f) ),
+	Vertex( QVector3D( -1.0f, 1.0f, 0.0f), QVector3D(0.0f, 0.0f, 0.0f) ),
+
+	Vertex( QVector3D( 1.0f,  1.0f, 0.0f), QVector3D(0.0f, 0.0f, 0.0f) ),
+	Vertex( QVector3D(-1.0f, 1.0f, 0.0f), QVector3D(0.0f, 0.0f, 0.0f) ),
+	Vertex( QVector3D( 1.0f, -1.0f, 0.0f), QVector3D(0.0f, 0.0f, 1.0f) )
+
+};
+
 /*!
  * \brief Convert a QColor to a QVector3D.
  * \return A QVector3D holding a RGB representation of the colour.
@@ -44,47 +56,46 @@ RayCastCanvas::~RayCastCanvas()
  */
 void RayCastCanvas::initializeGL()
 {
+	m_program = new QOpenGLShaderProgram();
 	initializeOpenGLFunctions();
-	initShaders();
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
 	_sceneManager = SceneManagerCreator().createManager();
 	_drawManager = DrawManagerCreator().createManager();
-	pos = m_program.attributeLocation("vertex");
-	qDebug() << QString("Log programm");
-	qDebug() << m_program.log();
-
-	if (!m_program.bind())
 	{
-		qWarning("Error bind programm");
+		// Create Shader (Do not release until VAO is created)
+		m_program = new QOpenGLShaderProgram();
+
+		if (!m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "../shaders/ex.vert"))
+			close();
+		if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "../shaders/ex.frag"))
+			close();
+		if (!m_program->link())
+		{
+			qDebug() << "unable to link";
+			close();
+		}
+		m_program->bind();
+
+		// Create Buffer (Do not release until VAO is created)
+		m_vertex.create();
+		m_vertex.bind();
+		m_vertex.setUsagePattern(QOpenGLBuffer::DynamicCopy);
+		m_vertex.allocate(sg_vertexes, sizeof(sg_vertexes));
+
+		// Create Vertex Array Object
+		m_object.create();
+		m_object.bind();
+		m_program->enableAttributeArray(0);
+		m_program->enableAttributeArray(1);
+		m_program->setAttributeBuffer(0, GL_FLOAT, Vertex::positionOffset(), Vertex::PositionTupleSize, Vertex::stride());
+		m_program->setAttributeBuffer(1, GL_FLOAT, Vertex::colorOffset(), Vertex::ColorTupleSize, Vertex::stride());
+
+		// Release (unbind) all
+		m_object.release();
+		m_vertex.release();
+		m_program->release();
 	}
-
-	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(-10, 0, 0), 1).create();
-	lightsource->setColor(ColorRGB(1, 1, 1));
-	_sceneManager->getScene()->setLightSource(lightsource);
-	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -5 }, { 0, 0, 1 }).create();
-	_drawManager->setCamera(camera);
-	_sceneManager->getScene()->addCamera(camera);
-
-	ColorRGB red(1.0f, 0, 0);
-	ColorRGB green(0, 1.0f, 0.0);
-	ColorRGB blue(0, 0.0, 1.0f);
-	Material materialRed(0.1, 1.0, 0.3, red);
-	std::vector<Sphere> all_spheres;
-	std::shared_ptr<Sphere> sphereRed = std::make_shared<Sphere>(VecD3({ 1.0, 1.0, 0 }), 1.0, materialRed);
-	all_spheres.push_back(*sphereRed);
-
-	m_program.setUniformValue("vector_size", (int)all_spheres.size());
-	m_program.setUniformValue("light_pos",QVector3D(1.4 ,-1.2 ,3.4));
-
-	functions = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_3_Core>();
-	/*functions->glGenBuffers(1, &ssbo);
-	functions->glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-	functions->glBufferData(GL_SHADER_STORAGE_BUFFER,
-		all_spheres.size() * sizeof(Sphere),
-		all_spheres.data(),
-		GL_DYNAMIC_COPY);
-	functions->glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);*/
-	m_program.release();
 
 
 }
@@ -110,43 +121,30 @@ void RayCastCanvas::resizeGL(int w, int h)
 void RayCastCanvas::paintGL()
 {
 	qDebug() << "started_painting\n";
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	if (!m_program.bind())
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Render using our shader
+	m_program->bind();
 	{
-		return;
+		m_object.bind();
+		glDrawArrays(GL_TRIANGLES, 0, sizeof(sg_vertexes) / sizeof(sg_vertexes[0]));
+		m_object.release();
 	}
-	qDebug() << "pos is:" << pos;
-	qDebug() << "data[0] is:" << data[0];
-	m_program.enableAttributeArray(pos);
-	m_program.setAttributeArray(pos, data, 3);
+	m_program->release();
 
-	glDrawArrays(GL_POINT, 0, 4);
 
-	m_program.disableAttributeArray(pos);
 
-	std::shared_ptr<Camera> camera = _sceneManager->getScene()->getCamera();
-	VecD3 cam_pos = camera->getViewPoint();
-	VecD3 cam_dir = camera->getViewDirection();
-	VecD3 cam_up = camera->getUpVector();
-	VecD3 cam_r = cam_dir * cam_up;
+	/*m_program->setUniformValue("camera.position", QVector3D(cam_pos.x, cam_pos.y, cam_pos.z));
+	m_program->setUniformValue("camera.view", QVector3D(cam_dir.x, cam_dir.y, cam_dir.z));
 
-	std::shared_ptr<BaseLightSource> lightSource = _sceneManager->getScene()->getLightSource();
-	VecD3 light_pos = lightSource->getPosition();
-	float light_int = lightSource->getIntensivity(); //TODO::fix later;
+	m_program->setUniformValue("camera.up", QVector3D(cam_up.x, cam_up.y, cam_up.z));
+	m_program->setUniformValue("camera.side", QVector3D(cam_r.x, cam_r.y, cam_r.z));
+	m_program->setUniformValue("scale", QVector2D(width(), height()));
+	m_program->setUniformValue("light.position", QVector3D(light_pos.x, light_pos.y, light_pos.z));
+	m_program->setUniformValue("light.intensivity", QVector3D(light_int, light_int, light_int));
 
-	m_program.release();
-
-	/*m_program.setUniformValue("camera.position", QVector3D(cam_pos.x, cam_pos.y, cam_pos.z));
-	m_program.setUniformValue("camera.view", QVector3D(cam_dir.x, cam_dir.y, cam_dir.z));
-
-	m_program.setUniformValue("camera.up", QVector3D(cam_up.x, cam_up.y, cam_up.z));
-	m_program.setUniformValue("camera.side", QVector3D(cam_r.x, cam_r.y, cam_r.z));
-	m_program.setUniformValue("scale", QVector2D(width(), height()));
-	m_program.setUniformValue("light.position", QVector3D(light_pos.x, light_pos.y, light_pos.z));
-	m_program.setUniformValue("light.intensivity", QVector3D(light_int, light_int, light_int));
-
-	m_program.setUniformValue("light_pos", QVector3D(light_pos.x, light_pos.y, light_pos.z));
-	m_program.release();*/
+	m_program->setUniformValue("light_pos", QVector3D(light_pos.x, light_pos.y, light_pos.z));
+	m_program->release();*/
 	qDebug() << QString("Finished Painting");
 /*
 	 *    // Create Buffer (Do not release until VAO is created)
@@ -168,7 +166,7 @@ void RayCastCanvas::paintGL()
     m_vertex.release();
     m_program->release();
 */
-	qDebug() << "Paint GL " << cam_pos.x << ' ' << cam_pos.y << ' ' << cam_pos.z;
+	//qDebug() << "Paint GL " << cam_pos.x << ' ' << cam_pos.y << ' ' << cam_pos.z;
 	//qDebug() << "Paint GL " << camera.view.x() << ' ' << camera.view.y() << ' ' << camera.view.z();
 	//qDebug() << "Paint GL " << camera.up.x() << ' ' << camera.up.y() << ' ' << camera.up.z();
 	//qDebug() << "Paint GL " << camera.side.x() << ' ' << camera.side.y() << ' ' << camera.side.z();
@@ -291,12 +289,12 @@ void RayCastCanvas::add_shader(const QString& name, const QString& vertex, const
 }
 void RayCastCanvas::initShaders()
 {
-	if (!m_program.addShaderFromSourceFile(QOpenGLShader::Vertex, "../shaders/ex.vert"))
+	if (!m_program->addShaderFromSourceFile(QOpenGLShader::Vertex, "../shaders/ex.vert"))
 		close();
 
-	if (!m_program.addShaderFromSourceFile(QOpenGLShader::Fragment, "../shaders/ex.frag"))
+	if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, "../shaders/ex.frag"))
 		close();
 
-	if (m_program.link())
+	if (m_program->link())
 		close();
 }

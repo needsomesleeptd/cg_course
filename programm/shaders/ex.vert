@@ -1,9 +1,10 @@
-#version 420
+#version 330
+layout(location = 0) in vec3 position;
+layout(location = 1) in vec3 color;
+out vec3 interpolated_vertex;
 
-in vec3 vertex;
-out vec4 interpolated_vertex;
-
-void main(void){
-    //gl_Position = vec4(vertex, 1.0);
-    interpolated_vertex = vec4(vertex,0.5);
+void main()
+{
+    gl_Position = vec4(position, 1.0);
+    interpolated_vertex = position;
 }

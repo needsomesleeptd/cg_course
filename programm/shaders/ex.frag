@@ -4,6 +4,8 @@
 #define EPS 1e-3
 #define INF 1e6
 
+#define  K   0.1f
+
 struct Camera {
     vec3 position;
     vec3 view;
@@ -19,10 +21,8 @@ struct Ray {
 };
 
 struct Material {
-    vec3 _color;
-    float k_a;
-    float k_d;
-    float k_s;
+    vec3 color;
+    vec3 lightKoefs;
 };
 
 struct Sphere {
@@ -42,12 +42,11 @@ struct Plane {
 
 
 struct Intersection {
-    float time;
+    float t;
     vec3 point;
     vec3 normal;
-    vec3 color;
-    vec4 light_coeffs;
     Material material;
+    Ray tracedRay;
 };
 
 
@@ -77,7 +76,7 @@ struct Triangle {
 in vec3 interpolated_vertex;
 out vec4 FragColor;
 
-uniform Light light;
+uniform Light lightSource;
 uniform Camera camera;
 uniform vec2 scale;
 //uniform vec3 light_pos;
@@ -94,18 +93,23 @@ uniform vec2 scale;
 //camera.inverseProjectionMatrix = mat4(1);
 //uniform Camera camera;
 
-Material material = Material(vec3(0.7, 0.1, 0.4), 0.0, 0.8, 0.5);
-//vec2 scale = vec2(400,400);
 
-Sphere sphere = Sphere(vec3(-0.5, 0, 0), 0.8, material);
 
-vec3 light_pos = vec3(1, 1, 1);
-Ray GenerateRay(Camera camera) {
 
-    vec2 coords = interpolated_vertex.xy * normalize(scale);
+Ray GenerateRay(Camera camera, vec3 texcoord, vec2 viewportSize) {
 
-    vec3 direction = camera.view + camera.right * coords.x + camera.up * coords.y;
-    return Ray(camera.position, normalize(direction));
+    float fov = 0.45f;
+    vec2 texDiff = 0.5 * vec2(1.0 - 2.0 * texcoord.x, 2.0 * texcoord.y - 1.0);
+    vec2 angleDiff = texDiff * vec2(viewportSize.x / viewportSize.y, 1.0) * tan(fov * 0.5);
+
+    vec3 rayDirection = normalize(vec3(angleDiff, 1.0f));
+    mat3 viewToWorld = mat3(
+        -camera.right,
+        camera.up,
+        camera.view
+    );
+
+    return Ray(camera.position, viewToWorld * rayDirection);
 }
 
 
@@ -113,7 +117,7 @@ Ray GenerateRay(Camera camera) {
 float IntersectSphere(Sphere sphere, Ray ray) {
     ray.origin -= sphere.center;
     float A = dot(ray.direction, ray.direction);
-    float B = 2.0f * dot(ray.direction, ray.origin);
+    float B = 2.0 * dot(ray.direction, ray.origin);
     float C = dot(ray.origin, ray.origin) - sphere.radius * sphere.radius;
 
     float D = B * B - 4 * A * C;
@@ -202,7 +206,7 @@ bool IntersectSquare(Ray ray, vec3 v1, vec3 v2, vec3 v3, vec3 v4, out float time
 bool Intersect(Ray ray, float start, float final, inout Intersection intersect) {
     bool result = false;
     float time = start;
-    intersect.time = final;
+    intersect.t = final;
 
 /*for (int i = 0;i < vector_size; i++) {
         if (IntersectSphere(sphere_data[i], ray, time) && time < intersect.time) {
@@ -256,44 +260,78 @@ bool Intersect(Ray ray, float start, float final, inout Intersection intersect) 
     return shad;
 }*/
 
-vec3 Phong(Intersection intersect, vec3 pos_light, float shadow) {
-    vec3 light = normalize(pos_light - intersect.point);
-    float diffuse = max(dot(light, intersect.normal), 0.0);
-    vec3 view = normalize(camera.position - intersect.point);
-    vec3 reflected = reflect(-view, intersect.normal);
-    float specular = pow(max(dot(reflected, light), 0.0), intersect.light_coeffs.w);
+vec3 Phong(Intersection intersect) {
 
-    return intersect.light_coeffs.x * intersect.color +
-    intersect.light_coeffs.y * diffuse * intersect.color * shadow +
-    intersect.light_coeffs.z * specular;
+
+    vec3 lightVector = normalize(intersect.point - lightSource.position);
+    Ray lightRay = Ray(lightSource.position, lightVector);
+    vec3 shapeNormal = intersect.normal;
+    vec3 ambientIntensivity = intersect.material.lightKoefs[0] * lightSource.intensivity;
+    vec3 finalColor = vec3(0.0);
+
+    finalColor += ambientIntensivity * intersect.material.color;
+    float diffuseLight = dot(shapeNormal, lightVector);
+    Material shapeMaterial = intersect.material;
+
+    if (shapeMaterial.lightKoefs[1] > 0.0f)
+    {
+        if (diffuseLight > 0.0f)
+        {
+            //std::cout << " diffuseLight" << diffuseLight << std::endl;
+            vec3 diffuseColorRay = lightSource.intensivity * diffuseLight * shapeMaterial.lightKoefs[1];
+            finalColor += shapeMaterial.color * diffuseColorRay * shapeMaterial.lightKoefs;
+        }
+    }
+    /*if (finalColor.x > 0.1)
+    {
+        finalColor += vec3(0.0, 0.5, 0.0);
+    }*/
+    if (shapeMaterial.lightKoefs.y > 0)
+    {
+        vec3 reflectedDirection = intersect.tracedRay.direction - 2.0f * intersect.normal * dot(intersect.tracedRay.direction, intersect.normal);
+        Ray reflected = Ray(intersect.tracedRay.origin, reflectedDirection);
+        float specularDot = pow(dot(reflected.direction, intersect.tracedRay.direction), 4);
+        if (specularDot > 0.0f)
+        {
+
+            finalColor +=    shapeMaterial.lightKoefs[2] * specularDot*  shapeMaterial.color;
+            //return vec3(1.0, 1.0, 1.0);
+        }
+    }
+    float rayLength = (intersect.point - intersect.tracedRay.direction).length();
+    //finalColor = finalColor / (rayLength + K);
+
+    return finalColor;
 }
 
-vec4 RayTrace(Ray primary_ray) {
+vec4 RayTrace(Ray primary_ray, Sphere sphere) {
     vec4 resColor = vec4(0, 0, 0, 0);
     Ray ray = primary_ray;
 
     Intersection intersect;
-    intersect.time = INF;
+    intersect.t = INF;
     float start = 0.0;
     float final = INF;
-    float intersect_t = 0.0;
+    float intersect_t = -1.0;
     intersect_t = IntersectSphere(sphere, ray);
     bool was = (intersect_t > 0.0f);
     if (was)
     {
-        //intersect.time = time;
-        intersect.point = ray.origin + ray.direction * intersect.time;
-        intersect.normal = normalize(intersect.point - sphere.center);
-        intersect.color = sphere.material._color;
-        intersect.material = sphere.material;
-        intersect.light_coeffs = vec4(material.k_a, material.k_d, material.k_s, 0.0);
+        intersect.t = intersect_t;
+        intersect.point = ray.origin + ray.direction * intersect.t;
+        intersect.normal = normalize( (intersect.point - sphere.center) * sphere.radius);
+
+        intersect.material = sphere.matersial;
+        intersect.tracedRay = ray;
         //float shadowing = Shadow(light_pos, intersect);
-        resColor += vec4(Phong(intersect, light_pos, 1.0), 0);
+        resColor += vec4(Phong(intersect), 0.0);
     }
-/*if (Intersect(ray, start, final, intersect)) {
-        float shadowing = Shadow(light_pos, intersect);
-        resColor += vec4(Phong(intersect, light_pos, shadowing), 0);
-    }*/
+    else
+    {
+        resColor += vec4(1.0);
+    }
+
+
     return resColor;
 }
 
@@ -316,11 +354,26 @@ void main(void) {
     sq[4] = Square(vec3(10, 0, 0), vec3(20, 0, 0), vec3(20, 0, 10), vec3(10, 0, 10), 0, vec3(0.52, 0, 0.52));
     sq[5] = Square(vec3(10, 10, 0), vec3(20, 10, 0), vec3(20, 10, 10), vec3(10, 10, 10), 0, vec3(0.52, 0, 0.52));*/
 
+    Material material = Material(vec3(0.9f, 0.8f, 0.5f), vec3(0.2f, 0.9f, 0.9f));
+
+
+    Sphere sphere = Sphere(vec3(-0.5f, 0.0f, 0.0f), 0.3f, material);
     //if (camera.position.z > -2.0f)
     //{
-    Ray ray = GenerateRay(camera);
-    FragColor = RayTrace(ray);
-    float time = 1.0;
+/*if (material.lightKoefs.x > 0.1 && material.lightKoefs.y > 0.1 && material.lightKoefs.y > 0.1)
+    {
+        FragColor = vec4(0.5, 0.5, 0.0, 0.5);
+    }
+    else{
+        FragColor = vec4(0.0, 0.0, 0.0, 0.5);
+    }*/
+    Ray ray = GenerateRay(camera,interpolated_vertex,scale);
+    FragColor = RayTrace(ray, sphere);
+
+
+
+
+    //float time = 1.0;
     //}
     //else
     //{

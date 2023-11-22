@@ -85,6 +85,7 @@ void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_
 			ColorRGB diffuseColorRay = currentLightSource->getColor() * diffuseLight * shapeMaterial._k_d;
 			finalColor = shapeMaterial._color * diffuseColorRay + finalColor;
 
+
 		}
 	}
 	if (shapeMaterial._k_s > 0)

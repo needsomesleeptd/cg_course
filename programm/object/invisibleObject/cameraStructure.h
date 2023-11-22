@@ -3,8 +3,8 @@
 
 #include "transform.h"
 
-const int defaultViewPortHeight = 500;
-const int defaultViewPortWidth = 500;
+const int defaultViewPortHeight = 1151;
+const int defaultViewPortWidth = 901;
 const float nearClip = 0.1f;
 const float farClip = 100.0f;
 
@@ -53,7 +53,7 @@ struct CameraStructureImp
 	int _viewPortHeight = defaultViewPortWidth;
 
 
-	float _verticalFOV = 50.0f;
+	float _verticalFOV = 60.0f;
 
 	float _nearCLip = 1.0f;
 

@@ -87,10 +87,11 @@ void RayCastCanvas::initializeGL()
 	//_drawManager->setCamera(camera);
 	_sceneManager->getScene()->addCamera(camera);
 
-	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(-1, 0, 0), 1).create();
+	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0, 1.0, -1.0), 1).create();
 	lightsource->setColor(ColorRGB(1, 1, 1));
 	_sceneManager->getScene()->setLightSource(lightsource);
 
+	camera->setImageParams(QWidget::height(),QWidget::width());
 	m_program = new QOpenGLShaderProgram();
 	initializeOpenGLFunctions();
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -179,11 +180,14 @@ void RayCastCanvas::paintGL()
 	//lights
 
 	m_program->setUniformValue("light.position", to_q_vec(light->getPosition()));
-	m_program->setUniformValue("light.intensivity", QVector3D(1,1,1));
+	m_program->setUniformValue("light.intensivity", QVector3D(1.0f,1.0f,1.0f));
 
 	//scale
 	m_program->setUniformValue("scale",QVector2D(QWidget::width(),QWidget::height()));
 
+	//model + view + projection
+	m_program->setUniformValue("view",QMatrix4x4(&camera->_cameraStructure->_mView[0][0]));
+	m_program->setUniformValue("projection",QMatrix4x4(&camera->_cameraStructure->_mProjection[0][0]));
 
 
 
@@ -266,9 +270,10 @@ void RayCastCanvas::update()
 	Input::update();
 	// Camera Transformation
 	//qDebug() << "starting update";
+	bool moved = false;
 	if (Input::buttonPressed(Qt::RightButton))
 	{
-		const float speed = 0.5f;
+		const float speed = 0.02f;
 		std::shared_ptr<Camera> camera = _sceneManager->getScene()->getCamera();
 		VecD3 right = camera->getViewDirection() * camera->getUpVector();
 		static const float transSpeed = 0.5f;
@@ -293,11 +298,11 @@ void RayCastCanvas::update()
 		}
 		if (Input::keyPressed(Qt::Key_A))
 		{
-			translation -= right;
+			translation -= camera->_cameraStructure->getRight();
 		}
 		if (Input::keyPressed(Qt::Key_D))
 		{
-			translation += right;
+			translation += camera->_cameraStructure->getRight();
 		}
 		if (Input::keyPressed(Qt::Key_Q))
 		{
@@ -318,8 +323,9 @@ void RayCastCanvas::update()
 				glm::angleAxis(-yawDelta, glm::vec3(0.f, 1.0f, 0.0f))));
 
 			camera->_cameraStructure->_forward = glm::rotate(q, camera->_cameraStructure->getViewDirection());
-			//moved = true;
 		}
+		camera->_cameraStructure->updateView();
+		//camera->_cameraStructure->updateProjection();
 	}
 
 	// Update instance information

@@ -2,11 +2,15 @@
 //precision highp float;
 
 #define EPS 1e-3
-#define INF 1e6
+#define INF 1000000.0
+
+#define SPHERE_COUNT 3
 
 #define  K   0.1f
 
 #define MAX_DEPTH 3
+
+#define PI acos(0) * 2.0f
 
 
 struct Camera {
@@ -79,44 +83,76 @@ struct Triangle {
 in vec3 interpolated_vertex;
 out vec4 FragColor;
 
-//uniform Light lightSource;
+uniform Light lightSource;
 uniform Camera camera;
 uniform vec2 scale;
 
 uniform mat4 view;
 uniform mat4 projection;
 
-//uniform vec3 light_pos;
-//uniform int vector_size;*/
-Light lightSource = Light(vec3(0.0, 0.1, 0.0), vec3(1.0));
-/*layout(std430, binding = 0) buffer SphereBuffer {
-    vec3 sphere_data[];
-};*/
-
-/*layout(std430,binding = 1) buffer PlaneBuffer{
-    Plane plane_data[];
-};*/
-//Camera camera = Camera(vec3(0.0,0.0,-1),vec3(0.0,0.0,1.0),vec3(0.0,1.0,0.0),vec3(1.0,0.0,0.0),mat4(1),mat4(1));
-//camera.inverseProjectionMatrix = mat4(1);
-//uniform Camera camera;
 
 
+
+
+
+
+vec3 RandomHemispherePoint(vec2 rand)
+{
+    float cosTheta = sqrt(1.0 - rand.x);
+    float sinTheta = sqrt(rand.x);
+    float phi = 2.0 * PI * rand.y;
+    return vec3(
+        cos(phi) * sinTheta,
+        sin(phi) * sinTheta,
+        cosTheta
+    );
+}
+
+vec3 NormalOrientedHemispherePoint(vec2 rand, vec3 n)
+{
+    vec3 v = RandomHemispherePoint(rand);
+    return dot(v, n) < 0.0 ? -v : v;
+
+}
+
+
+float rand(vec2 co)
+{
+
+    highp float a = 12.9898;
+
+    highp float b = 78.233;
+
+    highp float c = 43758.5453;
+
+    highp float dt = dot(co.xy, vec2(a, b));
+
+    highp float sn = mod(dt, 3.14);
+
+    return fract(sin(sn) * c);
+
+}
+
+vec3 Random3D()
+{
+    return vec3(rand(vec2(1.0f)), rand(vec2(3.0f)), rand(vec2(5.0f)));
+}
 
 
 Ray GenerateRay(Camera camera, vec3 texcoord, vec2 viewportSize) {
 
     //texcoord.xy = vec2(texcoord.x / scale.x, texcoord.y / scale.y);
+
     float fov = 0.45f;
     vec2 texDiff = 0.5 * vec2(1.0 - 2.0 * texcoord.x, 2.0 * texcoord.y - 1.0);
-    vec2 angleDiff = texDiff * vec2(viewportSize.x / viewportSize.y, 1.0) * tan(fov);
+    vec2 angleDiff = texDiff * vec2(viewportSize.x / viewportSize.y, 1.0) * tan(fov * 0.5);
 
     vec3 rayDirection = normalize(vec3(angleDiff, 1.0f));
     mat3 viewToWorld = mat3(
-        -camera.right,
-        camera.up,
-        camera.view
+        -normalize(camera.right),
+        normalize(camera.up),
+        normalize(camera.view)
     );
-
     return Ray(camera.position, viewToWorld * rayDirection);
 }
 
@@ -251,129 +287,122 @@ bool Intersect(Ray ray, float start, float final, inout Intersection intersect) 
     return result;*/
 //}
 
-/*float Shadow(vec3 pos_light, Intersection intersect) {
-    float shad = 1.0;
-    vec3 direction = normalize(pos_light - intersect.point);
-    float dist_light = distance(pos_light, intersect.point);
-    vec3 qwe = direction * EPS;
-    Ray shad_ray = Ray(intersect.point + qwe, direction);
-    Intersection shad_intersect;
-    shad_intersect.time = INF;
-    if (Intersect(shad_ray, 0, dist_light, shad_intersect)) {
-        shad = 0.0;
-    }
-    return shad;
-}*/
+
 
 vec4 Phong(Intersection intersect) {
 
-
-    vec3 lightVector = normalize(normalize(lightSource.position) - normalize(intersect.point));
-    Ray lightRay = Ray(lightSource.position, lightVector);
-    vec3 shapeNormal = normalize(intersect.normal);
-    vec3 ambientIntensivity = intersect.material.lightKoefs[0] * intersect.material.color;
     vec3 finalColor = vec3(0.0);
-
-    finalColor += ambientIntensivity * intersect.material.color;
-    float diffuseLight = dot(shapeNormal, lightVector);
-    Material shapeMaterial = intersect.material;
-
-
-    //std::cout << " diffuseLight" << diffuseLight << std::endl;
-    float lightIntersect = max(0.0f, diffuseLight);
-    finalColor += lightIntersect * shapeMaterial.lightKoefs[1] * intersect.material.color;
-
-
-
-    if (shapeMaterial.lightKoefs[2] > 0.0f)
+    for (int i = 0; i < MAX_DEPTH; i++)
     {
-        vec3 reflectedDirection = reflect(intersect.tracedRay.direction, intersect.normal);
-        Ray reflected = Ray(intersect.tracedRay.origin, reflectedDirection);
-        float specularDot = pow(max(dot(reflected.direction, intersect.tracedRay.direction),0.0f), 20);
-        if (specularDot > 0.0f)
+
+        vec3 lightVector = normalize(normalize(lightSource.position) - normalize(intersect.point));
+        Ray lightRay = Ray(lightSource.position, lightVector);
+        vec3 shapeNormal = normalize(intersect.normal);
+        vec3 ambientIntensivity = intersect.material.lightKoefs[0] * intersect.material.color;
+
+
+        finalColor += ambientIntensivity * intersect.material.color;
+        float diffuseLight = dot(shapeNormal, lightVector);
+        Material shapeMaterial = intersect.material;
+
+
+        //std::cout << " diffuseLight" << diffuseLight << std::endl;
+        float lightIntersect = max(0.0f, diffuseLight);
+        finalColor += lightIntersect * shapeMaterial.lightKoefs[1] * intersect.material.color;
+
+
+
+        if (shapeMaterial.lightKoefs[2] > 0.0f)
         {
+            vec3 reflectedDirection = reflect(intersect.tracedRay.direction, intersect.normal);
+            Ray reflected = Ray(intersect.tracedRay.origin, reflectedDirection);
+            float specularDot = pow(max(dot(reflected.direction, intersect.tracedRay.direction), 0.0f), 20);
+            if (specularDot > 0.0f)
+            {
 
-            finalColor += shapeMaterial.lightKoefs[2] *  lightSource.intensivity * specularDot;
 
+                finalColor += shapeMaterial.lightKoefs[2] * lightSource.intensivity * specularDot;
+
+            }
         }
+        vec3 newRayOrigin = intersect.tracedRay.origin + intersect.t * intersect.tracedRay.direction;
+        vec3 hemisphereDistributedDirection = NormalOrientedHemispherePoint(vec2(Random3D()), intersect.normal);
+        vec3 randomVec = normalize(2.0 * Random3D() - 1.0);
+
+        vec3 tangent = cross(randomVec, intersect.normal);
+        vec3 bitangent = cross(intersect.normal, tangent);
+        mat3 transform = mat3(tangent, bitangent, intersect.normal);
+
+        vec3 newRayDirection = transform * hemisphereDistributedDirection;
+
+
     }
 
 
-    return vec4(finalColor,1);
+
+    return vec4(finalColor, 1);
 }
 
-vec4 RayTrace(Ray primary_ray, Sphere sphere) {
+Sphere spheres[SPHERE_COUNT];
+vec4 RayTrace(Ray primary_ray, int len) {
     vec4 resColor = vec4(0, 0, 0, 0);
     Ray ray = primary_ray;
     float minDistance = INF;
-    float D;
+    float D = -1.0;
     vec3 N;
-
     Intersection inters;
-    if (IntersectRaySphere(ray,sphere,D,N) && D < minDistance)
+    for (int i = 0; i < SPHERE_COUNT; i++)
     {
-        inters.normal = N;
-        inters.tracedRay = ray;
-        inters.point = normalize(ray.origin + ray.direction * D);
-        inters.material = sphere.material;
-        inters.t = D;
-        resColor += Phong(inters);
-        minDistance = D;
+        if ((IntersectRaySphere(ray, spheres[i], D, N)))
+        {
+            if (D < minDistance)
+            {
+                inters.normal = N;
+                inters.tracedRay = ray;
+                inters.point = normalize(ray.origin + ray.direction * D);
+                inters.material = spheres[i].material;
+                inters.t = D;
+                minDistance = D;
+                //return vec4(1.0, 0.0, 0.5, 1.0);
+            }
+        }
+
     }
-    else
+    if (minDistance == INF)
     {
-        resColor += vec4(0.3,0.2,0.1,1.0);
+        return vec4(0.0, 0.0, 0.0, 1.0);
     }
 
-
+    resColor = Phong(inters);
 
     return resColor;
 }
 
 
-/*Triangle tri[4];
-Square sq[6];*/
 
 void main(void) {
-    //FragColor = vec4(abs(interpolated_vertex.xy), 0, 1.0);
 
-/*tri[0] = Triangle(vec3(-10, -10, -30), vec3(10, -10, -30), vec3(0, 5, -25), 0, vec3(1, 1, 0));
-    tri[1] = Triangle(vec3(-10, -10, -30), vec3(10, -10, -30), vec3(0, -10, -10), 0, vec3(1, 1, 0));
-    tri[2] = Triangle(vec3(0, 5, -25), vec3(10, -10, -30), vec3(0, -10, -10), 0, vec3(1, 1, 0));
-    tri[3] = Triangle(vec3(0, 5, -25), vec3(0, -10, -10), vec3(-10, -10, -30), 0, vec3(1, 1, 0));
 
-    sq[0] = Square(vec3(10, 0, 0), vec3(20, 0, 0), vec3(20, 10, 0), vec3(10, 10, 0), 0, vec3(0.52, 0, 0.52));
-    sq[1] = Square(vec3(20, 0, 0), vec3(20, 0, 10), vec3(20, 10, 10), vec3(20, 10, 0), 0, vec3(0.52, 0, 0.52));
-    sq[2] = Square(vec3(20, 0, 10), vec3(10, 0, 10), vec3(10, 10, 10), vec3(20, 10, 10), 0, vec3(0.52, 0, 0.52));
-    sq[3] = Square(vec3(10, 0, 10), vec3(10, 0, 0), vec3(10, 10, 0), vec3(10, 10, 10), 0, vec3(0.52, 0, 0.52));
-    sq[4] = Square(vec3(10, 0, 0), vec3(20, 0, 0), vec3(20, 0, 10), vec3(10, 0, 10), 0, vec3(0.52, 0, 0.52));
-    sq[5] = Square(vec3(10, 10, 0), vec3(20, 10, 0), vec3(20, 10, 10), vec3(10, 10, 10), 0, vec3(0.52, 0, 0.52));*/
+
 
     Material material = Material(vec3(0.9f, 0.2f, 0.1f), vec3(0.1f, 0.4f, 0.1f));
+    Material new_material = Material(vec3(0.1f, 0.6f, 0.4f), vec3(0.1f, 0.2f, 0.3f));
+
+    Material new_new_material = Material(vec3(0.0f, 0.0f, 0.6f), vec3(0.1f, 0.4f, 0.0f));
 
 
-    Sphere sphere = Sphere(vec3(-0.5f, 0.0f, 0.0f), 0.7f, material);
+    spheres[0] = Sphere(vec3(-0.5f, 0.4f, 0.0f), 0.2f, material);
+    spheres[1] = Sphere(vec3(-0.5f, 0.7f, -0.1f), 0.3f, new_material);
+    spheres[2] = Sphere(vec3(-0.5f, 0.6f, 0.0f), 0.4f, new_new_material);
 
 
     Ray ray = GenerateRay(camera, interpolated_vertex, scale);
-    FragColor = RayTrace(ray, sphere);
+    FragColor = RayTrace(ray, SPHERE_COUNT);
 
 
 
 
-    //float time = 1.0;
-    //}
-    //else
-    //{
-    //        FragColor = vec4(0.5, 0.5, 0.0, 0.5);
-    //    }
-/*if (IntersectSphere(sphere, ray, time) && time < intersect.time) {
 
-    }*/
-
-    //FragColor = vec4(0.5, 0.5, 0.0, 0.5);
-
-    //FragColor = vec4(abs(ray.direction.xy), 0, 1.0);
 }
 
 

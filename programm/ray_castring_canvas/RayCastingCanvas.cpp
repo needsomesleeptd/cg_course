@@ -87,7 +87,7 @@ void RayCastCanvas::initializeGL()
 	//_drawManager->setCamera(camera);
 	_sceneManager->getScene()->addCamera(camera);
 
-	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0, 1.0, -1.0), 1).create();
+	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0, 0.1, 0.0), 1).create();
 	lightsource->setColor(ColorRGB(1, 1, 1));
 	_sceneManager->getScene()->setLightSource(lightsource);
 
@@ -179,8 +179,8 @@ void RayCastCanvas::paintGL()
 	m_program->setUniformValue("camera.inverseViewMatrix", inverseView);
 	//lights
 
-	m_program->setUniformValue("light.position", to_q_vec(light->getPosition()));
-	m_program->setUniformValue("light.intensivity", QVector3D(1.0f,1.0f,1.0f));
+	m_program->setUniformValue("lightSource.position", to_q_vec(light->getPosition()));
+	m_program->setUniformValue("lightSource.intensivity", QVector3D(1.0f,1.0f,1.0f));
 
 	//scale
 	m_program->setUniformValue("scale",QVector2D(QWidget::width(),QWidget::height()));
@@ -204,42 +204,6 @@ void RayCastCanvas::paintGL()
 
 
 
-	/*m_program->setUniformValue("camera.position", QVector3D(cam_pos.x, cam_pos.y, cam_pos.z));
-	m_program->setUniformValue("camera.view", QVector3D(cam_dir.x, cam_dir.y, cam_dir.z));
-
-	m_program->setUniformValue("camera.up", QVector3D(cam_up.x, cam_up.y, cam_up.z));
-	m_program->setUniformValue("camera.side", QVector3D(cam_r.x, cam_r.y, cam_r.z));
-	m_program->setUniformValue("scale", QVector2D(width(), height()));
-	m_program->setUniformValue("light.position", QVector3D(light_pos.x, light_pos.y, light_pos.z));
-	m_program->setUniformValue("light.intensivity", QVector3D(light_int, light_int, light_int));
-
-	m_program->setUniformValue("light_pos", QVector3D(light_pos.x, light_pos.y, light_pos.z));
-	m_program->release();*/
-	//qDebug() << QString("Finished Painting");
-/*
-	 *    // Create Buffer (Do not release until VAO is created)
-    m_vertex.create();
-    m_vertex.bind();
-    m_vertex.setUsagePattern(QOpenGLBuffer::StaticDraw);
-    m_vertex.allocate(sg_vertexes, sizeof(sg_vertexes));
-
-    // Create Vertex Array Object
-    m_object.create();
-    m_object.bind();
-    m_program->enableAttributeArray(0);
-    m_program->enableAttributeArray(1);
-    m_program->setAttributeBuffer(0, GL_FLOAT, Vertex::positionOffset(), Vertex::PositionTupleSize, Vertex::stride());
-    m_program->setAttributeBuffer(1, GL_FLOAT, Vertex::colorOffset(), Vertex::ColorTupleSize, Vertex::stride());
-
-    // Release (unbind) all
-    m_object.release();
-    m_vertex.release();
-    m_program->release();
-*/
-	//qDebug() << "Paint GL " << cam_pos.x << ' ' << cam_pos.y << ' ' << cam_pos.z;
-	//qDebug() << "Paint GL " << camera.view.x() << ' ' << camera.view.y() << ' ' << camera.view.z();
-	//qDebug() << "Paint GL " << camera.up.x() << ' ' << camera.up.y() << ' ' << camera.up.z();
-	//qDebug() << "Paint GL " << camera.side.x() << ' ' << camera.side.y() << ' ' << camera.side.z();
 }
 
 /*!
@@ -325,7 +289,7 @@ void RayCastCanvas::update()
 			camera->_cameraStructure->_forward = glm::rotate(q, camera->_cameraStructure->getViewDirection());
 		}
 		camera->_cameraStructure->updateView();
-		//camera->_cameraStructure->updateProjection();
+		camera->_cameraStructure->updateProjection();
 	}
 
 	// Update instance information

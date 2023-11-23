@@ -87,7 +87,7 @@ void RayCastCanvas::initializeGL()
 	//_drawManager->setCamera(camera);
 	_sceneManager->getScene()->addCamera(camera);
 
-	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0, 0.1, 0.0), 1).create();
+	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(-10, 0.2, 0.3), 0.5).create();
 	lightsource->setColor(ColorRGB(1, 1, 1));
 	_sceneManager->getScene()->setLightSource(lightsource);
 
@@ -180,7 +180,7 @@ void RayCastCanvas::paintGL()
 	//lights
 
 	m_program->setUniformValue("lightSource.position", to_q_vec(light->getPosition()));
-	m_program->setUniformValue("lightSource.intensivity", QVector3D(1.0f,1.0f,1.0f));
+	m_program->setUniformValue("lightSource.intensivity", QVector3D(0.9f,0.9f,0.9f));
 
 	//scale
 	m_program->setUniformValue("scale",QVector2D(QWidget::width(),QWidget::height()));
@@ -237,10 +237,10 @@ void RayCastCanvas::update()
 	bool moved = false;
 	if (Input::buttonPressed(Qt::RightButton))
 	{
-		const float speed = 0.02f;
+
 		std::shared_ptr<Camera> camera = _sceneManager->getScene()->getCamera();
 		VecD3 right = camera->getViewDirection() * camera->getUpVector();
-		static const float transSpeed = 0.5f;
+		static const float transSpeed = 0.05f;
 		static const float rotSpeed = 0.5f;
 
 		float delta_x = Input::mouseDelta().x() * 0.002f;
@@ -277,28 +277,25 @@ void RayCastCanvas::update()
 			translation += camera->getUpVector();
 		}
 		qDebug() << "translation is" << translation.x << translation.y << translation.z;
-		camera->_cameraStructure->move(translation * speed);
+		camera->_cameraStructure->move(translation * transSpeed);
 		if (delta.x != 0.0f || delta.y != 0.0f)
 		{
 			float pitchDelta = delta.y * rotSpeed;
 			float yawDelta = delta.x * rotSpeed;
 
-			glm::quat q = -glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, camera->_cameraStructure->getRight()),
+			glm::quat q = -glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, camera->_cameraStructure->_right),
 				glm::angleAxis(-yawDelta, glm::vec3(0.f, 1.0f, 0.0f))));
 
-			camera->_cameraStructure->_forward = glm::rotate(q, camera->_cameraStructure->getViewDirection());
+			camera->_cameraStructure->_forward = glm::rotate(q, camera->_cameraStructure->_forward);
 		}
 		camera->_cameraStructure->updateView();
 		camera->_cameraStructure->updateProjection();
 	}
 
-	// Update instance information
-	//m_transform.rotate(1.0f, QVector3D(0.4f, 0.3f, 0.3f));
 
-	// Schedule a redraw
-	//QOpenGLWindow::update();
+
 	QOpenGLWidget::update();
-	//paintGL();
+
 }
 
 void RayCastCanvas::keyPressEvent(QKeyEvent* event)

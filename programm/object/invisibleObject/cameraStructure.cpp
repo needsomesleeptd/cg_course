@@ -60,7 +60,8 @@ VecD3 CameraStructureImp::getUp() const
 }
 void CameraStructureImp::updateView()
 {
-	_mView = glm::lookAt(_coordinates,_coordinates + _forward,glm::vec3(0, 1, 0));//TODO::write own lookat function
+	_forward = normalise(_forward);
+	_mView = glm::lookAt(_coordinates,_coordinates + _forward,VecD3 (0.0,1.0,0.0));//TODO::write own lookat function
 	_mInverseView = glm::inverse(_mView);
 }
 

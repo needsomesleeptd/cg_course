@@ -53,7 +53,7 @@ struct CameraStructureImp
 	int _viewPortHeight = defaultViewPortWidth;
 
 
-	float _verticalFOV = 60.0f;
+	float _verticalFOV = 50.0f;
 
 	float _nearCLip = 1.0f;
 

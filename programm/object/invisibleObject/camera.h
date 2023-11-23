@@ -51,46 +51,6 @@ class CameraFactory : public BaseCameraFactory
 	 VecD3 _direction{ 0, 0, 0 };
 };
 
-
-//class Camera: public InvisibleObject {
-//public:
-//	Camera() = default;
-//	explicit Camera(const Point &coordinates): _coordinates(coordinates) {};
-//	~Camera() override = default;
-//
-//	void transform(const TransformParams &transformParams) override;
-//	void accept(std::shared_ptr<Visitor> visitor) override;
-//
-//	[[nodiscard]] Point getCoordinates() const noexcept;
-//	void setCoordinates(Point &coordinates);
-//
-//	[[nodiscard]] Matrix4 getViewDirection();
-//	[[nodiscard]] Matrix4 getProjection() const;
-//
-//	friend Point DrawManager::getProection(const Point &point);
-//	friend void TransformManager::visit(const Camera &model);
-//
-//
-//
-//protected:
-//	void updateVectors();
-//
-//private:
-//	Point _coordinates;
-//
-//	Vector3 _forward{0.0f, 0.0f, -1.0f};
-//	Vector3 _up{0.0, 1.0, 0.0};
-//	Vector3 _right{0.0, 0.0, 1.0};
-//	Vector3 _worldUp{0.0, 1.0, 0.0};
-//	float _yaw = -90;
-//	float _pitch = 0;
-//	float _aspect = 1.0f;
-//	float _zNear = 0.1f;
-//	float _zFar = 100.0f;
-//
-//	void rotate(float xOffset, float yOffset);
-//	void move(const Point& moveParams);
-////	CameraStructureImp _cameraStructure;
 //};
 
 #endif //LAB_03_CAMERA_H

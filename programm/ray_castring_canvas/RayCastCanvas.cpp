@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include "RayCastingCanvas.h"
+#include "RayCastCanvas.h"
 
 
 QVector3D to_q_vec(const VecD3& vec_src)
@@ -283,10 +283,19 @@ void RayCastCanvas::update()
 			float pitchDelta = delta.y * rotSpeed;
 			float yawDelta = delta.x * rotSpeed;
 
+			if (pitchDelta > 89.0f) {
+				pitchDelta = 89.0f;
+			}
+			if (pitchDelta < -89.0f) {
+				pitchDelta = -89.0f;
+			}
+
 			glm::quat q = -glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, camera->_cameraStructure->_right),
 				glm::angleAxis(-yawDelta, glm::vec3(0.f, 1.0f, 0.0f))));
 
-			camera->_cameraStructure->_forward = glm::rotate(q, camera->_cameraStructure->_forward);
+			qDebug() << "rotating by yaw " << yawDelta << "pitch " << pitchDelta << "\n";
+
+			camera->_cameraStructure->_forward = normalise(glm::rotate(q, camera->_cameraStructure->_forward));
 		}
 		camera->_cameraStructure->updateView();
 		camera->_cameraStructure->updateProjection();
@@ -334,3 +343,4 @@ void RayCastCanvas::mouseReleaseEvent(QMouseEvent* event)
 {
 	Input::registerMouseRelease(event->button());
 }
+

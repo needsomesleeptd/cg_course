@@ -2,8 +2,8 @@
 // Created by Андрей on 05/11/2023.
 //
 
-#ifndef LAB_03_CG_COURSE_PROGRAMM_RAY_CASTRING_CANVAS_RAYCASTINGCANVAS_H_
-#define LAB_03_CG_COURSE_PROGRAMM_RAY_CASTRING_CANVAS_RAYCASTINGCANVAS_H_
+#ifndef LAB_03_CG_COURSE_PROGRAMM_RAY_CASTRING_CANVAS_RAYCASTCANVAS_H_
+#define LAB_03_CG_COURSE_PROGRAMM_RAY_CASTRING_CANVAS_RAYCASTCANVAS_H_
 
 #include <functional>
 #include <vector>
@@ -79,6 +79,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
  public slots:
 	void update();
 
+
  protected:
 	void initializeGL();
 	void paintGL();
@@ -90,7 +91,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void keyReleaseEvent(QKeyEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;
 
- private:
+ public:
 
 	QMatrix4x4 m_viewMatrix;
 	QMatrix4x4 m_modelViewProjectionMatrix;
@@ -131,4 +132,4 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	QPointF pixel_pos_to_view_pos(const QPointF& p);
 
 };
-#endif //LAB_03_CG_COURSE_PROGRAMM_RAY_CASTRING_CANVAS_RAYCASTINGCANVAS_H_
+#endif //LAB_03_CG_COURSE_PROGRAMM_RAY_CASTRING_CANVAS_RAYCASTCANVAS_H_

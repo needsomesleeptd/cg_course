@@ -8,7 +8,7 @@
 
 #define  K   0.1f
 
-#define MAX_DEPTH 3
+#define MAX_DEPTH 8
 
 #define PI acos(0) * 2.0f
 
@@ -143,13 +143,19 @@ Ray GenerateRay(Camera camera, vec3 texcoord, vec2 viewportSize) {
 
     //texcoord.xy = vec2(texcoord.x / scale.x, texcoord.y / scale.y);
 
-    float fov = 0.45f;
-    vec2 texDiff = 0.5 * vec2(1.0 - 2.0 * texcoord.x, 2.0 * texcoord.y - 1.0);
-    vec2 angleDiff = texDiff * vec2(viewportSize.x / viewportSize.y, 1.0) * tan(fov);
+    float fov = 0.5f;
+    vec2 texDiff =  vec2(1.0 - 2.0 * texcoord.x, 2.0 * texcoord.y - 1.0);
+    vec2 angleDiff = texDiff * vec2(viewportSize.x / viewportSize.y, 1.0) * tan(fov * 0.5);
 
     vec3 rayDirection = normalize(vec3(angleDiff, 1.0f));
+    vec3 right = normalize(cross(camera.up, camera.view));
+    mat3 viewToWorld = mat3(
+        normalize(camera.right),
+        normalize(camera.up),
+        normalize(camera.view)
+    );
+    return Ray(camera.position, normalize(vec3(view*projection  * vec4(rayDirection,1.0))));
 
-    return Ray(camera.position, vec3(projection * view  * vec4(rayDirection, 1.0f)));
 }
 
 
@@ -387,7 +393,7 @@ vec4 RayTrace(Ray primary_ray, int len) {
         if (inters.t == INF)
            break;
         noIntersrction  = 0;
-        resColor += inters.material.lightKoefs[2]  * Phong(inters, primary_ray);
+        resColor +=  Phong(inters, primary_ray);
     }
 
     if (noIntersrction == 1)
@@ -404,15 +410,15 @@ void main(void) {
 
 
 
-    Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.0f, 0.2f, 0.1f));
-    Material new_material = Material(vec3(0.1f, 0.6f, 0.4f), vec3(0.0f, 0.2f, 0.4f));
+    Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.0f, 0.2f, 0.4f));
+    Material new_material = Material(vec3(0.1f, 0.6f, 0.4f), vec3(0.0f, 0.4f, 0.6f));
 
-    Material new_new_material = Material(vec3(0.0f, 0.0f, 0.6f), vec3(0.0f, 0.4f, 0.1f));
+    Material new_new_material = Material(vec3(1.0f, 1.0f, 1.0f), vec3(0.5f, 0.0f, 0.6f));
 
 
-    spheres[0] = Sphere(vec3(1.0f, 1.4f, 3.1f), 0.3f, material);
-    spheres[1] = Sphere(vec3(3.0f, 0.7f, -0.1f), 0.3f, new_material);
-    spheres[2] = Sphere(vec3(4.5f, 3.6f, 2.0f), 0.3f, new_new_material);
+    spheres[0] = Sphere(vec3(1.0f, 1.4f, 3.1f), 0.6f, material);
+    spheres[1] = Sphere(vec3(3.0f, 0.7f, -0.1f), 0.7f, new_material);
+    spheres[2] = Sphere(lightSource.position, 0.1f, new_new_material);
 
 
     Ray ray = GenerateRay(camera, interpolated_vertex, scale);

@@ -5,8 +5,7 @@
 
 const int defaultViewPortHeight = 1151;
 const int defaultViewPortWidth = 901;
-const float nearClip = 0.1f;
-const float farClip = 100.0f;
+
 
 struct CameraStructureImp
 {
@@ -55,7 +54,7 @@ struct CameraStructureImp
 
 	float _verticalFOV = 50.0f;
 
-	float _nearCLip = 1.0f;
+	float _nearCLip = 10.0f;
 
 	float _farClip = 100.0f;
 

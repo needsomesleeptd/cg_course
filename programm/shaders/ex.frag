@@ -5,12 +5,15 @@
 #define INF 1000000.0
 
 #define SPHERE_COUNT 3
+#define BOX_COUNT 1
 
 #define  K   0.1f
 
 #define MAX_DEPTH 8
 
 #define PI acos(0) * 2.0f
+
+#define R_LSOURCE 0.01f
 
 
 struct Camera {
@@ -44,6 +47,13 @@ struct Plane {
     int material_ind;
 };
 
+struct Box
+{
+    vec3 position;
+    mat3 rotation;
+    vec3 halfSize;
+    Material material;
+};
 
 
 
@@ -141,20 +151,21 @@ vec3 Random3D()
 
 Ray GenerateRay(Camera camera, vec3 texcoord, vec2 viewportSize) {
 
-    //texcoord.xy = vec2(texcoord.x / scale.x, texcoord.y / scale.y);
-
     float fov = 0.5f;
-    vec2 texDiff =  vec2(1.0 - 2.0 * texcoord.x, 2.0 * texcoord.y - 1.0);
+    vec2 texDiff = vec2(1.0 - 2.0 * texcoord.x, 2.0 * texcoord.y - 1.0);
     vec2 angleDiff = texDiff * vec2(viewportSize.x / viewportSize.y, 1.0) * tan(fov * 0.5);
 
     vec3 rayDirection = normalize(vec3(angleDiff, 1.0f));
     vec3 right = normalize(cross(camera.up, camera.view));
     mat3 viewToWorld = mat3(
-        normalize(camera.right),
+        normalize(right),
         normalize(camera.up),
         normalize(camera.view)
+
     );
-    return Ray(camera.position, normalize(vec3(view*projection  * vec4(rayDirection,1.0))));
+    vec4 rayDirectiondim = view * projection * vec4(rayDirection, 1.0);
+    rayDirection = vec3(rayDirectiondim / rayDirectiondim[3]);
+    return Ray(camera.position, normalize(rayDirection));
 
 }
 
@@ -172,10 +183,12 @@ bool IntersectRaySphere(Ray ray, Sphere sphere, out float fraction, out vec3 nor
 
     float r1 = (-b - sqrt(D)) / (2.0 * a);
     float r2 = (-b + sqrt(D)) / (2.0 * a);
-
+    if (r1 < 0.0f && r2 < 0.0f)
+    return false;
+    fraction = INF;
     if (r1 > 0.0)
     fraction = r1;
-    else if (r2 > 0.0)
+    else if (r2 > 0.0 && fraction > r2)
     fraction = r2;
     else
     return false;
@@ -186,63 +199,37 @@ bool IntersectRaySphere(Ray ray, Sphere sphere, out float fraction, out vec3 nor
     return true;
 }
 
-/*bool IntersectTriangle(Ray ray, vec3 v1, vec3 v2, vec3 v3, out float time) {
-    time = -1;
-    vec3 A = v2 - v1;
-    vec3 B = v3 - v1;
-    vec3 N = cross(A, B);
-    float NdotRayDirection = dot(N, ray.direction);
-    if (abs(NdotRayDirection) < 0.001)   return false;
-    float d = dot(N, v1);
-    float t = -1. * (dot(N, ray.origin) - d) / NdotRayDirection;
-    if (t < 0) return false;
-    vec3 P = ray.origin + t * ray.direction;
 
-    vec3 edge1 = v2 - v1;
-    vec3 VP1 = P - v1;
-    vec3 C = cross(edge1, VP1);
-    if (dot(N, C) < 0)  return false;
-    vec3 edge2 = v3 - v2;
-    vec3 VP2 = P - v2;
-    C = cross(edge2, VP2);
-    if (dot(N, C) < 0)   return false;
-    vec3 edge3 = v1 - v3;
-    vec3 VP3 = P - v3;
-    C = cross(edge3, VP3);
-    if (dot(N, C) < 0)   return false;
-    time = t;
-    return true;
-}*/
 
-bool IntersectSquare(Ray ray, vec3 v1, vec3 v2, vec3 v3, vec3 v4, out float time) {
-    time = -1.0;
-    vec3 A = v2 - v1;
-    vec3 B = v4 - v1;
-    vec3 N = cross(A, B);
-    float NdotRayDirection = dot(N, ray.direction);
-    if (abs(NdotRayDirection) < 0.001)   return false;
-    float d = dot(N, v1);
-    float t = -1. * (dot(N, ray.origin) - d) / NdotRayDirection;
-    if (t < 0.0) return false;
-    vec3 P = ray.origin + t * ray.direction;
+bool IntersectRayBox(Ray ray, Box box, out float fraction, out vec3 normal)
+{
+    vec3 rd = box.rotation * ray.direction;
+    vec3 ro = box.rotation * (ray.origin - box.position);
 
-    vec3 edge1 = v2 - v1;
-    vec3 VP1 = P - v1;
-    vec3 C = cross(edge1, VP1);
-    if (dot(N, C) < 0.0) return false;
-    vec3 edge2 = v3 - v2;
-    vec3 VP2 = P - v2;
-    C = cross(edge2, VP2);
-    if (dot(N, C) < 0.0) return false;
-    vec3 edge3 = v4 - v3;
-    vec3 VP3 = P - v3;
-    C = cross(edge3, VP3);
-    if (dot(N, C) < 0.0) return false;
-    vec3 edge4 = v1 - v4;
-    vec3 VP4 = P - v4;
-    C = cross(edge4, VP4);
-    if (dot(N, C) < 0.0) return false;
-    time = t;
+    vec3 m = vec3(1.0) / rd;
+
+    vec3 s = vec3((rd.x < 0.0) ? 1.0 : -1.0,
+                  (rd.y < 0.0) ? 1.0 : -1.0,
+                  (rd.z < 0.0) ? 1.0 : -1.0);
+    vec3 t1 = m * (-ro + s * box.halfSize);
+    vec3 t2 = m * (-ro - s * box.halfSize);
+
+    float tN = max(max(t1.x, t1.y), t1.z);
+    float tF = min(min(t2.x, t2.y), t2.z);
+
+    if (tN > tF || tF < 0.0) return false;
+
+    mat3 txi = transpose(box.rotation);
+
+    if (t1.x > t1.y && t1.x > t1.z)
+    normal = txi[0] * s.x;
+    else if (t1.y > t1.z)
+    normal = txi[1] * s.y;
+    else
+    normal = txi[2] * s.z;
+
+    fraction = tN;
+
     return true;
 }
 
@@ -299,6 +286,7 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
 
     vec3 lightVector = normalize(lightSource.position - intersect.point);
     Ray lightRay = Ray(lightSource.position, lightVector);
+    //if (!findIntersection(lightRay,spheres,boxes))
     vec3 shapeNormal = intersect.normal;
     vec3 ambientIntensivity = intersect.material.lightKoefs[0] * intersect.material.color;
 
@@ -314,16 +302,13 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
 
 
 
-    if (shapeMaterial.lightKoefs[2] > 0.0f)
-    {
-        vec3 reflectedDirection = normalize(intersect.tracedRay.direction - 2.0f * intersect.normal * dot(intersect.tracedRay.direction, intersect.normal));
-        Ray reflected = Ray(intersect.tracedRay.origin, reflectedDirection);
-        float specularDot = pow(max(dot(reflected.direction, intersect.tracedRay.direction), 0.0f), 2);
-        if (specularDot > 0.0f)
-        {
-            rayColor += shapeMaterial.lightKoefs[2]  * lightSource.intensivity *  specularDot * intersect.material.color;
-        }
-    }
+
+    vec3 reflectedDirection = normalize(intersect.tracedRay.direction - 2.0f * intersect.normal * dot(intersect.tracedRay.direction, intersect.normal));
+    Ray reflected = Ray(intersect.tracedRay.origin, reflectedDirection);
+    float specularDot = pow(max(dot(reflected.direction, intersect.tracedRay.direction), 0.0f), 5);
+
+    rayColor += shapeMaterial.lightKoefs[2] * lightSource.intensivity * specularDot;
+
 
     //float rayLength = (intersect.point - intersect.tracedRay.origin).length();
     //rayColor = rayColor / (rayLength + K);
@@ -339,8 +324,9 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
     vec3 newRayDirection = transform * hemisphereDistributedDirection;
     vec3 idealReflection = reflect(intersect.tracedRay.direction, intersect.normal);
     newRayDirection = normalize(mix(newRayDirection, idealReflection, intersect.material.lightKoefs[1]));
-
-    Ray new_ray = Ray(intersect.point, newRayDirection);
+    newRayOrigin += intersect.normal * 0.2;
+    //reflectedDirection = reflectedDirection += intersect.normal * 0.8;
+    Ray new_ray = Ray(newRayOrigin, reflectedDirection);
     rayReflected = new_ray;
 
 
@@ -353,9 +339,12 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
 
 Sphere spheres[SPHERE_COUNT];
 
+Box boxes[BOX_COUNT];
 
 
-Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT])
+
+
+Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[BOX_COUNT])
 {
     float minDistance = INF;
     float D = -1.0;
@@ -378,6 +367,25 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT])
         }
 
     }
+
+
+
+    for (int i = 0; i < BOX_COUNT; i++)
+    {
+        if (IntersectRayBox(ray, boxes[i], D, N))
+        {
+            if (D < minDistance)
+            {
+                inters.normal = N;
+                inters.tracedRay = ray;
+                inters.point = normalize(ray.origin + ray.direction * D);
+                inters.material = spheres[i].material;
+                inters.t = D;
+                minDistance = D;
+            }
+        }
+
+    }
     return inters;
 
 }
@@ -387,18 +395,35 @@ vec4 RayTrace(Ray primary_ray, int len) {
 
     Intersection inters;
     int noIntersrction = 1;
+
+
+
+
     for (int i = 0; i < MAX_DEPTH; i++)
     {
-        inters = findIntersection(primary_ray, spheres);
-        if (inters.t == INF)
-           break;
-        noIntersrction  = 0;
-        resColor +=  Phong(inters, primary_ray);
+        inters = findIntersection(primary_ray, spheres, boxes);
+        if (abs(inters.t - INF) < EPS)
+        break;
+        noIntersrction = 0;
+        resColor += Phong(inters, primary_ray);
+        if (i != 0)
+        resColor *= inters.material.lightKoefs[2];
     }
 
     if (noIntersrction == 1)
     {
-        resColor = vec4(0.1,0.2,0.3,1.0);
+        Material lightSourcematerial = Material(vec3(1.0, 1.0, 1.0), vec3(0.0f));
+        Sphere lightSourceSphere = Sphere(lightSource.position, R_LSOURCE, lightSourcematerial);
+        float fr;
+        vec3 nr;
+        if (IntersectRaySphere(primary_ray, lightSourceSphere, fr, nr))
+        {
+            resColor = vec4(lightSource.intensivity,1);
+        }
+        else
+        {
+            resColor = vec4(0.1, 0.2, 0.3, 1.0);
+        }
     }
     return resColor;
 }
@@ -410,15 +435,20 @@ void main(void) {
 
 
 
-    Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.0f, 0.2f, 0.4f));
-    Material new_material = Material(vec3(0.1f, 0.6f, 0.4f), vec3(0.0f, 0.4f, 0.6f));
+    Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.0f, 0.2f, 0.2f));
+    Material new_material = Material(vec3(0.1f, 0.9f, 0.4f), vec3(0.0f, 0.4f, 0.3f));
 
-    Material new_new_material = Material(vec3(1.0f, 1.0f, 1.0f), vec3(0.5f, 0.0f, 0.6f));
+    Material new_new_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.0f, 0.4f, 0.2f));
 
 
     spheres[0] = Sphere(vec3(1.0f, 1.4f, 3.1f), 0.6f, material);
     spheres[1] = Sphere(vec3(3.0f, 0.7f, -0.1f), 0.7f, new_material);
-    spheres[2] = Sphere(lightSource.position, 0.1f, new_new_material);
+    spheres[2] = Sphere(vec3(1.0f, 0.7f, -0.1f), 0.3f, new_new_material);
+
+
+
+    boxes[0] = Box(vec3(0.3f, 2.0f, -1.0f), mat3(1.0), vec3(1.0, 1.0, 1.0), new_material);
+
 
 
     Ray ray = GenerateRay(camera, interpolated_vertex, scale);

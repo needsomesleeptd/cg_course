@@ -8,6 +8,6 @@ uniform  mat4 projection;
 
 void main()
 {
-    gl_Position =  vec4(position, 1);
+    gl_Position =   vec4(position, 1);
     interpolated_vertex = vec3(gl_Position);
 }

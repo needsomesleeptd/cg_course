@@ -7,6 +7,8 @@
 #define SPHERE_COUNT 3
 #define BOX_COUNT 1
 
+#define CYLINDERS_COUNT 1
+
 #define  K   0.1f
 
 #define MAX_DEPTH 8
@@ -55,6 +57,14 @@ struct Box
     Material material;
 };
 
+
+struct Cylinder
+{
+    vec3 extr_a;
+    vec3 extr_b;
+    float ra;
+    Material material;
+};
 
 
 
@@ -145,7 +155,7 @@ float rand(vec2 co)
 
 vec3 Random3D()
 {
-    return vec3(rand(vec2(1.0f)), rand(vec2(3.0f)), rand(vec2(5.0f)));
+    return vec3(rand(vec2(interpolated_vertex.x)), rand(vec2(interpolated_vertex.y)), rand(vec2(interpolated_vertex.z)));
 }
 
 
@@ -233,48 +243,56 @@ bool IntersectRayBox(Ray ray, Box box, out float fraction, out vec3 normal)
     return true;
 }
 
-bool Intersect(Ray ray, float start, float final, inout Intersection intersect) {
-    bool result = false;
-    float time = start;
-    intersect.t = final;
 
-/*for (int i = 0;i < vector_size; i++) {
-        if (IntersectSphere(sphere_data[i], ray, time) && time < intersect.time) {
-            intersect.time = time;
-            intersect.point = ray.origin + ray.direction * time;
-            intersect.normal = normalize(intersect.point - sphere_data[i].center);
-            intersect.color = sphere_data[i].color;
-            intersect.material_ind = sphere_data[i].material_ind;
-            intersect.light_coeffs = material.light_coeffs;
-            result = true;
-        }
-    }*/
-    return result;
+vec3 cylNormal(in vec3 p, Cylinder cyl)
+{
+    vec3 pa = p - cyl.extr_a;
+    vec3 ba = cyl.extr_b - cyl.extr_a;
+    float baba = dot(ba, ba);
+    float paba = dot(pa, ba);
+    float h = dot(pa, ba) / baba;
+    return vec3(pa - ba * h) / cyl.ra;
 }
-/*for (int i = 0;i < 4; i++) {
-        if (IntersectTriangle(ray, tri[i].v1, tri[i].v2, tri[i].v3, time) && time < intersect.time) {
-            intersect.point = ray.origin + ray.direction * time;
-            intersect.normal = normalize(cross(tri[i].v1 - tri[i].v2, tri[i].v3 - tri[i].v2));
-            intersect.color = tri[i].color;
-            intersect.material_ind = tri[i].material_ind;
-            intersect.light_coeffs = material.light_coeffs;
-            intersect.time = time;
-            result = true;
-        }
-    }*/
-/*for (int i = 0;i < 6; i++) {
-        if (IntersectSquare(ray, sq[i].v1, sq[i].v2, sq[i].v3, sq[i].v4, time) && time < intersect.time) {
-            intersect.point = ray.origin + ray.direction * time;
-            intersect.normal = normalize(cross(sq[i].v1 - sq[i].v2, sq[i].v3 - sq[i].v2));
-            intersect.color = sq[i].color;
-            intersect.material_ind = sq[i].material_ind;
-            intersect.light_coeffs = material.light_coeffs;
-            intersect.time = time;
-            result = true;
-        }
+
+
+bool IntersectRayCyl(Ray ray, Cylinder cyl, out float fraction, out vec3 normal)
+{
+    vec3  ba = cyl.extr_b  - cyl.extr_a;
+    vec3  oc = ray.origin - cyl.extr_a;
+    float baba = dot(ba,ba);
+    float bard = dot(ba,ray.direction);
+    float baoc = dot(ba,oc);
+    float k2 = baba            - bard*bard;
+    float k1 = baba*dot(oc,ray.direction) - baoc*bard;
+    float k0 = baba*dot(oc,oc) - baoc*baoc - cyl.ra*cyl.ra*baba;
+    float h = k1*k1 - k2*k0;
+    if( h<0.0 ) return false;//no intersection
+    h = sqrt(h);
+    float t = (-k1-h)/k2;
+    // body
+    float y = baoc + t*bard;
+    if( y>0.0 && y<baba )
+    {
+        vec4 normal_n = vec4(t, (oc + t * ray.direction - ba * y / baba) / cyl.ra);
+        fraction = normal_n.t;
+        vec3 point = ray.origin + ray.direction * fraction;
+        normal = normal_n.yzw;
+        return true;
     }
-    return result;*/
-//}
+    // caps
+    t = ( ((y<0.0) ? 0.0 : baba) - baoc)/bard;
+    if( abs(k1+k2*t)<h )
+    {
+        vec4 normal_n =  vec4( t, ba*sign(y)/sqrt(baba) );
+        fraction = normal_n.t;
+        vec3 point = ray.origin + ray.direction * fraction;
+        normal = normal_n.yzw;
+        return true;
+    }
+    return false;//no intersection
+}
+
+
 
 
 
@@ -341,13 +359,14 @@ Sphere spheres[SPHERE_COUNT];
 
 Box boxes[BOX_COUNT];
 
+Cylinder cylinders[CYLINDERS_COUNT];
 
 
 
-Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[BOX_COUNT])
+Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[BOX_COUNT], Cylinder cylinders[CYLINDERS_COUNT])
 {
     float minDistance = INF;
-    float D = -1.0;
+    float D = INF;
     vec3 N;
     Intersection inters;
     inters.t = minDistance;
@@ -384,8 +403,26 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
                 minDistance = D;
             }
         }
-
     }
+
+
+    for (int i = 0; i < CYLINDERS_COUNT; i++)
+    {
+        if (IntersectRayCyl(ray, cylinders[i], D, N))
+        {
+            if (D < minDistance)
+            {
+                inters.normal = N;
+                inters.tracedRay = ray;
+                inters.point = normalize(ray.origin + ray.direction * D);
+                inters.material = spheres[i].material;
+                inters.t = D;
+                minDistance = D;
+            }
+        }
+    }
+
+
     return inters;
 
 }
@@ -401,7 +438,7 @@ vec4 RayTrace(Ray primary_ray, int len) {
 
     for (int i = 0; i < MAX_DEPTH; i++)
     {
-        inters = findIntersection(primary_ray, spheres, boxes);
+        inters = findIntersection(primary_ray, spheres, boxes, cylinders);
         if (abs(inters.t - INF) < EPS)
         break;
         noIntersrction = 0;
@@ -418,7 +455,7 @@ vec4 RayTrace(Ray primary_ray, int len) {
         vec3 nr;
         if (IntersectRaySphere(primary_ray, lightSourceSphere, fr, nr))
         {
-            resColor = vec4(lightSource.intensivity,1);
+            resColor = vec4(lightSource.intensivity, 1);
         }
         else
         {
@@ -429,16 +466,22 @@ vec4 RayTrace(Ray primary_ray, int len) {
 }
 
 
+Material gen_random_mat()
+{
+    Material material = Material(abs(Random3D()), abs(Random3D()));
+    return material;
+}
+
+
 
 void main(void) {
 
 
 
+    Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.0f, 0.3f, 0.3f));
+    Material new_material = Material(vec3(0.1f, 0.9f, 0.4f), vec3(0.0f, 0.4f, 0.1f));
 
-    Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.0f, 0.2f, 0.2f));
-    Material new_material = Material(vec3(0.1f, 0.9f, 0.4f), vec3(0.0f, 0.4f, 0.3f));
-
-    Material new_new_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.0f, 0.4f, 0.2f));
+    Material new_new_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.0f, 0.1f, 0.4f));
 
 
     spheres[0] = Sphere(vec3(1.0f, 1.4f, 3.1f), 0.6f, material);
@@ -449,10 +492,22 @@ void main(void) {
 
     boxes[0] = Box(vec3(0.3f, 2.0f, -1.0f), mat3(1.0), vec3(1.0, 1.0, 1.0), new_material);
 
+    cylinders[0].extr_a = vec3(1.0, 0.0, 1.0);
 
+    cylinders[0].extr_a = vec3(-1.0, 0.0, -1.0);
+
+    cylinders[0].ra = 0.2;
+
+    cylinders[0].material = gen_random_mat();
 
     Ray ray = GenerateRay(camera, interpolated_vertex, scale);
-    FragColor = RayTrace(ray, SPHERE_COUNT);
+
+    const int agr_count = 16;
+    for (int i = 0; i < agr_count; i++)
+    {
+        FragColor += RayTrace(ray, SPHERE_COUNT);
+    }
+    FragColor /= agr_count;
 
 
 

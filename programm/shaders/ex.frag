@@ -6,8 +6,9 @@
 
 #define SPHERE_COUNT 3
 #define BOX_COUNT 1
-
+#define CONES_COUNT 1
 #define CYLINDERS_COUNT 1
+
 
 #define  K   0.1f
 
@@ -85,6 +86,16 @@ struct Square {
     int material_ind;
     vec3 color;
 };
+
+struct Cone
+{
+    float cosa;	// half cone angle
+    float h;	// height
+    vec3 c;		// tip position
+    vec3 v;		// axis
+    Material material;	// material
+};
+
 
 struct Light {
     vec3 position;
@@ -257,24 +268,24 @@ vec3 cylNormal(in vec3 p, Cylinder cyl)
 
 bool IntersectRayCyl(Ray ray, Cylinder cyl, out float fraction, out vec3 normal)
 {
-    vec3  ba = cyl.extr_b  - cyl.extr_a;
-    vec3  oc = ray.origin - cyl.extr_a;
-    float baba = dot(ba,ba);
-    float bard = dot(ba,ray.direction);
-    float baoc = dot(ba,oc);
-    float k2 = baba            - bard*bard;
-    float k1 = baba*dot(oc,ray.direction) - baoc*bard;
-    float k0 = baba*dot(oc,oc) - baoc*baoc - cyl.ra*cyl.ra*baba;
-    float h = k1*k1 - k2*k0;
-    if( h<0.0 )
+    vec3 ba = cyl.extr_b - cyl.extr_a;
+    vec3 oc = ray.origin - cyl.extr_a;
+    float baba = dot(ba, ba);
+    float bard = dot(ba, ray.direction);
+    float baoc = dot(ba, oc);
+    float k2 = baba - bard * bard;
+    float k1 = baba * dot(oc, ray.direction) - baoc * bard;
+    float k0 = baba * dot(oc, oc) - baoc * baoc - cyl.ra * cyl.ra * baba;
+    float h = k1 * k1 - k2 * k0;
+    if (h < 0.0)
     {
         return false;//no intersection
     }
     h = sqrt(h);
-    float t = (-k1-h)/k2;
+    float t = (-k1 - h) / k2;
     // body
-    float y = baoc + t*bard;
-    if( y>0.0 && y<baba )
+    float y = baoc + t * bard;
+    if (y > 0.0 && y < baba)
     {
         vec4 normal_n = vec4(t, (oc + t * ray.direction - ba * y / baba) / cyl.ra);
         fraction = normal_n.x;
@@ -282,10 +293,10 @@ bool IntersectRayCyl(Ray ray, Cylinder cyl, out float fraction, out vec3 normal)
         return true;
     }
     // caps
-    t = ( ((y<0.0) ? 0.0 : baba) - baoc)/bard;
-    if( abs(k1+k2*t)<h )
+    t = (((y < 0.0) ? 0.0 : baba) - baoc) / bard;
+    if (abs(k1 + k2 * t) < h)
     {
-        vec4 normal_n =  vec4( t, ba*sign(y)/sqrt(baba) );
+        vec4 normal_n = vec4(t, ba * sign(y) / sqrt(baba));
         fraction = normal_n.x;
         normal = normal_n.yzw;
         return true;
@@ -293,6 +304,36 @@ bool IntersectRayCyl(Ray ray, Cylinder cyl, out float fraction, out vec3 normal)
     return false;//no intersection
 }
 
+
+bool IntersectRayCone(Ray r, Cone s, out float fraction, out vec3 normal) // https://lousodrome.net/blog/light/2017/01/03/intersection-of-a-ray-and-a-cone/
+{
+    vec3 co = r.origin - s.c;
+
+    float a = dot(r.direction,s.v)*dot(r.direction,s.v) - s.cosa*s.cosa;
+    float b = 2. * (dot(r.direction,s.v)*dot(co,s.v) - dot(r.direction,co)*s.cosa*s.cosa);
+    float c = dot(co,s.v)*dot(co,s.v) - dot(co,co)*s.cosa*s.cosa;
+
+    float det = b*b - 4.*a*c;
+    if (det < 0.) return false;
+
+    det = sqrt(det);
+    float t1 = (-b - det) / (2. * a);
+    float t2 = (-b + det) / (2. * a);
+
+    // This is a bit messy; there ought to be a more elegant solution.
+    float t = t1;
+    if (t < 0. || t2 > 0. && t2 < t) t = t2;
+    if (t < 0.) return false;
+
+    vec3 cp = r.origin + t*r.direction - s.c;
+    float h = dot(cp, s.v);
+    if (h < 0. || h > s.h) return false;
+
+    vec3 n = normalize(cp * dot(s.v, cp) / dot(cp, cp) - s.v);
+    fraction = t;
+    normal = n;
+    return true;
+}
 
 
 
@@ -347,12 +388,6 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
     //reflectedDirection = reflectedDirection += intersect.normal * 0.8;
     Ray new_ray = Ray(newRayOrigin, reflectedDirection);
     rayReflected = new_ray;
-
-
-
-
-
-
     return vec4(rayColor, 1);
 }
 
@@ -362,6 +397,7 @@ Box boxes[BOX_COUNT];
 
 Cylinder cylinders[CYLINDERS_COUNT];
 
+Cone cones[CONES_COUNT];
 
 
 Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[BOX_COUNT], Cylinder cylinders[CYLINDERS_COUNT])
@@ -417,12 +453,31 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
                 inters.normal = N;
                 inters.tracedRay = ray;
                 inters.point = ray.origin + ray.direction * D;
-                inters.material = spheres[i].material;
+                inters.material = cylinders[i].material;
                 inters.t = D;
                 minDistance = D;
             }
         }
     }
+
+    for (int i = 0; i < CONES_COUNT; i++)
+    {
+        if (IntersectRayCone(ray, cones[i], D, N))
+        {
+
+            if (D < minDistance)
+            {
+                inters.normal = N;
+                inters.tracedRay = ray;
+                inters.point = ray.origin + ray.direction * D;
+                inters.material = cones[i].material;
+                inters.t = D;
+                minDistance = D;
+            }
+        }
+    }
+
+
 
 
     return inters;
@@ -470,7 +525,7 @@ vec4 RayTrace(Ray primary_ray, int len) {
 
 Material gen_random_mat()
 {
-    Material material = Material(abs(Random3D()), abs(Random3D()));
+    Material material = Material(normalize(Random3D()), normalize(Random3D()));
     return material;
 }
 
@@ -483,14 +538,16 @@ void main(void) {
     Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.1f, 0.3f, 0.6f));
     Material new_material = Material(vec3(0.1f, 0.9f, 0.4f), vec3(0.1f, 0.8f, 0.1f));
 
-    Material new_new_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.01f, 0.3f, 0.3f));
+    Material new_new_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.1f, 0.3f, 0.3f));
+
+
+
+    Material cylinder_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.1f, 0.4f, 0.4f));
 
 
     spheres[0] = Sphere(vec3(1.0f, 1.4f, 3.1f), 0.6f, material);
     spheres[1] = Sphere(vec3(3.0f, 0.7f, -0.1f), 0.7f, new_material);
     spheres[2] = Sphere(vec3(1.0f, 0.7f, -0.1f), 0.3f, new_new_material);
-
-
 
     boxes[0] = Box(vec3(0.3f, 2.0f, -1.0f), mat3(1.0), vec3(1.0, 1.0, 1.0), new_material);
 
@@ -500,7 +557,19 @@ void main(void) {
 
     cylinders[0].ra = 0.2;
 
-    cylinders[0].material = gen_random_mat();
+    cylinders[0].material = new_new_material;
+
+
+/*
+    float cosa;	// half cone angle
+    float h;	// height
+    vec3 c;		// tip position
+    vec3 v;		// axis
+    Material material;	// material*/
+
+
+
+    cones[0] = Cone(0.5,1,vec3(1.0,2.0,1.0),vec3(1.0,0.0,0.0),new_new_material);
 
     Ray ray = GenerateRay(camera, interpolated_vertex, scale);
 

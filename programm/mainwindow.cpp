@@ -19,30 +19,17 @@ MainWindow::MainWindow(QWidget* parent)
 {
 	ui->setupUi(this);
 
-	//_sceneManager = SceneManagerCreator().createManager();
+	ui->addPrimitivesBox->addItem("Добавить сферу");
+	ui->addPrimitivesBox->addItem("Добавить конус");
+	ui->addPrimitivesBox->addItem("Добавить куб");
+	ui->addPrimitivesBox->addItem("Добавить циллиндр");
 
-	//_sceneManager->setScene()
-	//_drawManager = DrawManagerCreator().createManager();
-
-	//setupScene();
-
-
-
-
-	/*std::string config = "/home/andrew/OOP/OOP/OOP/lab_03Another/data/config.txt";
-	std::shared_ptr<ConfigCreator> config_creator = std::make_shared<ConfigCreator>();
-	config_creator->createConfig()->getConfigInfo();
-	_loadManager = LoadManagerCreator().createManager();
-
-	_drawManager = DrawManagerCreator().createManager();
-	_sceneManager = SceneManagerCreator().createManager();
-	_transformManager = TransformManagerCreator().createManager();
-
-	_facade = std::make_shared<Facade>(Facade());*/
+	connect(ui->addPrimitivesBox, SIGNAL(currentIndexChanged(int)), ui->graphicsView, SLOT(addPrimitive(int)));
 
 	connect(ui->light_x, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightPositionChangeButtonClicked);
 	connect(ui->light_y, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightPositionChangeButtonClicked);
 	connect(ui->light_z, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightPositionChangeButtonClicked);
+
 	/*connect(ui->pushButton_del_model_cur, &QPushButton::clicked, this, &MainWindow::onRemoveModelButtonClicked);
 	connect(ui->pushButton_del_model_all, &QPushButton::clicked, this, &MainWindow::onRemoveAllModelsButtonClicked);
 

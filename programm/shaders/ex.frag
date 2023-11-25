@@ -4,10 +4,10 @@
 #define EPS 1e-3
 #define INF 1000000.0
 
-#define SPHERE_COUNT 3
-#define BOX_COUNT 1
-#define CONES_COUNT 1
-#define CYLINDERS_COUNT 1
+#define SPHERE_COUNT 10
+#define BOX_COUNT 10
+#define CONES_COUNT 10
+#define CYLINDERS_COUNT 10
 
 
 #define  K   0.1f
@@ -89,11 +89,11 @@ struct Square {
 
 struct Cone
 {
-    float cosa;	// half cone angle
-    float h;	// height
-    vec3 c;		// tip position
-    vec3 v;		// axis
-    Material material;	// material
+    float cosa;    // half cone angle
+    float h;    // height
+    vec3 c;        // tip position
+    vec3 v;        // axis
+    Material material;    // material
 };
 
 
@@ -309,11 +309,11 @@ bool IntersectRayCone(Ray r, Cone s, out float fraction, out vec3 normal) // htt
 {
     vec3 co = r.origin - s.c;
 
-    float a = dot(r.direction,s.v)*dot(r.direction,s.v) - s.cosa*s.cosa;
-    float b = 2. * (dot(r.direction,s.v)*dot(co,s.v) - dot(r.direction,co)*s.cosa*s.cosa);
-    float c = dot(co,s.v)*dot(co,s.v) - dot(co,co)*s.cosa*s.cosa;
+    float a = dot(r.direction, s.v) * dot(r.direction, s.v) - s.cosa * s.cosa;
+    float b = 2. * (dot(r.direction, s.v) * dot(co, s.v) - dot(r.direction, co) * s.cosa * s.cosa);
+    float c = dot(co, s.v) * dot(co, s.v) - dot(co, co) * s.cosa * s.cosa;
 
-    float det = b*b - 4.*a*c;
+    float det = b * b - 4. * a * c;
     if (det < 0.) return false;
 
     det = sqrt(det);
@@ -325,7 +325,7 @@ bool IntersectRayCone(Ray r, Cone s, out float fraction, out vec3 normal) // htt
     if (t < 0. || t2 > 0. && t2 < t) t = t2;
     if (t < 0.) return false;
 
-    vec3 cp = r.origin + t*r.direction - s.c;
+    vec3 cp = r.origin + t * r.direction - s.c;
     float h = dot(cp, s.v);
     if (h < 0. || h > s.h) return false;
 
@@ -391,6 +391,7 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
     return vec4(rayColor, 1);
 }
 
+
 Sphere spheres[SPHERE_COUNT];
 
 Box boxes[BOX_COUNT];
@@ -399,15 +400,22 @@ Cylinder cylinders[CYLINDERS_COUNT];
 
 Cone cones[CONES_COUNT];
 
+struct PrimitiveArrLens {
+    int size_spheres;
+    int size_cylinders;
+    int size_boxes;
+    int size_cones;
+};
 
-Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[BOX_COUNT], Cylinder cylinders[CYLINDERS_COUNT])
+
+Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[BOX_COUNT], Cylinder cylinders[CYLINDERS_COUNT], PrimitiveArrLens sizes)
 {
     float minDistance = INF;
     float D = INF;
     vec3 N;
     Intersection inters;
     inters.t = minDistance;
-    for (int i = 0; i < SPHERE_COUNT; i++)
+    for (int i = 0; i < sizes.size_spheres; i++)
     {
         if (IntersectRaySphere(ray, spheres[i], D, N))
         {
@@ -426,7 +434,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
 
 
 
-    for (int i = 0; i < BOX_COUNT; i++)
+    for (int i = 0; i < sizes.size_boxes; i++)
     {
         if (IntersectRayBox(ray, boxes[i], D, N))
         {
@@ -443,7 +451,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
     }
 
 
-    for (int i = 0; i < CYLINDERS_COUNT; i++)
+    for (int i = 0; i < sizes.size_cylinders; i++)
     {
         if (IntersectRayCyl(ray, cylinders[i], D, N))
         {
@@ -460,7 +468,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
         }
     }
 
-    for (int i = 0; i < CONES_COUNT; i++)
+    for (int i = 0; i < sizes.size_cones; i++)
     {
         if (IntersectRayCone(ray, cones[i], D, N))
         {
@@ -484,7 +492,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
 
 }
 
-vec4 RayTrace(Ray primary_ray, int len) {
+vec4 RayTrace(Ray primary_ray, PrimitiveArrLens lens) {
     vec4 resColor = vec4(0, 0, 0, 1.0);
 
     Intersection inters;
@@ -495,7 +503,7 @@ vec4 RayTrace(Ray primary_ray, int len) {
 
     for (int i = 0; i < MAX_DEPTH; i++)
     {
-        inters = findIntersection(primary_ray, spheres, boxes, cylinders);
+        inters = findIntersection(primary_ray, spheres, boxes, cylinders, lens);
         if (abs(inters.t - INF) < EPS)
         break;
         noIntersrction = 0;
@@ -530,10 +538,10 @@ Material gen_random_mat()
 }
 
 
+uniform PrimitiveArrLens prLens;
+
 
 void main(void) {
-
-
 
     Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.1f, 0.3f, 0.6f));
     Material new_material = Material(vec3(0.1f, 0.9f, 0.4f), vec3(0.1f, 0.8f, 0.1f));
@@ -560,23 +568,17 @@ void main(void) {
     cylinders[0].material = new_new_material;
 
 
-/*
-    float cosa;	// half cone angle
-    float h;	// height
-    vec3 c;		// tip position
-    vec3 v;		// axis
-    Material material;	// material*/
 
 
 
-    cones[0] = Cone(0.5,1,vec3(1.0,2.0,1.0),vec3(1.0,0.0,0.0),new_new_material);
+    cones[0] = Cone(0.5, 1, vec3(1.0, 2.0, 1.0), vec3(1.0, 0.0, 0.0), new_new_material);
 
     Ray ray = GenerateRay(camera, interpolated_vertex, scale);
 
     const int agr_count = 1;
     for (int i = 0; i < agr_count; i++)
     {
-        FragColor += RayTrace(ray, SPHERE_COUNT);
+        FragColor += RayTrace(ray,prLens);
     }
     FragColor /= agr_count;
 

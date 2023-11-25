@@ -9,12 +9,12 @@
 #include <glm/gtx/quaternion.hpp>
 #include "RayCastCanvas.h"
 
-
 QVector3D to_q_vec(const VecD3& vec_src)
 {
-	QVector3D res = QVector3D(vec_src.x,vec_src.y,vec_src.z);
+	QVector3D res = QVector3D(vec_src.x, vec_src.y, vec_src.z);
 	return res;
-}
+};
+
 
 static const Vertex sg_vertexes[] = {
 	Vertex(QVector3D(-1.0f, -1.0f, 0.0f), QVector3D(0.0f, 0.0f, 0.0f)),
@@ -43,19 +43,10 @@ QVector3D to_vector3d(const QColor& colour)
 RayCastCanvas::RayCastCanvas(QWidget* parent)
 	: QOpenGLWidget{ parent }
 {
-	data = new GLfloat[12];
-	data[0] = -1.;
-	data[1] = -1.;
-	data[2] = 0.;
-	data[3] = 1.;
-	data[4] = -1.;
-	data[5] = 0;
-	data[6] = 1.;
-	data[7] = 1.;
-	data[8] = 0;
-	data[9] = -1.;
-	data[10] = 1.;
-	data[11] = 0;
+	spheres_count = 2;
+	cylinders_count = 0;
+	boxes_count = 0;
+	cones_count = 0;
 }
 
 /*!
@@ -63,11 +54,7 @@ RayCastCanvas::RayCastCanvas(QWidget* parent)
  */
 RayCastCanvas::~RayCastCanvas()
 {
-	delete data;
-	/*for (auto& [key, val] : m_shaders) {
-		delete val;
-	}
-	delete m_raycasting_volume;*/
+
 }
 
 /*!
@@ -81,7 +68,6 @@ void RayCastCanvas::initializeGL()
 	_sceneManager = SceneManagerCreator().createManager();
 	_drawManager = DrawManagerCreator().createManager();
 
-
 	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -2.0f }, { 0.0f, 0.0f, 1.0f }).create();
 	//camera->setImageParams(_scene->height(), _scene->width());
 	//_drawManager->setCamera(camera);
@@ -91,11 +77,15 @@ void RayCastCanvas::initializeGL()
 	lightsource->setColor(ColorRGB(1, 1, 1));
 	_sceneManager->getScene()->setLightSource(lightsource);
 
-	camera->setImageParams(QWidget::height(),QWidget::width());
+	camera->setImageParams(QWidget::height(), QWidget::width());
 	m_program = new QOpenGLShaderProgram();
 	initializeOpenGLFunctions();
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
+	std::vector<Sphere> spheres_vec;
+	Material material = Material(0.5, 0.5, 0.5, ColorRGB(0.3, 0.9, 0.1));
+	Sphere sphere = Sphere(VecD3(1.0), 1.0, material);
+	spheres_vec.push_back(sphere);
 	{
 		// Create Shader (Do not release until VAO is created)]
 
@@ -118,14 +108,21 @@ void RayCastCanvas::initializeGL()
 		// Create Buffer (Do not release until VAO is created)
 		m_vertex.create();
 		m_vertex.bind();
+
 		m_vertex.setUsagePattern(QOpenGLBuffer::DynamicDraw);
+
 		m_vertex.allocate(sg_vertexes, sizeof(sg_vertexes));
+
+
+
+
 
 		// Create Vertex Array Object
 		m_object.create();
 		m_object.bind();
 		m_program->enableAttributeArray(0);
 		m_program->enableAttributeArray(1);
+		m_program->enableAttributeArray(2);
 		m_program->setAttributeBuffer(0,
 			GL_FLOAT,
 			Vertex::positionOffset(),
@@ -136,6 +133,15 @@ void RayCastCanvas::initializeGL()
 		// Release (unbind) all
 		m_object.release();
 		m_vertex.release();
+
+
+		//ended with transferring buffers
+
+		m_program->setUniformValue("prLens.size_spheres", spheres_count);
+		m_program->setUniformValue("prLens.size_cylinders", cylinders_count);
+		m_program->setUniformValue("prLens.size_boxes", boxes_count);
+		m_program->setUniformValue("prLens.size_cones", cones_count);
+
 		m_program->release();
 	}
 
@@ -180,17 +186,14 @@ void RayCastCanvas::paintGL()
 	//lights
 
 	m_program->setUniformValue("lightSource.position", to_q_vec(light->getPosition()));
-	m_program->setUniformValue("lightSource.intensivity", QVector3D(0.9f,0.9f,0.9f));
+	m_program->setUniformValue("lightSource.intensivity", QVector3D(0.9f, 0.9f, 0.9f));
 
 	//scale
-	m_program->setUniformValue("scale",QVector2D(QWidget::width(),QWidget::height()));
+	m_program->setUniformValue("scale", QVector2D(QWidget::width(), QWidget::height()));
 
 	//model + view + projection
-	m_program->setUniformValue("view",QMatrix4x4(&camera->_cameraStructure->_mView[0][0]));
-	m_program->setUniformValue("projection",QMatrix4x4(&camera->_cameraStructure->_mProjection[0][0]));
-
-
-
+	m_program->setUniformValue("view", QMatrix4x4(&camera->_cameraStructure->_mView[0][0]));
+	m_program->setUniformValue("projection", QMatrix4x4(&camera->_cameraStructure->_mProjection[0][0]));
 
 	{
 
@@ -201,8 +204,6 @@ void RayCastCanvas::paintGL()
 		m_object.release();
 	}
 	m_program->release();
-
-
 
 }
 
@@ -251,7 +252,7 @@ void RayCastCanvas::update()
 		//m_camera.rotate(-rotSpeed * Input::mouseDelta().y(), m_camera.right());
 
 		// Handle translations
-		VecD3 translation = {0.0f,0.0f,0.0f};
+		VecD3 translation = { 0.0f, 0.0f, 0.0f };
 		if (Input::keyPressed(Qt::Key_W))
 		{
 			translation += camera->getViewDirection();
@@ -276,17 +277,21 @@ void RayCastCanvas::update()
 		{
 			translation += camera->getUpVector();
 		}
-		qDebug() << "translation is" << translation.x << translation.y << translation.z;
+		//qDebug() << "translation is" << translation.x << translation.y << translation.z;
 		camera->_cameraStructure->move(translation * transSpeed);
+		qDebug() << "currentPosition is " << camera->_cameraStructure->_coordinates.x
+		         << camera->_cameraStructure->_coordinates.y << camera->_cameraStructure->_coordinates.z;
 		if (delta.x != 0.0f || delta.y != 0.0f)
 		{
 			float pitchDelta = delta.y * rotSpeed;
 			float yawDelta = delta.x * rotSpeed;
 
-			if (pitchDelta > 89.0f) {
+			if (pitchDelta > 89.0f)
+			{
 				pitchDelta = 89.0f;
 			}
-			if (pitchDelta < -89.0f) {
+			if (pitchDelta < -89.0f)
+			{
 				pitchDelta = -89.0f;
 			}
 
@@ -301,8 +306,6 @@ void RayCastCanvas::update()
 		camera->_cameraStructure->updateProjection();
 	}
 
-
-
 	QOpenGLWidget::update();
 
 }
@@ -315,7 +318,7 @@ void RayCastCanvas::keyPressEvent(QKeyEvent* event)
 	}
 	else
 	{*/
-		Input::registerKeyPress(event->key());
+	Input::registerKeyPress(event->key());
 	//}
 	qDebug() << "key press event";
 	event->accept();
@@ -342,5 +345,35 @@ void RayCastCanvas::mousePressEvent(QMouseEvent* event)
 void RayCastCanvas::mouseReleaseEvent(QMouseEvent* event)
 {
 	Input::registerMouseRelease(event->button());
+}
+void RayCastCanvas::addSphere(int index)
+{
+	Sphere sphere = Sphere(VecD3(1, 2, 3), 0.5, defaultMaterial);
+	qDebug() << "spheres update";
+	std::string sphere_pos = "spheres[" + std::to_string(spheres_count) + ']';
+	std::string center_str = ".center";
+	std::string radius_str = ".radius";
+	std::string mat_color_str = ".material.color";
+	std::string mat_coefs_str = ".material.lightKoefs";
+
+	spheres_count++;
+	m_program->bind();
+	QVector3D lightCoeffs = { defaultMaterial._k_a, defaultMaterial._k_d, defaultMaterial._k_s };
+	QVector3D color = {defaultMaterial._color.R,defaultMaterial._color.G,defaultMaterial._color.B};
+	qDebug() << "sphere_pos==" << (sphere_pos + center_str).c_str();
+	m_program->setUniformValue((sphere_pos + center_str).c_str(), to_q_vec(sphere.getCenter()));
+	m_program->setUniformValue((sphere_pos + radius_str).c_str(), (float)sphere.getRadius());
+	m_program->setUniformValue((sphere_pos + mat_color_str).c_str(), color);
+	m_program->setUniformValue((sphere_pos + mat_coefs_str).c_str(), lightCoeffs);
+	m_program->setUniformValue("prLens.size_spheres", spheres_count);
+	m_program->release();
+	qDebug() << "spheres count" << spheres_count;
+
+}
+void RayCastCanvas::addPrimitive(int idx_prim)
+{
+	qDebug() << "started adding primitives " << idx_prim;
+	if (idx_prim == add_sphere_idx)
+		addSphere(spheres_count);
 }
 

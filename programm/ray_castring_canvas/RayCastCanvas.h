@@ -30,6 +30,8 @@
 
 #include "vertex.h"
 
+
+
 class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
  Q_OBJECT
@@ -37,48 +39,14 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	explicit RayCastCanvas(QWidget* parent = nullptr);
 	~RayCastCanvas();
 
-	void setStepLength(const GLfloat step_length)
-	{
-		m_stepLength = step_length;
-		update();
-	}
 
-	void setVolume(const QString& volume)
-	{
-		//m_raycasting_volume->load_volume(volume);
-		update();
-	}
-
-	void setThreshold(const double threshold)
-	{
-		//auto range = m_raycasting_volume ? getRange() : std::pair<double, double>{0.0, 1.0};
-		//m_threshold = threshold / (range.second - range.first);
-		update();
-	}
-
-	void setMode(const QString& mode)
-	{
-		m_active_mode = mode;
-		update();
-	}
-
-	void setBackground(const QColor& colour)
-	{
-		m_background = colour;
-		update();
-	}
-
-	QColor getBackground(void)
-	{
-		return m_background;
-	}
 
  signals:
 	// NOPE
 
  public slots:
 	void update();
-
+	void addPrimitive(int idx_prim);
 
  protected:
 	void initializeGL();
@@ -91,23 +59,20 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void keyReleaseEvent(QKeyEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;
 
+	void addSphere(int index);
+
+	Material defaultMaterial = Material(0.1, 0.1, 0.1, ColorRGB(0.3, 0.5, 0.7));
+ private:
+	const int add_sphere_idx = 0;
+	const int add_cone_idx = 0;
+	const int add_cylinder_idx = 0;
+	const int add_cube_idx = 0;
+
  public:
 
-	QMatrix4x4 m_viewMatrix;
-	QMatrix4x4 m_modelViewProjectionMatrix;
-	QMatrix3x3 m_normalMatrix;
+
 
 	const GLfloat m_fov = 60.0f;                                          /*!< Vertical field of view. */
-	const GLfloat m_focalLength = 1.0 / qTan(M_PI / 180.0 * m_fov / 2.0); /*!< Focal length. */
-	GLfloat m_aspectRatio;                                                /*!< width / height */
-
-	QVector2D m_viewportSize;
-	QVector3D m_rayOrigin; /*!< Camera position in model space coordinates. */
-
-	QVector3D m_lightPosition{ 3.0, 0.0, 3.0 };    /*!< In camera coordinates. */
-	QVector3D m_diffuseMaterial{ 1.0, 1.0, 1.0 };  /*!< Material colour. */
-	GLfloat m_stepLength;                         /*!< Step length for ray march. */
-	GLfloat m_threshold;                          /*!< Isosurface intensity threshold. */
 	QColor m_background;                          /*!< Viewport background colour. */
 	QOpenGLFunctions_4_3_Core* functions;
 	GLuint ssbo = 0;
@@ -122,10 +87,18 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	QString m_active_mode;
 
 	QOpenGLBuffer m_vertex;
+	QOpenGLBuffer spheres;
 	QOpenGLVertexArrayObject m_object;
 
 	GLuint scaled_width();
 	GLuint scaled_height();
+
+
+
+	int spheres_count;
+	int cylinders_count;
+	int boxes_count;
+	int cones_count;
 
 
 

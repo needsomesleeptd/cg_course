@@ -50,6 +50,8 @@ class MainWindow : public QMainWindow
 	std::shared_ptr<TransformManager> _transformManager;
 	std::shared_ptr<SceneManager> _sceneManager;*/
 
+
+
 	void onLightPositionChangeButtonClicked();
 	void onImportModelButtonClicked();
 	void onRemoveModelButtonClicked();

@@ -5,10 +5,9 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include  "Input.h"
-/*
-Point Camera::getCoordinates() const noexcept {
-	return _cameraStructure->getCoordinates();
-}*/
+
+
+
 
 
 
@@ -16,13 +15,7 @@ void Camera::accept(std::shared_ptr<Visitor> visitor)
 {
 	visitor->visit(*this);
 }
-/*
-void Camera::setCoordinates(Point &coordinates) {
-	Point tmp(coordinates);
-//	_coordinates = tmp;
-	_cameraStructure->setCoordinates(coordinates);
-}
-*/
+
 Camera::Camera(const VecD3& coordinates, const VecD3& direction)
 	: _cameraStructure(std::make_shared<CameraStructureImp>(coordinates, direction))
 {
@@ -53,11 +46,11 @@ void Camera::update(float time)
 	const float rotSpeed = 0.5f;
 	bool moved = false;
 
-	std::cout << "Right is pressed";
 
-	// Handle rotations
-	/*m_camera.rotate(-rotSpeed * Input::mouseDelta().x(), _cameraStructure->getUp());
-	m_camera.rotate(-rotSpeed * Input::mouseDelta().y(), _cameraStructure->getRight());*/
+
+
+
+
 
 	VecD3 translation = { 0.0, 0.0, 0.0 };
 
@@ -86,7 +79,8 @@ void Camera::update(float time)
 	{
 		translation += _cameraStructure->getUp();
 	}
-	std::cout << translation.x << " " << translation.y << " " << translation.z << std::endl;
+
+//	std::cout << translation.x << " " << translation.y << " " << translation.z << std::endl;
 	_cameraStructure->move(translation * transSpeed);
 	std::cout << translation.x << " " << translation.y << " " << translation.z << std::endl;
 	if (Input::buttonPressed(Qt::RightButton))

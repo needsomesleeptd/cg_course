@@ -12,7 +12,7 @@
 
 #define  K   0.1f
 
-#define MAX_DEPTH 4
+#define MAX_DEPTH 2
 
 #define PI acos(0) * 2.0f
 
@@ -173,18 +173,20 @@ vec3 Random3D()
 Ray GenerateRay(Camera camera, vec3 texcoord, vec2 viewportSize) {
 
     float fov = 0.5f;
+
     vec2 texDiff = vec2(1.0 - 2.0 * texcoord.x, 2.0 * texcoord.y - 1.0);
     vec2 angleDiff = texDiff * vec2(viewportSize.x / viewportSize.y, 1.0) * tan(fov * 0.5);
 
     vec3 rayDirection = normalize(vec3(angleDiff, 1.0f));
-    vec3 right = normalize(cross(camera.up, camera.view));
+    //vec3 right = normalize(cross(camera.up, camera.view));
     mat3 viewToWorld = mat3(
-        normalize(right),
+        normalize(camera.right),
         normalize(camera.up),
         normalize(camera.view)
-
     );
-    vec4 rayDirectiondim = view * projection * vec4(rayDirection, 1.0);
+
+
+    vec4 rayDirectiondim = view * vec4(rayDirection, 1.0);
     rayDirection = vec3(rayDirectiondim / rayDirectiondim[3]);
     return Ray(camera.position, normalize(rayDirection));
 
@@ -384,8 +386,11 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
     vec3 newRayDirection = transform * hemisphereDistributedDirection;
     vec3 idealReflection = reflect(intersect.tracedRay.direction, intersect.normal);
     newRayDirection = normalize(mix(newRayDirection, idealReflection, intersect.material.lightKoefs[1]));
-    newRayOrigin += intersect.normal;
-    //reflectedDirection = reflectedDirection += intersect.normal * 0.8;
+    //newRayOrigin +=  0.02;
+    //idealReflection  +=intersect.normal * 0.8;
+    //newRayDirection  += intersect.normal * 0.8;
+    newRayOrigin += intersect.normal * 0.4;
+    //Ray new_ray = Ray(newRayOrigin, newRayDirection); right_version need aggregation
     Ray new_ray = Ray(newRayOrigin, reflectedDirection);
     rayReflected = new_ray;
     return vec4(rayColor, 1);
@@ -456,7 +461,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
         if (IntersectRayCyl(ray, cylinders[i], D, N))
         {
 
-            if (D < minDistance)
+            if (D < minDistance && D > 0.0f)
             {
                 inters.normal = N;
                 inters.tracedRay = ray;
@@ -543,8 +548,8 @@ uniform PrimitiveArrLens prLens;
 
 void main(void) {
 
-    Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.1f, 0.3f, 0.6f));
-    Material new_material = Material(vec3(0.1f, 0.9f, 0.4f), vec3(0.1f, 0.8f, 0.1f));
+    Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.1f, 0.4f, 0.6f));
+    Material new_material = Material(vec3(0.1f, 0.9f, 0.4f), vec3(0.1f, 0.4f, 0.3f));
 
     Material new_new_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.1f, 0.3f, 0.3f));
 
@@ -557,7 +562,7 @@ void main(void) {
     spheres[1] = Sphere(vec3(3.0f, 0.7f, -0.1f), 0.7f, new_material);
     spheres[2] = Sphere(vec3(1.0f, 0.7f, -0.1f), 0.3f, new_new_material);
 
-    boxes[0] = Box(vec3(0.3f, 2.0f, -1.0f), mat3(1.0), vec3(1.0, 1.0, 1.0), new_material);
+    boxes[0] = Box(vec3(0.3f, 2.0f, -1.0f), mat3(1.0), vec3(1.0, 1.0, 1.0), gen_random_mat());
 
     cylinders[0].extr_a = vec3(1.0, 0.0, 1.0);
 

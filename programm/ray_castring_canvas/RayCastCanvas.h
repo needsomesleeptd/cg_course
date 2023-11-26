@@ -60,6 +60,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void mousePressEvent(QMouseEvent* event) override;
 
 	void addSphere(int index);
+	void addCyllinder(int index);
 
 	Material defaultMaterial = Material(0.1, 0.1, 0.1, ColorRGB(0.3, 0.5, 0.7));
  private:

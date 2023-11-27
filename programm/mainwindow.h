@@ -28,6 +28,9 @@ class MainWindow : public QMainWindow
 	MainWindow(QWidget* parent = nullptr);
 	~MainWindow();
 
+ public slots:
+		void addToSelectionPrimitives(int idx);
+
  protected:
 	//void resizeEvent(QResizeEvent *event) override;
 	void setupScene();
@@ -53,6 +56,10 @@ class MainWindow : public QMainWindow
 
 
 	void onLightPositionChangeButtonClicked();
+	void onLightColorChangeButtonClicked();
+
+
+
 	void onImportModelButtonClicked();
 	void onRemoveModelButtonClicked();
 	void onRemoveAllModelsButtonClicked();

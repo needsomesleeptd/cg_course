@@ -170,6 +170,9 @@ void RayCastCanvas::paintGL()
 
 	VecD3 cam_r = camera->_cameraStructure->getRight();
 
+
+	ColorRGB lSColor = light->getColor();
+
 	QMatrix4x4 inverseProject(&camera->getInverseProjectionMatrix()[0][0]);
 	QMatrix4x4 inverseView(&camera->getInverseViewMatrix()[0][0]);
 	// Render using our shader
@@ -185,7 +188,7 @@ void RayCastCanvas::paintGL()
 	//lights
 
 	m_program->setUniformValue("lightSource.position", to_q_vec(light->getPosition()));
-	m_program->setUniformValue("lightSource.intensivity", QVector3D(0.9f, 0.9f, 0.9f));
+	m_program->setUniformValue("lightSource.intensivity", QVector3D(lSColor.R, lSColor.G, lSColor.B));
 
 	//scale
 	m_program->setUniformValue("scale", QVector2D(QWidget::width(), QWidget::height()));
@@ -384,6 +387,11 @@ void RayCastCanvas::addPrimitive(int idx_prim)
 		addSphere(spheres_count);
 }
 
+
+
+
+
+
 void RayCastCanvas::addCyllinder(int index)
 {
 	/*vec3 extr_a;
@@ -413,5 +421,9 @@ void RayCastCanvas::addCyllinder(int index)
 	m_program->setUniformValue("prLens.size_spheres", spheres_count);
 	m_program->release();
 	qDebug() << "spheres count" << spheres_count;*/
+}
+void RayCastCanvas::MoveObject(int idx_prim)
+{
+
 }
 

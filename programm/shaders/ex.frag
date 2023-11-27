@@ -316,7 +316,7 @@ bool IntersectRayCone(Ray r, Cone s, out float fraction, out vec3 normal) // htt
     float c = dot(co, s.v) * dot(co, s.v) - dot(co, co) * s.cosa * s.cosa;
 
     float det = b * b - 4. * a * c;
-    if (det < 0.) return false;
+    if (det < 0.0f) return false;
 
     det = sqrt(det);
     float t1 = (-b - det) / (2. * a);
@@ -324,7 +324,7 @@ bool IntersectRayCone(Ray r, Cone s, out float fraction, out vec3 normal) // htt
 
     // This is a bit messy; there ought to be a more elegant solution.
     float t = t1;
-    if (t < 0. || t2 > 0. && t2 < t) t = t2;
+    if (t < 0.0f || t2 > 0.0f && t2 < t) t = t2;
     if (t < 0.) return false;
 
     vec3 cp = r.origin + t * r.direction - s.c;
@@ -348,7 +348,7 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
 
     vec3 lightVector = normalize(lightSource.position - intersect.point);
     Ray lightRay = Ray(lightSource.position, lightVector);
-    //if (!findIntersection(lightRay,spheres,boxes))
+
     vec3 shapeNormal = intersect.normal;
     vec3 ambientIntensivity = intersect.material.lightKoefs[0] * intersect.material.color;
 
@@ -389,7 +389,7 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
     //newRayOrigin +=  0.02;
     //idealReflection  +=intersect.normal * 0.8;
     //newRayDirection  += intersect.normal * 0.8;
-    newRayOrigin += intersect.normal * 0.4;
+    newRayOrigin += intersect.normal * 0.02;
     //Ray new_ray = Ray(newRayOrigin, newRayDirection); right_version need aggregation
     Ray new_ray = Ray(newRayOrigin, reflectedDirection);
     rayReflected = new_ray;
@@ -424,7 +424,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
     {
         if (IntersectRaySphere(ray, spheres[i], D, N))
         {
-            if (D < minDistance)
+            if (D < minDistance  && D > 0.0f)
             {
                 inters.normal = N;
                 inters.tracedRay = ray;
@@ -443,7 +443,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
     {
         if (IntersectRayBox(ray, boxes[i], D, N))
         {
-            if (D < minDistance)
+            if (D < minDistance  && D > 0.0f)
             {
                 inters.normal = N;
                 inters.tracedRay = ray;
@@ -478,7 +478,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
         if (IntersectRayCone(ray, cones[i], D, N))
         {
 
-            if (D < minDistance)
+            if (D < minDistance  && D > 0.0f)
             {
                 inters.normal = N;
                 inters.tracedRay = ray;
@@ -491,8 +491,6 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
     }
 
 
-
-
     return inters;
 
 }
@@ -501,6 +499,9 @@ vec4 RayTrace(Ray primary_ray, PrimitiveArrLens lens) {
     vec4 resColor = vec4(0, 0, 0, 1.0);
 
     Intersection inters;
+    inters.t = INF;
+    Intersection inters_light;
+    inters_light.t = INF;
     int noIntersrction = 1;
 
 
@@ -512,6 +513,22 @@ vec4 RayTrace(Ray primary_ray, PrimitiveArrLens lens) {
         if (abs(inters.t - INF) < EPS)
         break;
         noIntersrction = 0;
+
+
+        // working with shadows
+        vec3 lightVector = normalize(lightSource.position - inters.point);
+        Ray lightRay = Ray(lightSource.position, lightVector);
+        inters_light = findIntersection(lightRay, spheres, boxes, cylinders, lens);
+
+        if (inters_light.t < INF)
+        {
+            resColor += vec4(vec3(0.0f),1.0f);
+            break;
+        }
+
+
+
+
         resColor += Phong(inters, primary_ray);
         if (i != 0)
         resColor *= inters.material.lightKoefs[2];
@@ -576,7 +593,7 @@ void main(void) {
 
 
 
-    cones[0] = Cone(0.5, 1, vec3(1.0, 2.0, 1.0), vec3(1.0, 0.0, 0.0), new_new_material);
+    cones[0] = Cone(PI / 6, 1, vec3(1.0, 2.0, 1.0), vec3(0.0, 1.0, 0.0), new_new_material);
 
     Ray ray = GenerateRay(camera, interpolated_vertex, scale);
 

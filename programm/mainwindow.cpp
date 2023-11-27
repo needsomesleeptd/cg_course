@@ -7,6 +7,7 @@
 #include "LightSource.h"
 #include <stdlib.h>
 #include "cone.h"
+#include "color.h"
 
 float GenerateRandom()
 {
@@ -26,9 +27,17 @@ MainWindow::MainWindow(QWidget* parent)
 
 	connect(ui->addPrimitivesBox, SIGNAL(currentIndexChanged(int)), ui->graphicsView, SLOT(addPrimitive(int)));
 
+	connect(ui->addPrimitivesBox, SIGNAL(currentIndexChanged(int)), this, SLOT(addToSelectionPrimitives(int)));
+
+	//Working woth Lights
+
 	connect(ui->light_x, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightPositionChangeButtonClicked);
 	connect(ui->light_y, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightPositionChangeButtonClicked);
 	connect(ui->light_z, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightPositionChangeButtonClicked);
+
+	connect(ui->light_r, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightColorChangeButtonClicked);
+	connect(ui->light_g, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightColorChangeButtonClicked);
+	connect(ui->light_b, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightColorChangeButtonClicked);
 
 
 
@@ -53,9 +62,19 @@ MainWindow::MainWindow(QWidget* parent)
 
 	connect(ui->comboBox_cameras, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::changeCam);*/
 }
-void MainWindow::onCameraRotateBbuttonClicked()
+void MainWindow::onLightColorChangeButtonClicked()
 {
+	ColorRGB newColor = ColorRGB(ui->light_r->value(), ui->light_g->value(), ui->light_b->value());
+	ui->graphicsView->_sceneManager->getScene()->getLightSource()->setColor(newColor);
+}
 
+void MainWindow::addToSelectionPrimitives(int idx)
+{
+	if (idx == ui->graphicsView->add_sphere_idx)
+	{
+		int spheres_count = ui->graphicsView->spheres_count;
+		ui->choose_primitives_box->addItem(("Сфера" + std::to_string(spheres_count)).c_str());
+	}
 }
 
 MainWindow::~MainWindow()

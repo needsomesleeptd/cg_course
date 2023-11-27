@@ -47,6 +47,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
  public slots:
 	void update();
 	void addPrimitive(int idx_prim);
+	void MoveObject(int idx_prim);
 
  protected:
 	void initializeGL();
@@ -63,11 +64,11 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void addCyllinder(int index);
 
 	Material defaultMaterial = Material(0.1, 0.1, 0.1, ColorRGB(0.3, 0.5, 0.7));
- private:
+ public:
 	const int add_sphere_idx = 0;
-	const int add_cone_idx = 0;
-	const int add_cylinder_idx = 0;
-	const int add_cube_idx = 0;
+	const int add_cone_idx = 1;
+	const int add_cylinder_idx = 3;
+	const int add_cube_idx = 2;
 
  public:
 

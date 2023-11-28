@@ -30,6 +30,7 @@
 
 #include "vertex.h"
 #include "cone.h"
+#include "box.h"
 
 class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
@@ -38,17 +39,14 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	explicit RayCastCanvas(QWidget* parent = nullptr);
 	~RayCastCanvas();
 
-
-
  public slots:
 	void update();
-
 
  protected:
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int width, int height);
-	void initShaders();
+
 
 	void mouseReleaseEvent(QMouseEvent* event) override;
 	void keyPressEvent(QKeyEvent* event) override;
@@ -57,24 +55,27 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 
 	void modifySpheres(int index, std::shared_ptr<Sphere> sphere);
 	void modifyCones(int index, std::shared_ptr<Cone> cone);
+	void modifyBoxes(int index, std::shared_ptr<Box> box);
 
-
-	void addSphere(std::shared_ptr<Sphere> sphere);
-	void addCone(std::shared_ptr<Cone> cone);
+	void addSphere(const std::shared_ptr<Sphere>& sphere);
+	void addCone(const std::shared_ptr<Cone>& cone);
+	void addBox(const std::shared_ptr<Box>& box);
 
 	Material defaultMaterial = Material(0.1, 0.1, 0.1, ColorRGB(0.3, 0.5, 0.7));
-	std::shared_ptr<Sphere> defaultSphere = std::make_shared<Sphere>(VecD3(1.0, 2.0, 3.0), 1.0, defaultMaterial);
-	std::shared_ptr<Cone> defaultCone = std::make_shared<Cone>(0.9,1, VecD3(0.0,0.0,0.0),VecD3(0.0,1.0,0.0), defaultMaterial);
-
+	VecD3 defaultInitPos = VecD3(0.0);
+	std::shared_ptr<Sphere> defaultSphere = std::make_shared<Sphere>(defaultInitPos, 1.0, defaultMaterial);
+	std::shared_ptr<Cone>
+		defaultCone = std::make_shared<Cone>(0.9, 1, defaultInitPos, VecD3(0.0, 1.0, 0.0), defaultMaterial);
+	std::shared_ptr<Box>
+		defaultBox = std::make_shared<Box>(defaultInitPos, glm::mat3(1.0f), VecD3(1.0, 1.0, 1.0), defaultMaterial);
 	std::vector<int> shapeTypes;
-
 
  public:
 
 	const int add_sphere_idx = 0;
 	const int add_cone_idx = 1;
 	const int add_cylinder_idx = 3;
-	const int add_cube_idx = 2;
+	const int add_box_idx = 2;
 
  public:
 	void movePrimitive(int idx_prim, VecD3 delta);
@@ -99,8 +100,6 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 
 	GLuint scaled_width();
 	GLuint scaled_height();
-
-
 
 	int spheres_count;
 	int cylinders_count;

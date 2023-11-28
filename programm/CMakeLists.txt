@@ -41,6 +41,7 @@ set(PROJECT_SOURCES
         object/primitives/transform.h
         object/visibleObject/shapes/sphere/sphere.cpp object/visibleObject/shapes/sphere/sphere.h
         object/visibleObject/shapes/cone/cone.cpp object/visibleObject/shapes/cone/cone.h
+        object/visibleObject/shapes/box/box.cpp object/visibleObject/shapes/box/box.h
         object/visibleObject/shapes/baseShape.h
         object/object.h
         object/invisibleObject/cameraStructure.cpp  object/invisibleObject/cameraStructure.h

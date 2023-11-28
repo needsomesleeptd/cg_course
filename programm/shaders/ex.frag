@@ -78,14 +78,6 @@ struct Intersection {
 };
 
 
-struct Square {
-    vec3 v1;
-    vec3 v2;
-    vec3 v3;
-    vec3 v4;
-    int material_ind;
-    vec3 color;
-};
 
 struct Cone
 {
@@ -102,13 +94,6 @@ struct Light {
     vec3 intensivity;
 };
 
-struct Triangle {
-    vec3 v1;
-    vec3 v2;
-    vec3 v3;
-    int material_ind;
-    vec3 color;
-};
 
 
 in vec3 interpolated_vertex;

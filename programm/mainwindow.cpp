@@ -60,6 +60,13 @@ void MainWindow::addToSelectionPrimitives(int idx)
 		int cones_count = ui->graphicsView->cones_count;
 		ui->choose_primitives_box->addItem(("Конус" + std::to_string(cones_count)).c_str());
 	}
+
+	if (idx == ui->graphicsView->add_box_idx)
+	{
+		int boxes_count = ui->graphicsView->boxes_count;
+		ui->choose_primitives_box->addItem(("Куб" + std::to_string(boxes_count)).c_str());
+	}
+
 }
 
 MainWindow::~MainWindow()

@@ -42,10 +42,10 @@ QVector3D to_vector3d(const QColor& colour)
 RayCastCanvas::RayCastCanvas(QWidget* parent)
 	: QOpenGLWidget{ parent }
 {
-	spheres_count = 2;
-	cylinders_count = 1;
-	boxes_count = 1;
-	cones_count = 1;
+	spheres_count = 0;
+	cylinders_count = 0;
+	boxes_count = 0;
+	cones_count = 0;
 }
 
 /*!
@@ -81,10 +81,7 @@ void RayCastCanvas::initializeGL()
 	initializeOpenGLFunctions();
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	std::vector<Sphere> spheres_vec;
-	Material material = Material(0.5, 0.5, 0.5, ColorRGB(0.3, 0.9, 0.1));
-	Sphere sphere = Sphere(VecD3(1.0), 1.0, material);
-	spheres_vec.push_back(sphere);
+
 	{
 		// Create Shader (Do not release until VAO is created)]
 
@@ -170,7 +167,6 @@ void RayCastCanvas::paintGL()
 
 	VecD3 cam_r = camera->_cameraStructure->getRight();
 
-
 	ColorRGB lSColor = light->getColor();
 
 	QMatrix4x4 inverseProject(&camera->getInverseProjectionMatrix()[0][0]);
@@ -237,7 +233,7 @@ void RayCastCanvas::update()
 	Input::update();
 	// Camera Transformation
 	//qDebug() << "starting update";
-	bool moved = false;
+
 	if (Input::buttonPressed(Qt::RightButton))
 	{
 
@@ -279,10 +275,8 @@ void RayCastCanvas::update()
 		}
 		//qDebug() << "translation is" << translation.x << translation.y << translation.z;
 		camera->_cameraStructure->move(translation * transSpeed);
-		qDebug() << "currentPosition is " << camera->_cameraStructure->_coordinates.x
-		         << camera->_cameraStructure->_coordinates.y << camera->_cameraStructure->_coordinates.z;
-
-
+		/*qDebug() << "currentPosition is " << camera->_cameraStructure->_coordinates.x
+		         << camera->_cameraStructure->_coordinates.y << camera->_cameraStructure->_coordinates.z;*/
 
 		if (delta.x != 0.0f || delta.y != 0.0f)
 		{
@@ -298,10 +292,9 @@ void RayCastCanvas::update()
 				pitchDelta = -89.0f;
 			}
 
-
 			glm::quat q = -glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, camera->_cameraStructure->_right),
 				glm::angleAxis(-yawDelta, glm::vec3(0.f, 1.0f, 0.0f))));
-			qDebug() << "rotating by yaw " << yawDelta << "pitch " << pitchDelta << "\n";
+			//qDebug() << "rotating by yaw " << yawDelta << "pitch " << pitchDelta << "\n";
 
 			camera->_cameraStructure->_forward = normalise(glm::rotate(q, camera->_cameraStructure->_forward));
 			camera->_cameraStructure->_right = normalise(glm::rotate(q, camera->_cameraStructure->_right));
@@ -324,7 +317,6 @@ void RayCastCanvas::keyPressEvent(QKeyEvent* event)
 	{
 		Input::registerKeyPress(event->key());
 	}
-	qDebug() << "key press event";
 	event->accept();
 }
 
@@ -350,80 +342,156 @@ void RayCastCanvas::mouseReleaseEvent(QMouseEvent* event)
 {
 	Input::registerMouseRelease(event->button());
 }
-void RayCastCanvas::addSphere(int index)
+
+
+void RayCastCanvas::modifySpheres(int index, std::shared_ptr<Sphere> sphere)
 {
-	Sphere sphere = Sphere(VecD3(1, 2, 3), 0.5, defaultMaterial);
+
 	qDebug() << "spheres update";
-	std::string sphere_pos = "spheres[" + std::to_string(spheres_count) + ']';
+	int shape_count = index;
+
+	std::string sphere_pos = "spheres[" + std::to_string(shape_count) + ']';
 	std::string center_str = ".center";
 	std::string radius_str = ".radius";
 	std::string mat_color_str = ".material.color";
 	std::string mat_coefs_str = ".material.lightKoefs";
 
-	spheres_count++;
 	m_program->bind();
 	QVector3D lightCoeffs = { defaultMaterial._k_a, defaultMaterial._k_d, defaultMaterial._k_s };
 	QVector3D color = { defaultMaterial._color.R, defaultMaterial._color.G, defaultMaterial._color.B };
-	qDebug() << "sphere_pos==" << (sphere_pos + center_str).c_str();
-	m_program->setUniformValue((sphere_pos + center_str).c_str(), to_q_vec(sphere.getCenter()));
-	m_program->setUniformValue((sphere_pos + radius_str).c_str(), (float)sphere.getRadius());
+	qDebug() << "sphere_pos==" << sphere->getCenter().x << sphere->getCenter().y << sphere->getCenter().z;
+	m_program->setUniformValue((sphere_pos + center_str).c_str(), to_q_vec(sphere->getCenter()));
+	m_program->setUniformValue((sphere_pos + radius_str).c_str(), (float)sphere->getRadius());
+	m_program->setUniformValue((sphere_pos + mat_color_str).c_str(), color);
+	m_program->setUniformValue((sphere_pos + mat_coefs_str).c_str(), lightCoeffs);
+	m_program->release();
+	qDebug() << "spheres count" << spheres_count;
+	paintGL();
+}
+
+void RayCastCanvas::addPrimitive(int idx_prim)
+{
+
+
+	if (idx_prim == add_sphere_idx)
+		addSphere(defaultSphere);
+	if (idx_prim == add_cone_idx)
+		addCone(defaultCone);
+
+	QOpenGLWidget::update();
+
+}
+
+
+void RayCastCanvas::movePrimitive(int idx_prim, VecD3 delta)
+{
+	std::shared_ptr<BaseShape>
+		shape = std::dynamic_pointer_cast<BaseShape>(_sceneManager->getScene()->getModels()[idx_prim]);
+	int shapeType = shapeTypes[idx_prim];
+	shape->move(delta);
+	if (shapeType == add_sphere_idx)
+	{
+		std::shared_ptr<Sphere> sphere =  std::dynamic_pointer_cast<Sphere>(shape);
+		modifySpheres(idx_prim, sphere);
+	}
+	else if (shapeType == add_cone_idx)
+	{
+		std::shared_ptr<Cone> cone =  std::dynamic_pointer_cast<Cone>(shape);
+		modifyCones(idx_prim, cone);
+	}
+	QOpenGLWidget::update();
+}
+void RayCastCanvas::addSphere(std::shared_ptr<Sphere> sphere)
+{
+	_sceneManager->getScene()->addModel(sphere);
+	shapeTypes.push_back(add_sphere_idx);
+	qDebug() << "spheres add";
+	spheres_count++;
+	int shape_count = spheres_count - 1;
+
+	std::string sphere_pos = "spheres[" + std::to_string(shape_count) + ']';
+	std::string center_str = ".center";
+	std::string radius_str = ".radius";
+	std::string mat_color_str = ".material.color";
+	std::string mat_coefs_str = ".material.lightKoefs";
+
+	m_program->bind();
+	QVector3D lightCoeffs = { defaultMaterial._k_a, defaultMaterial._k_d, defaultMaterial._k_s };
+	QVector3D color = { defaultMaterial._color.R, defaultMaterial._color.G, defaultMaterial._color.B };
+	qDebug() << "sphere_pos==" << sphere->getCenter().x << sphere->getCenter().y << sphere->getCenter().z;
+	m_program->setUniformValue((sphere_pos + center_str).c_str(), to_q_vec(sphere->getCenter()));
+	m_program->setUniformValue((sphere_pos + radius_str).c_str(), (float)sphere->getRadius());
 	m_program->setUniformValue((sphere_pos + mat_color_str).c_str(), color);
 	m_program->setUniformValue((sphere_pos + mat_coefs_str).c_str(), lightCoeffs);
 	m_program->setUniformValue("prLens.size_spheres", spheres_count);
 	m_program->release();
 	qDebug() << "spheres count" << spheres_count;
+
+
 }
-
-
-
-
-
-
-
-void RayCastCanvas::addPrimitive(int idx_prim)
+void RayCastCanvas::addCone(std::shared_ptr<Cone> cone)
 {
-	qDebug() << "started adding primitives " << idx_prim;
-	if (idx_prim == add_sphere_idx)
-		addSphere(spheres_count);
-}
 
+	_sceneManager->getScene()->addModel(cone);
+	shapeTypes.push_back(add_cone_idx);
+	qDebug() << "spheres add";
+	++cones_count;
+	int shape_count = cones_count - 1;
 
-
-
-
-
-void RayCastCanvas::addCyllinder(int index)
-{
-	/*vec3 extr_a;
-	vec3 extr_b;
-	float ra;
-	Material material;
-
-
-	Sphere sphere = Sphere(VecD3(1, 2, 3), 0.5, defaultMaterial);
-
-	qDebug() << "cyllinder update";
-	std::string cyllinder_pos = "spheres[" + std::to_string(spheres_count) + ']';
-	std::string center_str = ".center";
-	std::string radius_str = ".radius";
+	std::string cone_pos = "cones[" + std::to_string(shape_count) + ']';
+	std::string angle = ".cosa";
+	std::string height = ".h";
+	std::string tip_position = ".c";
+	std::string axis = ".v";
 	std::string mat_color_str = ".material.color";
 	std::string mat_coefs_str = ".material.lightKoefs";
 
-	spheres_count++;
 	m_program->bind();
 	QVector3D lightCoeffs = { defaultMaterial._k_a, defaultMaterial._k_d, defaultMaterial._k_s };
 	QVector3D color = { defaultMaterial._color.R, defaultMaterial._color.G, defaultMaterial._color.B };
-	qDebug() << "sphere_pos==" << (sphere_pos + center_str).c_str();
-	m_program->setUniformValue((sphere_pos + center_str).c_str(), to_q_vec(sphere.getCenter()));
-	m_program->setUniformValue((sphere_pos + radius_str).c_str(), (float)sphere.getRadius());
-	m_program->setUniformValue((sphere_pos + mat_color_str).c_str(), color);
-	m_program->setUniformValue((sphere_pos + mat_coefs_str).c_str(), lightCoeffs);
-	m_program->setUniformValue("prLens.size_spheres", spheres_count);
+
+	m_program->setUniformValue((cone_pos + angle).c_str(), cone->_cosa);
+	m_program->setUniformValue((cone_pos + height).c_str(), cone->_h);
+
+	m_program->setUniformValue((cone_pos + axis).c_str(), to_q_vec(cone->_v));
+
+	m_program->setUniformValue((cone_pos + tip_position).c_str(), to_q_vec(cone->_c));
+
+	m_program->setUniformValue((cone_pos + mat_color_str).c_str(), color);
+	m_program->setUniformValue((cone_pos + mat_coefs_str).c_str(), lightCoeffs);
+	m_program->setUniformValue("prLens.size_cones", cones_count);
 	m_program->release();
-	qDebug() << "spheres count" << spheres_count;*/
-}
-void RayCastCanvas::MoveObject(int idx_prim)
-{
+	qDebug() << "cones count" << cones_count;
 
 }
+void RayCastCanvas::modifyCones(int index, std::shared_ptr<Cone> cone)
+{
+
+	int shape_count = index;
+
+	std::string cone_pos = "cones[" + std::to_string(shape_count) + ']';
+	std::string angle = ".cosa";
+	std::string height = ".h";
+	std::string tip_position = ".c";
+	std::string axis = ".v";
+	std::string mat_color_str = ".material.color";
+	std::string mat_coefs_str = ".material.lightKoefs";
+
+	m_program->bind();
+	QVector3D lightCoeffs = { defaultMaterial._k_a, defaultMaterial._k_d, defaultMaterial._k_s };
+	QVector3D color = { defaultMaterial._color.R, defaultMaterial._color.G, defaultMaterial._color.B };
+
+	m_program->setUniformValue((cone_pos + angle).c_str(), cone->_cosa);
+	m_program->setUniformValue((cone_pos + height).c_str(), cone->_h);
+
+	m_program->setUniformValue((cone_pos + axis).c_str(), to_q_vec(cone->_v));
+
+	m_program->setUniformValue((cone_pos + tip_position).c_str(), to_q_vec(cone->_c));
+
+	m_program->setUniformValue((cone_pos + mat_color_str).c_str(), color);
+	m_program->setUniformValue((cone_pos + mat_coefs_str).c_str(), lightCoeffs);
+	m_program->release();
+
+}
+
 

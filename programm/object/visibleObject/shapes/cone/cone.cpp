@@ -3,20 +3,14 @@
 //
 
 #include "cone.h"
-Cone::Cone(const VecD3& apex,const VecD3& axis, float slope, const Material& material)
-{
-	_apex = apex;
-	_axis = axis;
-	_slope = slope;
-	_material = material;
-}
+
 void Cone::transform(const TransformParams& transformParams)
 {
 	;//TODO:: do smth
 }
 float Cone::intersection(const Ray& ray)
 {
-	// Calculate the ray origin relative to the cone apex
+	/*// Calculate the ray origin relative to the cone apex
 	VecD3 origin = ray.E - this->_apex;
 
 	// Calculate the coefficients for the quadratic equation
@@ -47,9 +41,10 @@ float Cone::intersection(const Ray& ray)
 			t = t2;
 		else if (t2 < 0)
 			t = t1;
-	}
+	}*/
 
-	return t;
+	//TODO::implement this
+	return -1.0;
 }
 void Cone::setSpectralParams(float k_a, float k_d, float k_s)
 {
@@ -71,26 +66,18 @@ void Cone::accept(std::shared_ptr<Visitor> visitor)
 }
 VecD3 Cone::getNormal(VecD3 intersectionPoint)
 {
-	VecD3 __axisToIntersection = intersectionPoint - this->_axis;
-	VecD3 _axisProjection = this->_axis * dot(__axisToIntersection, this->_axis);
-
-	// Check if the intersection point is on the top or bottom of the cone
-	// If it is, return the _axis direction as the normal
-	float distanceFrom_axis = _axisProjection.length();
-	if (distanceFrom_axis < this->_slope * dot(__axisToIntersection, this->_axis))
-	{
-		return this->_axis;
-	}
-
-	// Calculate the direction of the normal by projecting __axisToIntersection onto the cone's surface
-	VecD3 coneSurfaceProjection = __axisToIntersection - _axisProjection;
-	coneSurfaceProjection = normalize(coneSurfaceProjection);
-
-	// Calculate the normal vector
-	VecD3 normal = coneSurfaceProjection - (this->_slope * this->_slope) * _axisProjection;
-
-	// Normalize the normal vector
-	normal = normalize(normal);
-
-	return normal;
+	//TODO::implementinh
+	return VecD3(1.0);
+}
+Cone::Cone(float cosa, float h, const VecD3& c, const VecD3& v, const Material& material)
+{
+	_cosa = cosa;
+	_h = h;
+	_c = c;
+	_v = v;
+	_material = material;
+}
+void Cone::move(VecD3 delta)
+{
+	_c = delta;
 }

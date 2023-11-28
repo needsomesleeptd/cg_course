@@ -29,8 +29,7 @@
 #include "drawManagerCreator.h"
 
 #include "vertex.h"
-
-
+#include "cone.h"
 
 class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
@@ -41,13 +40,9 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 
 
 
- signals:
-	// NOPE
-
  public slots:
 	void update();
-	void addPrimitive(int idx_prim);
-	void MoveObject(int idx_prim);
+
 
  protected:
 	void initializeGL();
@@ -60,20 +55,30 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void keyReleaseEvent(QKeyEvent* event) override;
 	void mousePressEvent(QMouseEvent* event) override;
 
-	void addSphere(int index);
-	void addCyllinder(int index);
+	void modifySpheres(int index, std::shared_ptr<Sphere> sphere);
+	void modifyCones(int index, std::shared_ptr<Cone> cone);
+
+
+	void addSphere(std::shared_ptr<Sphere> sphere);
+	void addCone(std::shared_ptr<Cone> cone);
 
 	Material defaultMaterial = Material(0.1, 0.1, 0.1, ColorRGB(0.3, 0.5, 0.7));
+	std::shared_ptr<Sphere> defaultSphere = std::make_shared<Sphere>(VecD3(1.0, 2.0, 3.0), 1.0, defaultMaterial);
+	std::shared_ptr<Cone> defaultCone = std::make_shared<Cone>(0.9,1, VecD3(0.0,0.0,0.0),VecD3(0.0,1.0,0.0), defaultMaterial);
+
+	std::vector<int> shapeTypes;
+
+
  public:
+
 	const int add_sphere_idx = 0;
 	const int add_cone_idx = 1;
 	const int add_cylinder_idx = 3;
 	const int add_cube_idx = 2;
 
  public:
-
-
-
+	void movePrimitive(int idx_prim, VecD3 delta);
+	void addPrimitive(int idx_prim);
 	const GLfloat m_fov = 60.0f;                                          /*!< Vertical field of view. */
 	QColor m_background;                          /*!< Viewport background colour. */
 	QOpenGLFunctions_4_3_Core* functions;
@@ -101,8 +106,6 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	int cylinders_count;
 	int boxes_count;
 	int cones_count;
-
-
 
 	QPointF pixel_pos_to_view_pos(const QPointF& p);
 

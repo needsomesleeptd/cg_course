@@ -74,3 +74,9 @@ VecD3 Sphere::getCenter()
 {
 	return _center;
 }
+void Sphere::move(VecD3 delta)
+{
+
+	_center = delta;
+}
+

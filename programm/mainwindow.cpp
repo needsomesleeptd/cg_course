@@ -23,11 +23,13 @@ MainWindow::MainWindow(QWidget* parent)
 	ui->addPrimitivesBox->addItem("Добавить сферу");
 	ui->addPrimitivesBox->addItem("Добавить конус");
 	ui->addPrimitivesBox->addItem("Добавить куб");
-	ui->addPrimitivesBox->addItem("Добавить циллиндр");
+	ui->addPrimitivesBox->addItem("Добавить цилиндр");
 
-	connect(ui->addPrimitivesBox, SIGNAL(currentIndexChanged(int)), ui->graphicsView, SLOT(addPrimitive(int)));
+	connect(ui->translate, SIGNAL(clicked()), this, SLOT(onTranslateButtonClicked()));
 
-	connect(ui->addPrimitivesBox, SIGNAL(currentIndexChanged(int)), this, SLOT(addToSelectionPrimitives(int)));
+	connect(ui->add, SIGNAL(clicked()), this, SLOT(onAddButtonClicked()));
+
+
 
 	//Working woth Lights
 
@@ -39,28 +41,6 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui->light_g, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightColorChangeButtonClicked);
 	connect(ui->light_b, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightColorChangeButtonClicked);
 
-
-
-
-
-	/*connect(ui->pushButton_del_model_cur, &QPushButton::clicked, this, &MainWindow::onRemoveModelButtonClicked);
-	connect(ui->pushButton_del_model_all, &QPushButton::clicked, this, &MainWindow::onRemoveAllModelsButtonClicked);
-
-	connect(ui->pushButton_add_camera, &QPushButton::clicked, this, &MainWindow::onAddCameraButtonClicked);
-	connect(ui->pushButton_del_camera_cur, &QPushButton::clicked, this, &MainWindow::onRemoveCameraButtonClicked);*/
-
-
-
-	/*connect(ui->pushButton_move, &QPushButton::clicked, this, &MainWindow::onMoveButtonClicked);
-	connect(ui->pushButton_move_all, &QPushButton::clicked, this, &MainWindow::onMoveAllButtonClicked);
-
-	connect(ui->pushButton_scale, &QPushButton::clicked, this, &MainWindow::onScaleButtonClicked);
-	connect(ui->pushButton_scale_all, &QPushButton::clicked, this, &MainWindow::onScaleAllButtonClicked);
-
-	connect(ui->pushButton_spin, &QPushButton::clicked, this, &MainWindow::onRotateButtonClicked);
-	connect(ui->pushButton_spin_all, &QPushButton::clicked, this, &MainWindow::onRotateAllButtonClicked);
-
-	connect(ui->comboBox_cameras, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::changeCam);*/
 }
 void MainWindow::onLightColorChangeButtonClicked()
 {
@@ -74,6 +54,11 @@ void MainWindow::addToSelectionPrimitives(int idx)
 	{
 		int spheres_count = ui->graphicsView->spheres_count;
 		ui->choose_primitives_box->addItem(("Сфера" + std::to_string(spheres_count)).c_str());
+	}
+	if (idx == ui->graphicsView->add_cone_idx)
+	{
+		int cones_count = ui->graphicsView->cones_count;
+		ui->choose_primitives_box->addItem(("Конус" + std::to_string(cones_count)).c_str());
 	}
 }
 
@@ -95,4 +80,18 @@ void MainWindow::onLightPositionChangeButtonClicked()
 	ui->graphicsView->_sceneManager->getScene()->getLightSource()->setPosition(VecD3(ui->light_x->value(),
 		ui->light_y->value(),
 		ui->light_z->value()));
+}
+void MainWindow::onTranslateButtonClicked()
+{
+	int idx = ui->choose_primitives_box->currentIndex();
+	VecD3 moveParams = VecD3(ui->obj_x->value(), ui->obj_y->value(), ui->obj_z->value());
+	qDebug() << "started moving on" << idx << moveParams.x << moveParams.y << moveParams.z;
+	ui->graphicsView->movePrimitive(idx, moveParams);
+}
+void MainWindow::onAddButtonClicked()
+{
+	int idx = ui->addPrimitivesBox->currentIndex();
+	addToSelectionPrimitives(idx);
+	qDebug() << "adding primitive with id" << idx;
+	ui->graphicsView->addPrimitive(idx);
 }

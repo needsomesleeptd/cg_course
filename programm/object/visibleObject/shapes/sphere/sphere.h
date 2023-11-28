@@ -27,6 +27,8 @@ class Sphere : public BaseShape
 	virtual void accept(std::shared_ptr<Visitor> visitor);
 	double getRadius();
 	VecD3 getCenter();
+	void move(VecD3 delta) override;
+
 
 };
 

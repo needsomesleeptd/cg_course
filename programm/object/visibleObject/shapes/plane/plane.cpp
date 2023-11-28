@@ -41,5 +41,10 @@ void Plane::accept(std::shared_ptr<Visitor> visitor)
 {
 	visitor->visit(*this);
 }
+void Plane::move(VecD3 delta)
+{
+	//TODO::implement this
+}
+
 //bidirectional path tracing
 //imgui

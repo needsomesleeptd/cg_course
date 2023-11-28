@@ -12,7 +12,7 @@
 
 #define  K   0.1f
 
-#define MAX_DEPTH 2
+#define MAX_DEPTH 5
 
 #define PI acos(0) * 2.0f
 
@@ -397,13 +397,13 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
 }
 
 
-Sphere spheres[SPHERE_COUNT];
+uniform Sphere spheres[SPHERE_COUNT];
 
-Box boxes[BOX_COUNT];
+uniform Box boxes[BOX_COUNT];
 
-Cylinder cylinders[CYLINDERS_COUNT];
+uniform Cylinder cylinders[CYLINDERS_COUNT];
 
-Cone cones[CONES_COUNT];
+uniform Cone cones[CONES_COUNT];
 
 struct PrimitiveArrLens {
     int size_spheres;
@@ -575,11 +575,11 @@ void main(void) {
     Material cylinder_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.1f, 0.4f, 0.4f));
 
 
-    spheres[0] = Sphere(vec3(1.0f, 1.4f, 3.1f), 0.6f, material);
+   /* spheres[0] = Sphere(vec3(1.0f, 1.4f, 3.1f), 0.6f, material);
     spheres[1] = Sphere(vec3(3.0f, 0.7f, -0.1f), 0.7f, new_material);
-    spheres[2] = Sphere(vec3(1.0f, 0.7f, -0.1f), 0.3f, new_new_material);
+    spheres[2] = Sphere(vec3(1.0f, 0.7f, -0.1f), 0.3f, new_new_material);*/
 
-    boxes[0] = Box(vec3(0.3f, 2.0f, -1.0f), mat3(1.0), vec3(1.0, 1.0, 1.0), gen_random_mat());
+    /*boxes[0] = Box(vec3(0.3f, 2.0f, -1.0f), mat3(1.0), vec3(1.0, 1.0, 1.0), gen_random_mat());
 
     cylinders[0].extr_a = vec3(1.0, 0.0, 1.0);
 
@@ -593,7 +593,7 @@ void main(void) {
 
 
 
-    cones[0] = Cone(PI / 6, 1, vec3(1.0, 2.0, 1.0), vec3(0.0, 1.0, 0.0), new_new_material);
+    cones[0] = Cone(PI / 6, 1, vec3(1.0, 2.0, 1.0), vec3(0.0, 1.0, 0.0), new_new_material);*/
 
     Ray ray = GenerateRay(camera, interpolated_vertex, scale);
 

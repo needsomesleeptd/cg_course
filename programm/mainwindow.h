@@ -30,6 +30,8 @@ class MainWindow : public QMainWindow
 
  public slots:
 		void addToSelectionPrimitives(int idx);
+		void onTranslateButtonClicked();
+		void onAddButtonClicked();
 
  protected:
 	//void resizeEvent(QResizeEvent *event) override;
@@ -60,40 +62,9 @@ class MainWindow : public QMainWindow
 
 
 
-	void onImportModelButtonClicked();
-	void onRemoveModelButtonClicked();
-	void onRemoveAllModelsButtonClicked();
 
-	void onMoveButtonClicked();
-	void onMoveAllButtonClicked();
 
-	void onScaleButtonClicked();
-	void onScaleAllButtonClicked();
 
-	void onRotateButtonClicked();
-	void onRotateAllButtonClicked();
-
-	void onCameraMoveUbuttonClicked();
-	void onCameraMoveLbuttonClicked();
-	void onCameraMoveBbuttonClicked();
-	void onCameraMoveRbuttonClicked();
-	void onCameraMoveULbuttonClicked();
-	void onCameraMoveURbuttonClicked();
-	void onCameraMoveBLbuttonClicked();
-	void onCameraMoveBRbuttonClicked();
-
-	void onCameraRotateUbuttonClicked();
-	void onCameraRotateLbuttonClicked();
-	void onCameraRotateBbuttonClicked();
-	void onCameraRotateRbuttonClicked();
-	void onCameraRotateULbuttonClicked();
-	void onCameraRotateURbuttonClicked();
-	void onCameraRotateBLbuttonClicked();
-	void onCameraRotateBRbuttonClicked();
-
-	void onRemoveCameraButtonClicked();
-	void onAddCameraButtonClicked();
-	void changeCam();
 
 };
 

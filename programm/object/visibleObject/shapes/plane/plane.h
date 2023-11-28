@@ -21,6 +21,8 @@ class Plane : public BaseShape
 	Material getMaterial() override;
 	VecD3 getNormal(VecD3 intersectionPoint);
 	virtual void accept(std::shared_ptr<Visitor> visitor);
+	void move(VecD3 delta);
+
  private:
 	VecD3 _point;
 	VecD3 _normal;

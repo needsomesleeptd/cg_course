@@ -11,14 +11,15 @@
 
 class Cone : public BaseShape
 {
- private:
-	VecD3 _apex;
-	VecD3 _axis;
-	float _slope;
-	Material _material;
+ public:
+	float _cosa;    // half cone angle
+	float _h;    // height
+	VecD3 _c;        // tip position
+	VecD3 _v;        // axis
+	Material _material;    // material
  public:
 	Cone() = default;
-	Cone(const VecD3& apex,const  VecD3& axis, float slope, const Material& material);
+	Cone(float cosa,float h, const VecD3 &c,const VecD3 &v, const Material& material);
 	void transform(const TransformParams& transformParams) override;
 	float intersection(const Ray& ray) override;
 	void setSpectralParams(float k_a, float k_d, float k_s);
@@ -27,7 +28,8 @@ class Cone : public BaseShape
 	VecD3 getNormal(VecD3 intersectionPoint);
 	virtual void accept(std::shared_ptr<Visitor> visitor);
 	//double getRadius(); // TODO::implement getters
-	//VecD3 getCenter();
+	void move(VecD3 delta) override;
+
 
 };
 

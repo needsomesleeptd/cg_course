@@ -16,6 +16,7 @@ class BaseShape : public VisibleObject
 	BaseShape() = default;
 	virtual ~BaseShape() = default;
 	virtual void transform(const TransformParams& transformParams) = 0;
+	virtual void move(VecD3 delta) = 0;
 	virtual Material getMaterial() = 0;
 	virtual float intersection(const Ray& ray) = 0;
 	virtual VecD3 getNormal(VecD3 intersectionPoint) = 0;

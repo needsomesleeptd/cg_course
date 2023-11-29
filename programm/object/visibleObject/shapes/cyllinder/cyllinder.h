@@ -27,7 +27,8 @@ class Cyllinder : public BaseShape
 	Material getMaterial() override;
 	VecD3 getNormal(VecD3 intersectionPoint);
 	virtual void accept(std::shared_ptr<Visitor> visitor);
-
+	void setMaterial(const Material& material) override;
+	VecD3 getCenter() override;
 	void move(VecD3 delta) override;
 };
 

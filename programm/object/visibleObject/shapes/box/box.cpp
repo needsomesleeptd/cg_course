@@ -44,3 +44,11 @@ void Box::move(VecD3 delta)
 {
 	_position = delta;
 }
+void Box::setMaterial(const Material& material)
+{
+	_material = material;
+}
+VecD3 Box::getCenter()
+{
+	return _position;
+}

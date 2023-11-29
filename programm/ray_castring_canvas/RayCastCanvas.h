@@ -57,7 +57,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void modifySpheres(int index, std::shared_ptr<Sphere> sphere);
 	void modifyCones(int index, std::shared_ptr<Cone> cone);
 	void modifyBoxes(int index, std::shared_ptr<Box> box);
-	void modifyCyllinders(int index, std::shared_ptr<Cyllinder> cyllinder);
+	void modifyCyllinders(int index, std::shared_ptr<Cyllinder> cyllinder,bool binding);
 
 	void addSphere(const std::shared_ptr<Sphere>& sphere);
 	void addCone(const std::shared_ptr<Cone>& cone);

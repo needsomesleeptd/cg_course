@@ -43,7 +43,15 @@ void Cyllinder::accept(std::shared_ptr<Visitor> visitor)
 }
 void Cyllinder::move(VecD3 delta)
 {
-	VecD3  len_vec = abs(_extr_b - _extr_a);
-	_extr_b = delta + (len_vec / VecD3(2.0,2.0,2.0));
-	_extr_a = delta - (len_vec / VecD3(2.0,2.0,2.0));
+	VecD3 len_vec = abs(_extr_b - _extr_a);
+	_extr_b = delta + (len_vec / VecD3(2.0, 2.0, 2.0));
+	_extr_a = delta - (len_vec / VecD3(2.0, 2.0, 2.0));
+}
+void Cyllinder::setMaterial(const Material& material)
+{
+	_material = material;
+}
+VecD3 Cyllinder::getCenter()
+{
+	return (_extr_a + _extr_b) / VecD3(2.0f, 2.0f, 2.0f);
 }

@@ -81,3 +81,11 @@ void Cone::move(VecD3 delta)
 {
 	_c = delta;
 }
+void Cone::setMaterial(const Material& material)
+{
+	_material = material;
+}
+VecD3 Cone::getCenter()
+{
+	return VecD3(_c + (_v / VecD3(2.0f, 2.0f, 2.0f)));
+}

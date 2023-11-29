@@ -30,8 +30,16 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui->add, SIGNAL(clicked()), this, SLOT(onAddButtonClicked()));
 
 
+	connect(ui->obj_R, &QDoubleSpinBox::textChanged, this, &MainWindow::materialUpdate);
+	connect(ui->obj_G, &QDoubleSpinBox::textChanged, this,  &MainWindow::materialUpdate);
+	connect(ui->obj_B, &QDoubleSpinBox::textChanged, this,  &MainWindow::materialUpdate);
 
-	//Working woth Lights
+	connect(ui->obj_k_a, &QDoubleSpinBox::textChanged, this,  &MainWindow::materialUpdate);
+	connect(ui->obj_k_d, &QDoubleSpinBox::textChanged, this,  &MainWindow::materialUpdate);
+	connect(ui->obj_k_s, &QDoubleSpinBox::textChanged, this,  &MainWindow::materialUpdate);
+
+
+	//Working with Lights
 
 	connect(ui->light_x, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightPositionChangeButtonClicked);
 	connect(ui->light_y, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightPositionChangeButtonClicked);
@@ -72,7 +80,7 @@ void MainWindow::addToSelectionPrimitives(int idx)
 		int cylinders_count = ui->graphicsView->cylinders_count;
 		ui->choose_primitives_box->addItem(("Цилиндр" + std::to_string(cylinders_count)).c_str());
 	}
-	
+
 }
 
 MainWindow::~MainWindow()
@@ -107,4 +115,16 @@ void MainWindow::onAddButtonClicked()
 	addToSelectionPrimitives(idx);
 	qDebug() << "adding primitive with id" << idx;
 	ui->graphicsView->addPrimitive(idx);
+	int models_count = ui->graphicsView->_sceneManager->getScene()->getModels().size();
+	ui->choose_primitives_box->setCurrentIndex(models_count - 1);
+}
+void MainWindow::materialUpdate()
+{
+	int idx_model = ui->choose_primitives_box->currentIndex();
+	std::shared_ptr<BaseShape> shape = std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[idx_model]);
+	ColorRGB color(ui->obj_R->value(),ui->obj_G->value(),ui->obj_B->value());
+	qDebug() << "updating material";
+	Material material = Material(ui->obj_k_a->value(),ui->obj_k_d->value(),ui->obj_k_s->value(),color);
+	shape->setMaterial(material);
+
 }

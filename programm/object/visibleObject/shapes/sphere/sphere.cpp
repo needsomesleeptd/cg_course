@@ -79,4 +79,8 @@ void Sphere::move(VecD3 delta)
 
 	_center = delta;
 }
+void Sphere::setMaterial(const Material& material)
+{
+	_material = material;
+}
 

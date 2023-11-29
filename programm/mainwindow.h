@@ -44,21 +44,14 @@ class MainWindow : public QMainWindow
  private:
 	Ui::MainWindow* ui;
 
-	QGraphicsScene* _scene;
-	std::shared_ptr<DrawManager> _drawManager;
-	std::shared_ptr<SceneManager> _sceneManager;
-	/*std::shared_ptr<Facade> _facade;
-	std::shared_ptr<AbstractDrawer> _drawer;
 
-	std::shared_ptr<LoadManager> _loadManager;
-	std::shared_ptr<DrawManager> _drawManager;
-	std::shared_ptr<TransformManager> _transformManager;
-	std::shared_ptr<SceneManager> _sceneManager;*/
 
 
 
 	void onLightPositionChangeButtonClicked();
 	void onLightColorChangeButtonClicked();
+
+	void materialUpdate();
 
 
 

@@ -67,6 +67,12 @@ void MainWindow::addToSelectionPrimitives(int idx)
 		ui->choose_primitives_box->addItem(("Куб" + std::to_string(boxes_count)).c_str());
 	}
 
+	if (idx == ui->graphicsView->add_cylinder_idx)
+	{
+		int cylinders_count = ui->graphicsView->cylinders_count;
+		ui->choose_primitives_box->addItem(("Цилиндр" + std::to_string(cylinders_count)).c_str());
+	}
+	
 }
 
 MainWindow::~MainWindow()

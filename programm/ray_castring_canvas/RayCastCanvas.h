@@ -31,6 +31,7 @@
 #include "vertex.h"
 #include "cone.h"
 #include "box.h"
+#include "cyllinder.h"
 
 class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
@@ -47,7 +48,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void paintGL();
 	void resizeGL(int width, int height);
 
-
+	void updatePrimitives();
 	void mouseReleaseEvent(QMouseEvent* event) override;
 	void keyPressEvent(QKeyEvent* event) override;
 	void keyReleaseEvent(QKeyEvent* event) override;
@@ -56,10 +57,12 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void modifySpheres(int index, std::shared_ptr<Sphere> sphere);
 	void modifyCones(int index, std::shared_ptr<Cone> cone);
 	void modifyBoxes(int index, std::shared_ptr<Box> box);
+	void modifyCyllinders(int index, std::shared_ptr<Cyllinder> cyllinder);
 
 	void addSphere(const std::shared_ptr<Sphere>& sphere);
 	void addCone(const std::shared_ptr<Cone>& cone);
 	void addBox(const std::shared_ptr<Box>& box);
+	void addCyllinder(const std::shared_ptr<Cyllinder>& cyllinder);
 
 	Material defaultMaterial = Material(0.1, 0.1, 0.1, ColorRGB(0.3, 0.5, 0.7));
 	VecD3 defaultInitPos = VecD3(0.0);
@@ -68,6 +71,14 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 		defaultCone = std::make_shared<Cone>(0.9, 1, defaultInitPos, VecD3(0.0, 1.0, 0.0), defaultMaterial);
 	std::shared_ptr<Box>
 		defaultBox = std::make_shared<Box>(defaultInitPos, glm::mat3(1.0f), VecD3(1.0, 1.0, 1.0), defaultMaterial);
+
+	std::shared_ptr<Cyllinder>
+		defaultCyllinder = std::make_shared<Cyllinder>(
+		VecD3(1.0, 0.0, 1.0),
+		VecD3(-1.0, 0.0, -1.0),
+		1.0f,
+		defaultMaterial);
+
 	std::vector<int> shapeTypes;
 
  public:

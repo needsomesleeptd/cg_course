@@ -61,7 +61,7 @@ set(PROJECT_SOURCES
         renderer/baseRenderer.h color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h material/material.cpp material/material.h object/visibleObject/shapes/plane/plane.cpp object/visibleObject/shapes/plane/plane.h
         Input/Input.h Input/Input.cpp
         ray_castring_canvas/RayCastCanvas.cpp ray_castring_canvas/RayCastCanvas.h
-        )
+        object/visibleObject/shapes/cyllinder/cyllinder.cpp object/visibleObject/shapes/cyllinder/cyllinder.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(lab_03

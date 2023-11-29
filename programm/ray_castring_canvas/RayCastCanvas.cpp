@@ -9,6 +9,21 @@
 #include <glm/gtx/quaternion.hpp>
 #include "RayCastCanvas.h"
 
+template<class T>
+void setUniformArrayValue(QOpenGLShaderProgram* program,
+	const QString& arrayName,
+	const QString& varName,
+	int index,
+	const T& value)
+{
+	std::string name = QString("%1[%2].%3")
+		.arg(arrayName)
+		.arg(index)
+		.arg(varName)
+		.toStdString();
+	program->setUniformValue(name.c_str(), value);
+}
+
 QVector3D to_q_vec(const VecD3& vec_src)
 {
 	QVector3D res = QVector3D(vec_src.x, vec_src.y, vec_src.z);
@@ -81,7 +96,6 @@ void RayCastCanvas::initializeGL()
 	initializeOpenGLFunctions();
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-
 	{
 		// Create Shader (Do not release until VAO is created)]
 
@@ -153,6 +167,11 @@ void RayCastCanvas::resizeGL(int w, int h)
 	//m_raycasting_volume->create_noise();
 }
 
+
+
+
+
+
 void RayCastCanvas::paintGL()
 {
 	//qDebug() << "started_painting\n";
@@ -171,7 +190,8 @@ void RayCastCanvas::paintGL()
 
 	QMatrix4x4 inverseProject(&camera->getInverseProjectionMatrix()[0][0]);
 	QMatrix4x4 inverseView(&camera->getInverseViewMatrix()[0][0]);
-	// Render using our shader
+
+	updatePrimitives();
 	m_program->bind();
 	//camera
 	m_program->setUniformValue("camera.position", QVector3D(cam_pos.x, cam_pos.y, cam_pos.z));
@@ -343,69 +363,75 @@ void RayCastCanvas::mouseReleaseEvent(QMouseEvent* event)
 	Input::registerMouseRelease(event->button());
 }
 
-
 void RayCastCanvas::modifySpheres(int index, std::shared_ptr<Sphere> sphere)
 {
 
 	qDebug() << "spheres update";
-	int shape_count = index;
 
-	std::string sphere_pos = "spheres[" + std::to_string(shape_count) + ']';
-	std::string center_str = ".center";
-	std::string radius_str = ".radius";
-	std::string mat_color_str = ".material.color";
-	std::string mat_coefs_str = ".material.lightKoefs";
+	QString sphere_pos = "spheres";
+	QString center_str = "center";
+	QString radius_str = "radius";
+	QString mat_color_str = "material.color";
+	QString mat_coefs_str = "material.lightKoefs";
 
 	m_program->bind();
 	QVector3D lightCoeffs = { defaultMaterial._k_a, defaultMaterial._k_d, defaultMaterial._k_s };
 	QVector3D color = { defaultMaterial._color.R, defaultMaterial._color.G, defaultMaterial._color.B };
 	qDebug() << "sphere_pos==" << sphere->getCenter().x << sphere->getCenter().y << sphere->getCenter().z;
-	m_program->setUniformValue((sphere_pos + center_str).c_str(), to_q_vec(sphere->getCenter()));
-	m_program->setUniformValue((sphere_pos + radius_str).c_str(), (float)sphere->getRadius());
-	m_program->setUniformValue((sphere_pos + mat_color_str).c_str(), color);
-	m_program->setUniformValue((sphere_pos + mat_coefs_str).c_str(), lightCoeffs);
+	setUniformArrayValue<QVector3D>(m_program, sphere_pos, center_str, index, to_q_vec(sphere->getCenter()));
+	setUniformArrayValue<float>(m_program, sphere_pos, radius_str, index, (float)sphere->getRadius());
+	setUniformArrayValue<QVector3D>(m_program, sphere_pos, mat_color_str, index, color);
+	setUniformArrayValue<QVector3D>(m_program, sphere_pos, mat_coefs_str, index, lightCoeffs);
+
 	m_program->release();
 	qDebug() << "spheres count" << spheres_count;
-	paintGL();
+
 }
 
-void RayCastCanvas::addPrimitive(int idx_prim)
+void RayCastCanvas::addPrimitive(int i)
 {
 
-
-	if (idx_prim == add_sphere_idx)
+	if (i == add_sphere_idx)
 		addSphere(defaultSphere);
-	if (idx_prim == add_cone_idx)
+	if (i == add_cone_idx)
 		addCone(defaultCone);
-	if (idx_prim == add_box_idx)
+	if (i == add_box_idx)
 		addBox(defaultBox);
-	QOpenGLWidget::update();
+	if (i == add_cylinder_idx)
+		addCyllinder(defaultCyllinder);
+
+
 
 }
 
-
-void RayCastCanvas::movePrimitive(int idx_prim, VecD3 delta)
+void RayCastCanvas::movePrimitive(int i, VecD3 delta)
 {
 	std::shared_ptr<BaseShape>
-		shape = std::dynamic_pointer_cast<BaseShape>(_sceneManager->getScene()->getModels()[idx_prim]);
-	int shapeType = shapeTypes[idx_prim];
+		shape = std::dynamic_pointer_cast<BaseShape>(_sceneManager->getScene()->getModels()[i]);
+	int shapeType = shapeTypes[i];
 	shape->move(delta);
 	if (shapeType == add_sphere_idx)
 	{
-		std::shared_ptr<Sphere> sphere =  std::dynamic_pointer_cast<Sphere>(shape);
-		modifySpheres(idx_prim, sphere);
+		std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(shape);
+		modifySpheres(i, sphere);
 	}
 	else if (shapeType == add_cone_idx)
 	{
-		std::shared_ptr<Cone> cone =  std::dynamic_pointer_cast<Cone>(shape);
-		modifyCones(idx_prim, cone);
+		qDebug() << "moving object is a cone moving it";
+		std::shared_ptr<Cone> cone = std::dynamic_pointer_cast<Cone>(shape);
+		modifyCones(i, cone);
 	}
 	else if (shapeType == add_box_idx)
 	{
-		std::shared_ptr<Box> box =  std::dynamic_pointer_cast<Box>(shape);
-		modifyBoxes(idx_prim, box);
+		std::shared_ptr<Box> box = std::dynamic_pointer_cast<Box>(shape);
+		modifyBoxes(i, box);
 	}
-	QOpenGLWidget::update();
+	else if (shapeType == add_cylinder_idx)
+	{
+		std::shared_ptr<Cyllinder> cylinder = std::dynamic_pointer_cast<Cyllinder>(shape);
+		modifyCyllinders(i, cylinder);
+	}
+
 }
 void RayCastCanvas::addSphere(const std::shared_ptr<Sphere>& sphere)
 {
@@ -415,24 +441,12 @@ void RayCastCanvas::addSphere(const std::shared_ptr<Sphere>& sphere)
 	spheres_count++;
 	int shape_count = spheres_count - 1;
 
-	std::string sphere_pos = "spheres[" + std::to_string(shape_count) + ']';
-	std::string center_str = ".center";
-	std::string radius_str = ".radius";
-	std::string mat_color_str = ".material.color";
-	std::string mat_coefs_str = ".material.lightKoefs";
+	modifySpheres(shape_count, sphere);
 
 	m_program->bind();
-	QVector3D lightCoeffs = { defaultMaterial._k_a, defaultMaterial._k_d, defaultMaterial._k_s };
-	QVector3D color = { defaultMaterial._color.R, defaultMaterial._color.G, defaultMaterial._color.B };
-	qDebug() << "sphere_pos==" << sphere->getCenter().x << sphere->getCenter().y << sphere->getCenter().z;
-	m_program->setUniformValue((sphere_pos + center_str).c_str(), to_q_vec(sphere->getCenter()));
-	m_program->setUniformValue((sphere_pos + radius_str).c_str(), (float)sphere->getRadius());
-	m_program->setUniformValue((sphere_pos + mat_color_str).c_str(), color);
-	m_program->setUniformValue((sphere_pos + mat_coefs_str).c_str(), lightCoeffs);
 	m_program->setUniformValue("prLens.size_spheres", spheres_count);
 	m_program->release();
 	qDebug() << "spheres count" << spheres_count;
-
 
 }
 void RayCastCanvas::addCone(const std::shared_ptr<Cone>& cone)
@@ -530,8 +544,6 @@ void RayCastCanvas::modifyBoxes(int index, std::shared_ptr<Box> box)
 {
 	int shape_count = index;
 
-
-
 	std::string box_pos = "boxes[" + std::to_string(shape_count) + ']';
 	std::string position = ".position";
 	std::string rotation = ".rotation";
@@ -550,6 +562,78 @@ void RayCastCanvas::modifyBoxes(int index, std::shared_ptr<Box> box)
 	m_program->setUniformValue((box_pos + mat_color_str).c_str(), color);
 	m_program->setUniformValue((box_pos + mat_coefs_str).c_str(), lightCoeffs);
 	m_program->release();
+}
+void RayCastCanvas::addCyllinder(const std::shared_ptr<Cyllinder>& cyllinder)
+{
+	_sceneManager->getScene()->addModel(cyllinder);
+	shapeTypes.push_back(add_cylinder_idx);
+	qDebug() << "cyl add";
+	cylinders_count++;
+	int shape_count = cylinders_count - 1;
+
+	modifyCyllinders(shape_count, cyllinder);
+
+	m_program->bind();
+	m_program->setUniformValue("prLens.size_cylinders", cylinders_count);
+	m_program->release();
+	qDebug() << "cyl count" << cylinders_count;
+
+}
+void RayCastCanvas::modifyCyllinders(int index, std::shared_ptr<Cyllinder> cyllinder)
+{
+	qDebug() << "cylinders update";
+
+	QString cyl_name = "cylinders";
+	QString extr_a = "extr_a";
+	QString extr_b = "extr_b";
+	QString radius = "ra";
+	QString mat_color_str = "material.color";
+	QString mat_coefs_str = "material.lightKoefs";
+
+	m_program->bind();
+	QVector3D lightCoeffs = { defaultMaterial._k_a, defaultMaterial._k_d, defaultMaterial._k_s };
+	QVector3D color = { defaultMaterial._color.R, defaultMaterial._color.G, defaultMaterial._color.B };
+
+	setUniformArrayValue<QVector3D>(m_program, cyl_name, extr_a, index, to_q_vec(cyllinder->_extr_a));
+	setUniformArrayValue<QVector3D>(m_program, cyl_name, extr_b, index, to_q_vec(cyllinder->_extr_b));
+	setUniformArrayValue<float>(m_program, cyl_name, radius, index, cyllinder->_ra);
+
+	setUniformArrayValue<QVector3D>(m_program, cyl_name, mat_color_str, index, color);
+	setUniformArrayValue<QVector3D>(m_program, cyl_name, mat_coefs_str, index, lightCoeffs);
+
+	m_program->release();
+
+}
+void RayCastCanvas::updatePrimitives()
+{
+	int shape_count = spheres_count + cylinders_count + boxes_count + cones_count;
+	for (int i = 0; i < shape_count; i++)
+	{
+		std::shared_ptr<BaseShape>
+			shape = std::dynamic_pointer_cast<BaseShape>(_sceneManager->getScene()->getModels()[i]);
+		int shapeType = shapeTypes[i];
+		if (shapeType == add_sphere_idx)
+		{
+			std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(shape);
+			modifySpheres(i, sphere);
+		}
+		else if (shapeType == add_cone_idx)
+		{
+			qDebug() << "moving object is a cone moving it";
+			std::shared_ptr<Cone> cone = std::dynamic_pointer_cast<Cone>(shape);
+			modifyCones(i, cone);
+		}
+		else if (shapeType == add_box_idx)
+		{
+			std::shared_ptr<Box> box = std::dynamic_pointer_cast<Box>(shape);
+			modifyBoxes(i, box);
+		}
+		else if (shapeType == add_cylinder_idx)
+		{
+			std::shared_ptr<Cyllinder> cylinder = std::dynamic_pointer_cast<Cyllinder>(shape);
+			modifyCyllinders(i, cylinder);
+		}
+	}
 }
 
 

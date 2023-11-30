@@ -1,8 +1,8 @@
 #version 420
-//precision highp float;
+//precision HIGHP float;
 
-#define EPS 1e-3
-#define INF 1000000.0
+#define EPS 1e-7
+#define INF 100000.0
 
 #define SPHERE_COUNT 40
 #define BOX_COUNT 40
@@ -333,6 +333,7 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
 
     vec3 lightVector = normalize(lightSource.position - intersect.point);
     Ray lightRay = Ray(lightSource.position, lightVector);
+    Intersection lightIntersection;
 
     vec3 shapeNormal = intersect.normal;
     vec3 ambientIntensivity = intersect.material.lightKoefs[0] * intersect.material.color;
@@ -409,7 +410,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
     {
         if (IntersectRaySphere(ray, spheres[i], D, N))
         {
-            if (D < minDistance  && D > 0.0f)
+            if (D < minDistance && D > 0.0f)
             {
                 inters.normal = N;
                 inters.tracedRay = ray;
@@ -428,7 +429,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
     {
         if (IntersectRayBox(ray, boxes[i], D, N))
         {
-            if (D < minDistance  && D > 0.0f)
+            if (D < minDistance && D > 0.0f)
             {
                 inters.normal = N;
                 inters.tracedRay = ray;
@@ -463,7 +464,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
         if (IntersectRayCone(ray, cones[i], D, N))
         {
 
-            if (D < minDistance  && D > 0.0f)
+            if (D < minDistance && D > 0.0f)
             {
                 inters.normal = N;
                 inters.tracedRay = ray;
@@ -501,13 +502,17 @@ vec4 RayTrace(Ray primary_ray, PrimitiveArrLens lens) {
 
 
         // working with shadows
+        //newRayOrigin += intersect.normal * 0.02;\
+
         vec3 lightVector = normalize(lightSource.position - inters.point);
-        Ray lightRay = Ray(lightSource.position, lightVector);
+
+        vec3 shadow_orig = dot(lightVector, inters.normal) < 0 ? inters.point - inters.normal * 1e-5 : inters.point + inters.normal * 1e-5;
+        Ray lightRay = Ray(shadow_orig, lightVector);
         inters_light = findIntersection(lightRay, spheres, boxes, cylinders, lens);
 
         if (inters_light.t < INF)
         {
-            resColor += vec4(vec3(0.0f),1.0f);
+            resColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
             break;
         }
 
@@ -560,11 +565,11 @@ void main(void) {
     Material cylinder_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.1f, 0.4f, 0.4f));
 
 
-   /* spheres[0] = Sphere(vec3(1.0f, 1.4f, 3.1f), 0.6f, material);
+/* spheres[0] = Sphere(vec3(1.0f, 1.4f, 3.1f), 0.6f, material);
     spheres[1] = Sphere(vec3(3.0f, 0.7f, -0.1f), 0.7f, new_material);
     spheres[2] = Sphere(vec3(1.0f, 0.7f, -0.1f), 0.3f, new_new_material);*/
 
-    /*boxes[0] = Box(vec3(0.3f, 2.0f, -1.0f), mat3(1.0), vec3(1.0, 1.0, 1.0), gen_random_mat());
+/*boxes[0] = Box(vec3(0.3f, 2.0f, -1.0f), mat3(1.0), vec3(1.0, 1.0, 1.0), gen_random_mat());
 
     cylinders[0].extr_a = vec3(1.0, 0.0, 1.0);
 
@@ -585,7 +590,7 @@ void main(void) {
     const int agr_count = 1;
     for (int i = 0; i < agr_count; i++)
     {
-        FragColor += RayTrace(ray,prLens);
+        FragColor += RayTrace(ray, prLens);
     }
     FragColor /= agr_count;
 

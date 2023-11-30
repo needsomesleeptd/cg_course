@@ -17,8 +17,10 @@
     \item Обладает необходимым функционалом для сборки, профилирования и отладки программ.
 \end{enumerate}
 
+
+
 \section{Реализация алгоритмов}
-\begin{lstlisting}
+\begin{lstlisting}[label = lst:raytrace,caption= {Алгоритм обратной трассировки луча}]
     void Renderer::rayTrace(const Ray& tracedRay, ColorRGB& finalColor, std::shared_ptr<Scene> scene, int curDepth)
 {
 	std::shared_ptr<BaseShape> closestShape;
@@ -27,22 +29,23 @@
 	{
 
 		float intersection_t = shape->intersection(tracedRay);
-		//std::cout << intersection_t << std::endl;
+		
 		if (intersection_t > 0 || fabs(intersection_t) < EPS)
 		{
 			t = std::min(t, intersection_t);
 			closestShape = std::dynamic_pointer_cast<BaseShape>(shape);
 		}
 	}
-	if (abs(t - maxRange) < EPS)
+	if (fabs(t - maxRange) < EPS)
 	{
-		return; //Returning background color
-	}
+        return;
+    }
 	std::shared_ptr<BaseLightSource> currentLightSource = scene->getLightSource();
 	VecD3 intersectionPoint = tracedRay.getPoint(t);
 	VecD3 lightVector = normalise(intersectionPoint - currentLightSource->getPosition());
 
 	Ray lightRay(intersectionPoint,lightVector);
+    
 	if (hasIntersection(lightRay,scene))
 		return;
 
@@ -56,7 +59,7 @@
 	{
 		if (diffuseLight > 0)
 		{
-			//std::cout << " diffuseLight" << diffuseLight << std::endl;
+			
 			ColorRGB diffuseColorRay = currentLightSource->getColor() * diffuseLight * shapeMaterial._k_d;
 			finalColor = shapeMaterial._color * diffuseColorRay + finalColor;
 
@@ -67,10 +70,9 @@
 
 		Ray reflected = tracedRay.calculateReflected(shapeNormal, intersectionPoint);
 		float specularDot = dot(reflected.D, tracedRay.D);
-		//std::cout << " diffuseLight" << diffuseLight << std::endl;
+	
 		if (specularDot > 0.0)
 		{
-			//float spec = powf( specularDot, 20 ) * shapeMaterial._k_s;
 			finalColor = currentLightSource->getColor() * specularDot * shapeMaterial._k_s + finalColor;
 		}
 	}
@@ -88,5 +90,58 @@
 	float rayLength = (intersectionPoint - tracedRay.E).length();
 	finalColor = finalColor / rayLength;
 }
-
 \end{lstlisting}
+
+Заметим, что в листинге \ref{lst:raytrace} при трассировки луча сразу проверяется наличие пересечения с объектами сцены луча, исходящего к источнику света.
+В данном случае tracedRay обозначает анализируемый в данный момент луч, finalColor - финальный цвет пикселя, scene - вектор указателей на примитивы, curDepth - текущая эпоха луча.
+
+
+\begin{lstlisting}[label = lst:sphere_intersection,caption= {Алгоритм поиска пересечения со сферой}]
+    double Sphere::intersection(const Ray& ray)
+    {
+        VecD3 origin  = ray.E - this->_center;
+        float a = dot(ray.D, ray.D);
+        float b = 2.0f * dot(origin, ray.D);
+        float c = dot(origin, origin) - _radius * _radius;
+        float discriminant = b * b - 4 * a * c;
+        if (discriminant < 0)
+            return -1.0; 
+        else
+        {
+            float discriminant_value = sqrt(discriminant);
+            double t1 = (-b + discriminant_value) / (2 * a);
+            double t2 = (-b - discriminant_value) / (2 * a);
+            if (t1 < 0 && t2 < 0)
+                return -1.0;
+            float t = std::min(t1, t2);
+            if (t < 0)
+            {
+                if (t1 < 0)
+                    t = t2;
+                else if (t2 < 0)
+                    t = t1;
+            }
+            return t;
+        }
+    
+    }
+\end{lstlisting}
+
+Алгоритм \ref{lst:sphere_intersection} аналогичен алгоритму, приведенному в \ref{eq:sphere_solved}, в случае отсутствия пересечения возвратится отрицательный
+результат.
+
+\newpage
+\section{Полученные изображения}
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.4]{numerous_spheres}
+	\caption{Рендер нескольких сфер вместе с плоскостью}
+	\label{fig:numerous_spheres}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.4]{sphere_reflection}
+	\caption{Рендер одной сферы с плоскостью}
+	\label{fig:numerous_spheres}
+\end{figure}

@@ -12,7 +12,29 @@ Box::Box(const VecD3& position, glm::mat3 rotation, VecD3 halfSize, const Materi
 }
 void Box::transform(const TransformParams& transformParams)
 {
-	//pass
+
+	VecD3 rotate = TransformParams::toRadians(transformParams.getRotateParams());
+	float angle_x = rotate.x;
+	float angle_y = rotate.y;
+	float angle_z = rotate.z;
+
+
+
+
+
+	glm::mat3 rot_x = {{ 1.0, 0.0, 0.0 },
+	                   { 0, cos(angle_x), -sin(angle_x) },
+	                   { 0, sin(angle_x), cos(angle_x) }};
+
+	glm::mat3 rot_y = {{ cos(angle_y), 0.0, sin(angle_y) },
+	                   { 0.0, 1, 0.0 },
+	                   { -sin(angle_y), 0, cos(angle_y) }};
+
+	glm::mat3 rot_z = {{ cos(angle_z), -sin(angle_z), 0.0 },
+	                   { sin(angle_z), cos(angle_x), 0.0 },
+	                   { 0.0, 0.0, 1.0 }};
+
+	_rotation = rot_x * rot_y * rot_z;
 }
 float Box::intersection(const Ray& ray)
 {

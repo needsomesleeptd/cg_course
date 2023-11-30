@@ -31,6 +31,10 @@ MainWindow::MainWindow(QWidget* parent)
 
 	connect(ui->choose_primitives_box, SIGNAL(currentIndexChanged(int)), this, SLOT(currentShapeChanged(int)));
 
+	connect(ui->rotate, SIGNAL(clicked()),this, SLOT(onRotateButtonClicked()));
+
+
+	//material work
 	connect(ui->obj_R, &QDoubleSpinBox::textChanged, this, &MainWindow::materialUpdate);
 	connect(ui->obj_G, &QDoubleSpinBox::textChanged, this, &MainWindow::materialUpdate);
 	connect(ui->obj_B, &QDoubleSpinBox::textChanged, this, &MainWindow::materialUpdate);
@@ -157,4 +161,14 @@ void MainWindow::currentShapeChanged(int shape_idx)
 		ui->obj_B->setValue(color.B);
 	}
 
+}
+void MainWindow::onRotateButtonClicked()
+{
+	int idx_model = ui->choose_primitives_box->currentIndex();
+	std::shared_ptr<BaseShape> shape =
+		std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[idx_model]);
+	VecD3 rotation_params = { ui->obj_rot_x->value(), ui->obj_rot_y->value(), ui->obj_rot_z->value() };
+	TransformParams transformParams;
+	transformParams.setRotateParams(rotation_params);
+	shape->transform(transformParams);
 }

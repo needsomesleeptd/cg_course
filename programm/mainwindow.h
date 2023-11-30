@@ -31,6 +31,7 @@ class MainWindow : public QMainWindow
  public slots:
 		void addToSelectionPrimitives(int idx);
 		void onTranslateButtonClicked();
+		void onRotateButtonClicked();
 		void onAddButtonClicked();
 		void currentShapeChanged(int shape_idx);
 

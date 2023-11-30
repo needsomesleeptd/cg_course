@@ -2,6 +2,7 @@
 // Created by Андрей on 29/11/2023.
 //
 
+#include <QDebug>
 #include "cyllinder.h"
 Cyllinder::Cyllinder(const VecD3& extr_a, const VecD3& extr_b, float ra, const Material& material)
 {
@@ -12,7 +13,21 @@ Cyllinder::Cyllinder(const VecD3& extr_a, const VecD3& extr_b, float ra, const M
 }
 void Cyllinder::transform(const TransformParams& transformParams)
 {
-	//pass;
+	VecD3 rotate = TransformParams::toRadians(transformParams.getRotateParams());
+
+
+	VecD3 center = getCenter();
+	_extr_a -= center;
+	_extr_b -= center;
+
+	_extr_a = TransformParams::rotatePoint(_extr_a, rotate);
+	_extr_b = TransformParams::rotatePoint(_extr_b, rotate);
+
+	_extr_a += center;
+	_extr_b += center;
+
+	qDebug() << "pos_extr" << _extr_a.x << _extr_a.y << _extr_a.z;
+
 }
 float Cyllinder::intersection(const Ray& ray)
 {

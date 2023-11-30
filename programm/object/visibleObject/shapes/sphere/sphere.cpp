@@ -7,8 +7,8 @@
 #include <iostream> //TODO::remove after print
 void Sphere::transform(const TransformParams& transformParams)
 {
-	_center += transformParams.getMoveParams();
-	_radius += transformParams.getScaleParams()[0];
+	//Do nothing
+
 }
 float Sphere::intersection(const Ray& ray)
 {

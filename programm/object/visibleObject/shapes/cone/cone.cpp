@@ -6,7 +6,20 @@
 
 void Cone::transform(const TransformParams& transformParams)
 {
-	;//TODO:: do smth
+
+	VecD3 rotate = TransformParams::toRadians(transformParams.getRotateParams());
+
+
+	VecD3 center = getCenter();
+	//_v -= center;
+
+
+	_v= TransformParams::rotatePoint(_v, rotate);
+
+	//_v += center;
+
+
+
 }
 float Cone::intersection(const Ray& ray)
 {

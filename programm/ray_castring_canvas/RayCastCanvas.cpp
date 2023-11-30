@@ -449,7 +449,7 @@ void RayCastCanvas::addCone(const std::shared_ptr<Cone>& cone)
 		m_program->setUniformValue("prLens.size_cones", cones_count);
 		m_program->release();
 	}
-	qDebug() << "cones count" << cones_count;
+
 
 }
 void RayCastCanvas::modifyCones(int index, std::shared_ptr<Cone> cone)

@@ -4,10 +4,10 @@
 #define EPS 1e-3
 #define INF 1000000.0
 
-#define SPHERE_COUNT 10
-#define BOX_COUNT 10
-#define CONES_COUNT 10
-#define CYLINDERS_COUNT 10
+#define SPHERE_COUNT 40
+#define BOX_COUNT 40
+#define CONES_COUNT 40
+#define CYLINDERS_COUNT 40
 
 
 #define  K   0.1f
@@ -433,7 +433,7 @@ Intersection findIntersection(Ray ray, Sphere spheres[SPHERE_COUNT], Box boxes[B
                 inters.normal = N;
                 inters.tracedRay = ray;
                 inters.point = ray.origin + ray.direction * D;
-                inters.material = spheres[i].material;
+                inters.material = boxes[i].material;
                 inters.t = D;
                 minDistance = D;
             }

@@ -32,14 +32,13 @@ class MainWindow : public QMainWindow
 		void addToSelectionPrimitives(int idx);
 		void onTranslateButtonClicked();
 		void onAddButtonClicked();
+		void currentShapeChanged(int shape_idx);
 
  protected:
 	//void resizeEvent(QResizeEvent *event) override;
 	void setupScene();
 	void updateScene();
-	void IsCamsExist();
-	void CanDeleteCam();
-	void IsModelsExist();
+
 
  private:
 	Ui::MainWindow* ui;

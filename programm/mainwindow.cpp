@@ -29,14 +29,15 @@ MainWindow::MainWindow(QWidget* parent)
 
 	connect(ui->add, SIGNAL(clicked()), this, SLOT(onAddButtonClicked()));
 
+	connect(ui->choose_primitives_box, SIGNAL(currentIndexChanged(int)), this, SLOT(currentShapeChanged(int)));
 
 	connect(ui->obj_R, &QDoubleSpinBox::textChanged, this, &MainWindow::materialUpdate);
-	connect(ui->obj_G, &QDoubleSpinBox::textChanged, this,  &MainWindow::materialUpdate);
-	connect(ui->obj_B, &QDoubleSpinBox::textChanged, this,  &MainWindow::materialUpdate);
+	connect(ui->obj_G, &QDoubleSpinBox::textChanged, this, &MainWindow::materialUpdate);
+	connect(ui->obj_B, &QDoubleSpinBox::textChanged, this, &MainWindow::materialUpdate);
 
-	connect(ui->obj_k_a, &QDoubleSpinBox::textChanged, this,  &MainWindow::materialUpdate);
-	connect(ui->obj_k_d, &QDoubleSpinBox::textChanged, this,  &MainWindow::materialUpdate);
-	connect(ui->obj_k_s, &QDoubleSpinBox::textChanged, this,  &MainWindow::materialUpdate);
+	connect(ui->obj_k_a, &QDoubleSpinBox::textChanged, this, &MainWindow::materialUpdate);
+	connect(ui->obj_k_d, &QDoubleSpinBox::textChanged, this, &MainWindow::materialUpdate);
+	connect(ui->obj_k_s, &QDoubleSpinBox::textChanged, this, &MainWindow::materialUpdate);
 
 
 	//Working with Lights
@@ -112,19 +113,48 @@ void MainWindow::onTranslateButtonClicked()
 void MainWindow::onAddButtonClicked()
 {
 	int idx = ui->addPrimitivesBox->currentIndex();
-	addToSelectionPrimitives(idx);
-	qDebug() << "adding primitive with id" << idx;
 	ui->graphicsView->addPrimitive(idx);
-	int models_count = ui->graphicsView->_sceneManager->getScene()->getModels().size();
-	ui->choose_primitives_box->setCurrentIndex(models_count - 1);
+	addToSelectionPrimitives(idx);
+
+
+	//int models_count = ui->graphicsView->_sceneManager->getScene()->getModels().size();
+	//ui->choose_primitives_box->setCurrentIndex(models_count - 1);
 }
 void MainWindow::materialUpdate()
 {
 	int idx_model = ui->choose_primitives_box->currentIndex();
-	std::shared_ptr<BaseShape> shape = std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[idx_model]);
-	ColorRGB color(ui->obj_R->value(),ui->obj_G->value(),ui->obj_B->value());
-	qDebug() << "updating material";
-	Material material = Material(ui->obj_k_a->value(),ui->obj_k_d->value(),ui->obj_k_s->value(),color);
+	std::shared_ptr<BaseShape> shape =
+		std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[idx_model]);
+	ColorRGB color(ui->obj_R->value(), ui->obj_G->value(), ui->obj_B->value());
+
+	Material material = Material(ui->obj_k_a->value(), ui->obj_k_d->value(), ui->obj_k_s->value(), color);
+	//qDebug() << "setting color" << color.R << color.G << color.B << "on " << idx_model;
+
 	shape->setMaterial(material);
+
+}
+void MainWindow::currentShapeChanged(int shape_idx)
+{
+	qDebug() << "curr_shape_idx" << shape_idx;
+	if (ui->choose_primitives_box->count() > 0)
+	{
+		std::shared_ptr<BaseShape> shape =
+			std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[shape_idx]);
+		qDebug() << "curr_shape_idx" << shape_idx;
+		VecD3 pos = shape->getCenter();
+		Material material = shape->getMaterial();
+		ColorRGB color = material._color;
+		ui->obj_x->setValue(pos.x);
+		ui->obj_y->setValue(pos.y);
+		ui->obj_z->setValue(pos.z);
+
+		ui->obj_k_a->setValue(material._k_a);
+		ui->obj_k_d->setValue(material._k_d);
+		ui->obj_k_s->setValue(material._k_s);
+
+		ui->obj_R->setValue(color.R);
+		ui->obj_G->setValue(color.G);
+		ui->obj_B->setValue(color.B);
+	}
 
 }

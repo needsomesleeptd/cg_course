@@ -91,13 +91,6 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
  public:
 	void movePrimitive(int idx_prim, VecD3 delta);
 	void addPrimitive(int idx_prim);
-	const GLfloat m_fov = 60.0f;                                          /*!< Vertical field of view. */
-	QColor m_background;                          /*!< Viewport background colour. */
-	QOpenGLFunctions_4_3_Core* functions;
-	GLuint ssbo = 0;
-	int pos;
-	GLfloat* data;
-	const GLfloat m_gamma = 2.2f; /*!< Gamma correction parameter. */
 
 	std::shared_ptr<DrawManager> _drawManager;
 	std::shared_ptr<SceneManager> _sceneManager;
@@ -109,8 +102,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	QOpenGLBuffer spheres;
 	QOpenGLVertexArrayObject m_object;
 
-	GLuint scaled_width();
-	GLuint scaled_height();
+
 
 	int spheres_count;
 	int cylinders_count;

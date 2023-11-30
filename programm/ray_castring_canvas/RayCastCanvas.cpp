@@ -169,11 +169,6 @@ void RayCastCanvas::resizeGL(int w, int h)
 	//m_raycasting_volume->create_noise();
 }
 
-
-
-
-
-
 void RayCastCanvas::paintGL()
 {
 	//qDebug() << "started_painting\n";
@@ -192,7 +187,6 @@ void RayCastCanvas::paintGL()
 
 	QMatrix4x4 inverseProject(&camera->getInverseProjectionMatrix()[0][0]);
 	QMatrix4x4 inverseView(&camera->getInverseViewMatrix()[0][0]);
-
 
 	updatePrimitives();
 	if (!m_program->bind())
@@ -230,22 +224,6 @@ void RayCastCanvas::paintGL()
 	}
 	m_program->release();
 
-}
-
-/*!
- * \brief Width scaled by the pixel ratio (for HiDPI devices).
- */
-GLuint RayCastCanvas::scaled_width()
-{
-	return devicePixelRatio() * width();
-}
-
-/*!
- * \brief Height scaled by the pixel ratio (for HiDPI devices).
- */
-GLuint RayCastCanvas::scaled_height()
-{
-	return devicePixelRatio() * height();
 }
 
 QPointF RayCastCanvas::pixel_pos_to_view_pos(const QPointF& p)
@@ -373,8 +351,6 @@ void RayCastCanvas::mouseReleaseEvent(QMouseEvent* event)
 void RayCastCanvas::modifySpheres(int index, std::shared_ptr<Sphere> sphere)
 {
 
-
-
 	QString sphere_pos = "spheres";
 	QString center_str = "center";
 	QString radius_str = "radius";
@@ -397,7 +373,6 @@ void RayCastCanvas::modifySpheres(int index, std::shared_ptr<Sphere> sphere)
 		m_program->release();
 	}
 
-
 }
 
 void RayCastCanvas::addPrimitive(int idx_prim)
@@ -412,8 +387,6 @@ void RayCastCanvas::addPrimitive(int idx_prim)
 	if (idx_prim == add_cylinder_idx)
 		addCyllinder(defaultCyllinder);
 
-
-
 }
 
 void RayCastCanvas::movePrimitive(int idx_prim, VecD3 delta)
@@ -421,7 +394,6 @@ void RayCastCanvas::movePrimitive(int idx_prim, VecD3 delta)
 	std::shared_ptr<BaseShape>
 		shape = std::dynamic_pointer_cast<BaseShape>(_sceneManager->getScene()->getModels()[idx_prim]);
 	shape->move(delta);
-
 
 }
 void RayCastCanvas::addSphere(const std::shared_ptr<Sphere>& sphere)
@@ -434,7 +406,7 @@ void RayCastCanvas::addSphere(const std::shared_ptr<Sphere>& sphere)
 	++spheres_count;
 	int shape_count = spheres_count - 1;
 
-	modifySpheres(shape_count, sphere);
+	modifySpheres(shape_count, newSpherePtr);
 	{
 		m_program->bind();
 		m_program->setUniformValue("prLens.size_spheres", spheres_count);
@@ -445,7 +417,7 @@ void RayCastCanvas::addSphere(const std::shared_ptr<Sphere>& sphere)
 }
 void RayCastCanvas::addCone(const std::shared_ptr<Cone>& cone)
 {
-	Cone newCone = *cone.get();
+	Cone newCone = *cone;
 	std::shared_ptr<Cone> newConePtr = std::make_shared<Cone>(newCone);
 
 	_sceneManager->getScene()->addModel(newConePtr);
@@ -514,64 +486,49 @@ void RayCastCanvas::modifyCones(int index, std::shared_ptr<Cone> cone)
 }
 void RayCastCanvas::addBox(const std::shared_ptr<Box>& box)
 {
-	Box newBox = *box.get();
+	Box newBox = *box;
 	std::shared_ptr<Box> newBoxPtr = std::make_shared<Box>(newBox);
 	_sceneManager->getScene()->addModel(newBoxPtr);
 	++boxes_count;
-	int shape_count = boxes_count - 1;
 	shapeTypes.push_back(add_box_idx);
+	int shape_count = boxes_count - 1;
 
-	std::string box_pos = "boxes[" + std::to_string(shape_count) + ']';
-	std::string position = ".position";
-	std::string rotation = ".rotation";
-	std::string halfSize = ".halfSize";
-	std::string mat_color_str = ".material.color";
-	std::string mat_coefs_str = ".material.lightKoefs";
-	QVector3D lightCoeffs = { defaultMaterial._k_a, defaultMaterial._k_d, defaultMaterial._k_s };
-	QVector3D color = { defaultMaterial._color.R, defaultMaterial._color.G, defaultMaterial._color.B };
-	{
-		m_program->bind();
-
-		m_program->setUniformValue((box_pos + position).c_str(), to_q_vec(box->_position));
-		m_program->setUniformValue((box_pos + rotation).c_str(), QMatrix3x3(&box->_rotation[0][0]));
-		m_program->setUniformValue((box_pos + halfSize).c_str(), to_q_vec(box->_halfSize));
-
-		m_program->setUniformValue((box_pos + mat_color_str).c_str(), color);
-		m_program->setUniformValue((box_pos + mat_coefs_str).c_str(), lightCoeffs);
-		m_program->setUniformValue("prLens.size_boxes", boxes_count);
-		m_program->release();
-	}
+	modifyBoxes(shape_count, newBoxPtr);
+	m_program->bind();
+	m_program->setUniformValue("prLens.size_boxes", boxes_count);
+	m_program->release();
 }
 void RayCastCanvas::modifyBoxes(int index, std::shared_ptr<Box> box)
 {
-	int shape_count = index;
 
-	std::string box_pos = "boxes[" + std::to_string(shape_count) + ']';
-	std::string position = ".position";
-	std::string rotation = ".rotation";
-	std::string halfSize = ".halfSize";
-	std::string mat_color_str = ".material.color";
-	std::string mat_coefs_str = ".material.lightKoefs";
+	QString box_name = "boxes";
+	QString position = "position";
+	QString rotation = "rotation";
+	QString halfSize = "halfSize";
+	QString mat_color_str = "material.color";
+	QString mat_coefs_str = "material.lightKoefs";
 
 	Material material = box->getMaterial();
 	QVector3D lightCoeffs = { material._k_a, material._k_d, material._k_s };
 	QVector3D color = { material._color.R, material._color.G, material._color.B };
 
-	{
-		m_program->bind();
+	qDebug() << "curr box color" << color.x() << color.y() << color.z();
 
-		m_program->setUniformValue((box_pos + position).c_str(), to_q_vec(box->_position));
-		m_program->setUniformValue((box_pos + rotation).c_str(), QMatrix3x3(&box->_rotation[0][0]));
-		m_program->setUniformValue((box_pos + halfSize).c_str(), to_q_vec(box->_halfSize));
+	m_program->bind();
 
-		m_program->setUniformValue((box_pos + mat_color_str).c_str(), color);
-		m_program->setUniformValue((box_pos + mat_coefs_str).c_str(), lightCoeffs);
-		m_program->release();
-	}
+	setUniformArrayValue<QVector3D>(m_program, box_name, position, index, to_q_vec(box->_position));
+	setUniformArrayValue<QMatrix3x3>(m_program, box_name, rotation, index, QMatrix3x3(&box->_rotation[0][0]));
+
+	setUniformArrayValue<QVector3D>(m_program, box_name, halfSize, index, to_q_vec(box->_halfSize));
+
+	setUniformArrayValue<QVector3D>(m_program, box_name, mat_color_str, index, color);
+	setUniformArrayValue<QVector3D>(m_program, box_name, mat_coefs_str, index, lightCoeffs);
+
+	m_program->release();
 }
 void RayCastCanvas::addCyllinder(const std::shared_ptr<Cyllinder>& cyllinder)
 {
-	Cyllinder newCylinder = *cyllinder.get();
+	Cyllinder newCylinder = *cyllinder;
 	std::shared_ptr<Cyllinder> newCylPtr = std::make_shared<Cyllinder>(newCylinder);
 
 	_sceneManager->getScene()->addModel(newCylPtr);
@@ -579,7 +536,7 @@ void RayCastCanvas::addCyllinder(const std::shared_ptr<Cyllinder>& cyllinder)
 	cylinders_count++;
 	int shape_count = cylinders_count - 1;
 
-	modifyCyllinders(shape_count, cyllinder, false);
+	modifyCyllinders(shape_count, newCylPtr, false);
 
 	m_program->bind();
 	m_program->setUniformValue("prLens.size_cylinders", cylinders_count);
@@ -587,9 +544,8 @@ void RayCastCanvas::addCyllinder(const std::shared_ptr<Cyllinder>& cyllinder)
 	qDebug() << "cyl count" << cylinders_count;
 
 }
-void RayCastCanvas::modifyCyllinders(int index, std::shared_ptr<Cyllinder> cyllinder,bool binding)
+void RayCastCanvas::modifyCyllinders(int index, std::shared_ptr<Cyllinder> cyllinder, bool binding)
 {
-	//qDebug() << "cylinders update";
 
 	QString cyl_name = "cylinders";
 	QString extr_a = "extr_a";
@@ -604,7 +560,6 @@ void RayCastCanvas::modifyCyllinders(int index, std::shared_ptr<Cyllinder> cylli
 	if (!binding)
 		m_program->bind();
 
-
 	setUniformArrayValue<QVector3D>(m_program, cyl_name, extr_a, index, to_q_vec(cyllinder->_extr_a));
 	setUniformArrayValue<QVector3D>(m_program, cyl_name, extr_b, index, to_q_vec(cyllinder->_extr_b));
 	setUniformArrayValue<float>(m_program, cyl_name, radius, index, cyllinder->_ra);
@@ -615,9 +570,14 @@ void RayCastCanvas::modifyCyllinders(int index, std::shared_ptr<Cyllinder> cylli
 		m_program->release();
 
 }
-void RayCastCanvas::updatePrimitives()
+void RayCastCanvas::updatePrimitives() // TODO:: fix error for primitives using their own indexes
 {
 	int shape_count = spheres_count + cylinders_count + boxes_count + cones_count;
+	int cur_spheres_index = 0;
+	int cur_cylinders_index = 0;
+	int cur_boxes_index = 0;
+	int cur_cones_index = 0;
+
 	for (int i = 0; i < shape_count; i++)
 	{
 		std::shared_ptr<BaseShape>
@@ -626,22 +586,26 @@ void RayCastCanvas::updatePrimitives()
 		if (shapeType == add_sphere_idx)
 		{
 			std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(shape);
-			modifySpheres(i, sphere);
+			modifySpheres(cur_spheres_index, sphere);
+			++cur_spheres_index;
 		}
-		if (shapeType == add_cone_idx)
+		else if (shapeType == add_cone_idx)
 		{
 			std::shared_ptr<Cone> cone = std::dynamic_pointer_cast<Cone>(shape);
-			modifyCones(i, cone);
+			modifyCones(cur_cones_index, cone);
+			++cur_cones_index;
 		}
-		if (shapeType == add_box_idx)
+		else if (shapeType == add_box_idx)
 		{
 			std::shared_ptr<Box> box = std::dynamic_pointer_cast<Box>(shape);
-			modifyBoxes(i, box);
+			modifyBoxes(cur_boxes_index, box);
+			++cur_boxes_index;
 		}
-		if (shapeType == add_cylinder_idx)
+		else if (shapeType == add_cylinder_idx)
 		{
 			std::shared_ptr<Cyllinder> cylinder = std::dynamic_pointer_cast<Cyllinder>(shape);
-			modifyCyllinders(i, cylinder, false);
+			modifyCyllinders(cur_cylinders_index, cylinder, false);
+			++cur_cylinders_index;
 		}
 	}
 }

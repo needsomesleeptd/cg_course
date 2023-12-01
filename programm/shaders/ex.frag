@@ -149,9 +149,11 @@ float rand(vec2 co)
 
 }
 
+int rand_val = 0;
 vec3 Random3D()
 {
-    return vec3(rand(vec2(interpolated_vertex.x)), rand(vec2(interpolated_vertex.y)), rand(vec2(interpolated_vertex.z)));
+    rand_val++;
+    return vec3(rand(vec2(interpolated_vertex.x +rand_val,rand_val)), rand(vec2(interpolated_vertex.y+rand_val,rand_val)), rand(vec2(interpolated_vertex.z+rand_val,rand_val)));
 }
 
 
@@ -362,22 +364,22 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
     //rayColor = rayColor / (rayLength + K);
 
     vec3 newRayOrigin = intersect.tracedRay.origin + intersect.t * intersect.tracedRay.direction;
-    vec3 hemisphereDistributedDirection = NormalOrientedHemispherePoint(vec2(Random3D()), intersect.normal);
+    /*vec3 hemisphereDistributedDirection = NormalOrientedHemispherePoint(vec2(Random3D()), intersect.normal);
     vec3 randomVec = normalize(2.0 * Random3D() - 1.0);
 
     vec3 tangent = cross(randomVec, intersect.normal);
     vec3 bitangent = cross(intersect.normal, tangent);
     mat3 transform = mat3(tangent, bitangent, intersect.normal);
 
-    vec3 newRayDirection = transform * hemisphereDistributedDirection;
+    vec3 newRayDirection = transform * hemisphereDistributedDirection;*/
     vec3 idealReflection = reflect(intersect.tracedRay.direction, intersect.normal);
-    newRayDirection = normalize(mix(newRayDirection, idealReflection, intersect.material.lightKoefs[1]));
+    //newRayDirection = normalize(mix(newRayDirection, idealReflection, intersect.material.lightKoefs[1]));
     //newRayOrigin +=  0.02;
     //idealReflection  +=intersect.normal * 0.8;
     //newRayDirection  += intersect.normal * 0.8;
     newRayOrigin += intersect.normal * 0.02;
     //Ray new_ray = Ray(newRayOrigin, newRayDirection); right_version need aggregation
-    Ray new_ray = Ray(newRayOrigin, reflectedDirection);
+    Ray new_ray = Ray(newRayOrigin, idealReflection);
     rayReflected = new_ray;
     return vec4(rayColor, 1);
 }
@@ -510,16 +512,15 @@ vec4 RayTrace(Ray primary_ray, PrimitiveArrLens lens) {
         Ray lightRay = Ray(shadow_orig, lightVector);
         inters_light = findIntersection(lightRay, spheres, boxes, cylinders, lens);
 
+
+
+            resColor += Phong(inters, primary_ray);
         if (inters_light.t < INF)
         {
             resColor = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-            break;
+
         }
 
-
-
-
-        resColor += Phong(inters, primary_ray);
         if (i != 0)
         resColor *= inters.material.lightKoefs[2];
     }

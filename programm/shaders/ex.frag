@@ -367,7 +367,6 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
     float specularDot = pow(max(dot(-reflected.direction, intersect.tracedRay.direction), 0.0f), 5);
 
     rayColor += shapeMaterial.lightKoefs[2] * lightSource.intensivity * specularDot;
-    vec3 point = intersect.tracedRay.origin + intersect.tracedRay.direction * intersect.t;
 
 
 
@@ -529,7 +528,7 @@ vec4 RayTrace(Ray primary_ray, PrimitiveArrLens lens) {
         inters_light = findIntersection(lightRay, spheres, boxes, cylinders, lens);
 
 
-        if (inters_light.t < INF)
+        if (abs(inters.t - INF) < EPS)
         {
             addColor = vec4(inters.material.color * inters.material.lightKoefs[0],1.0);
             primary_ray = calculateReflected(primary_ray, inters);

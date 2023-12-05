@@ -223,7 +223,7 @@ void RayCastCanvas::paintGL()
 		m_object.release();
 	}
 	m_program->release();
-
+	updateFPS();
 }
 
 QPointF RayCastCanvas::pixel_pos_to_view_pos(const QPointF& p)
@@ -450,7 +450,6 @@ void RayCastCanvas::addCone(const std::shared_ptr<Cone>& cone)
 		m_program->release();
 	}
 
-
 }
 void RayCastCanvas::modifyCones(int index, std::shared_ptr<Cone> cone)
 {
@@ -608,6 +607,23 @@ void RayCastCanvas::updatePrimitives() // TODO:: fix error for primitives using 
 			++cur_cylinders_index;
 		}
 	}
+}
+void RayCastCanvas::updateFPS()
+{
+	frameCount++;
+
+	QTime currentTime = QTime::currentTime();
+	int timeElapsed = lastTime.msecsTo(currentTime);
+
+	lastTime = currentTime;
+
+	fps = (float)frameCount / (timeElapsed / 1000.0);
+	frameCount = 0;
+
+}
+float RayCastCanvas::getFPS()
+{
+	return fps;
 }
 
 

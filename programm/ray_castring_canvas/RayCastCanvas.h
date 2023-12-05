@@ -16,6 +16,7 @@
 #include <QOpenGLFunctions_4_3_Core>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
+#include <QTime>
 
 #include "sphere.h"
 #include "plane.h"
@@ -42,8 +43,10 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 
  public slots:
 	void update();
+    void updateFPS();
 
  protected:
+	float getFPS();
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int width, int height);
@@ -68,7 +71,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	VecD3 defaultInitPos = VecD3(0.0);
 	std::shared_ptr<Sphere> defaultSphere = std::make_shared<Sphere>(defaultInitPos, 1.0, defaultMaterial);
 	std::shared_ptr<Cone>
-		defaultCone = std::make_shared<Cone>(0.9, 1, defaultInitPos, VecD3(0.0, 1.0, 0.0), defaultMaterial);
+		defaultCone = std::make_shared<Cone>(0.9, 1, defaultInitPos, VecD3(0.0, -1.0, 0.0), defaultMaterial);
 	std::shared_ptr<Box>
 		defaultBox = std::make_shared<Box>(defaultInitPos, glm::mat3(1.0f), VecD3(1.0, 1.0, 1.0), defaultMaterial);
 
@@ -80,6 +83,9 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 		defaultMaterial);
 
 	std::vector<int> shapeTypes;
+	int frameCount;
+	float fps;
+	QTime lastTime;
 
  public:
 

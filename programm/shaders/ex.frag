@@ -297,8 +297,12 @@ bool IntersectRayCone(Ray r, Cone s, out float fraction, out vec3 normal)
     float b = 2. * (dot(r.direction, s.v) * dot(co, s.v) - dot(r.direction, co) * s.cosa * s.cosa);
     float c = dot(co, s.v) * dot(co, s.v) - dot(co, co) * s.cosa * s.cosa;
 
+
+
+
     float det = b * b - 4. * a * c;
     if (det < 0.0f) return false;
+
 
     det = sqrt(det);
     float t1 = (-b - det) / (2. * a);
@@ -306,12 +310,12 @@ bool IntersectRayCone(Ray r, Cone s, out float fraction, out vec3 normal)
 
     // This is a bit messy; there ought to be a more elegant solution.
     float t = t1;
-    if (t < 0.0f || t2 > 0.0f && t2 < t) t = t2;
+    if (t < 0.0f || (t2 > 0.0f && t2 < t)) t = t2;
     if (t < 0.) return false;
 
     vec3 cp = r.origin + t * r.direction - s.c;
     float h = dot(cp, s.v);
-    if (h < 0. || h > s.h) return false;
+    if (h < 0. || h > s.h + 0.1) return false;
 
     vec3 n = normalize(cp * dot(s.v, cp) / dot(cp, cp) - s.v);
     fraction = t;
@@ -320,6 +324,16 @@ bool IntersectRayCone(Ray r, Cone s, out float fraction, out vec3 normal)
 }
 
 
+Ray calculateReflected(Ray primary, Intersection intersection)
+{
+    vec3 idealReflection = normalize(reflect(primary.direction, intersection.normal));
+
+    vec3 reflectedDirection = idealReflection;
+    vec3 newRayOrigin = intersection.point;
+    newRayOrigin += intersection.normal * 0.02;
+    Ray reflected = Ray(newRayOrigin, reflectedDirection);
+    return reflected;
+}
 
 
 vec4 Phong(Intersection intersect, out Ray rayReflected) {
@@ -334,8 +348,8 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
     vec3 shapeNormal = intersect.normal;
 
     vec3 ambientIntensivity = intersect.material.lightKoefs[0] * intersect.material.color;
-    rayColor += ambientIntensivity;
 
+    rayColor += ambientIntensivity;
 
     float diffuseLight = dot(shapeNormal, lightVector);
     Material shapeMaterial = intersect.material;
@@ -345,15 +359,18 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
     rayColor += lightIntersect * shapeMaterial.lightKoefs[1] * intersect.material.color;
 
 
-    vec3 idealReflection = normalize(reflect(intersect.tracedRay.direction, intersect.normal));
 
-    vec3 reflectedDirection = idealReflection;
-    vec3 newRayOrigin = intersect.tracedRay.origin + intersect.t * intersect.tracedRay.direction;
-    newRayOrigin += intersect.normal * 0.02;
-    Ray reflected = Ray(newRayOrigin, reflectedDirection);
+
+
+    Ray reflected = calculateReflected(intersect.tracedRay, intersect);
+
     float specularDot = pow(max(dot(-reflected.direction, intersect.tracedRay.direction), 0.0f), 5);
 
     rayColor += shapeMaterial.lightKoefs[2] * lightSource.intensivity * specularDot;
+    vec3 point = intersect.tracedRay.origin + intersect.tracedRay.direction * intersect.t;
+
+
+
 
     rayReflected = reflected;
     return vec4(rayColor, 1);
@@ -465,67 +482,67 @@ vec4 RayTrace(Ray primary_ray, PrimitiveArrLens lens) {
     inters.t = INF;
     Intersection inters_light;
     inters_light.t = INF;
-    int noIntersrction = 1;
 
     vec4 addColor;
+    vec4 depthFatigue = vec4(1.0, 1.0, 1.0, 1.0);
 
     Material lightSourcematerial = Material(vec3(1.0, 1.0, 1.0), vec3(0.0f));
     Sphere lightSourceSphere = Sphere(lightSource.position, R_LSOURCE, lightSourcematerial);
 
     float fr;
     vec3 nr;
+    bool lighInter = IntersectRaySphere(primary_ray, lightSourceSphere, fr, nr);
 
     for (int i = 0; i < MAX_DEPTH; i++)
     {
         inters = findIntersection(primary_ray, spheres, boxes, cylinders, lens);
-        if (i==0 && abs(inters.t - INF) < EPS)
-        {
-
-            if (IntersectRaySphere(primary_ray, lightSourceSphere, fr, nr) && fr > 0.0)
-            {
-                resColor = vec4(lightSource.intensivity, 1);
-            }
-            else
-            {
-                resColor = vec4(0.1, 0.2, 0.3, 1.0);
-            }
-            break;
-        }
-
-
         if (i == 0)
         {
-            if (IntersectRaySphere(primary_ray, lightSourceSphere, fr, nr) && fr >0.0 && fr < inters.t)
+            if (abs(inters.t - INF) < EPS)
+            {
+
+                if (lighInter)
+                {
+                    resColor = vec4(lightSource.intensivity, 1);
+                }
+                else
+                {
+                    resColor = vec4(0.1, 0.2, 0.3, 1.0);
+                }
+                break;
+            }
+            else if (lighInter && fr > 0.0 && fr < inters.t)
             {
                 resColor = vec4(lightSource.intensivity, 1);
                 break;
             }
+
         }
-
-
-        noIntersrction = 0;
 
 
 
 
         vec3 lightVector = normalize(lightSource.position - inters.point);
 
-        vec3 shadow_orig = dot(lightVector, inters.normal) < 0 ? inters.point - inters.normal * 1e-5 : inters.point + inters.normal * 1e-5;
+        vec3 shadow_orig = dot(lightVector, inters.normal) <= 0 ? inters.point - inters.normal * 0.02 : inters.point + inters.normal * 0.02;
         Ray lightRay = Ray(shadow_orig, lightVector);
         inters_light = findIntersection(lightRay, spheres, boxes, cylinders, lens);
 
 
-        if (!(inters_light.t < INF))
-            addColor = Phong(inters, primary_ray);
-        else
+        if (inters_light.t < INF)
+        {
             addColor = vec4(inters.material.color * inters.material.lightKoefs[0],1.0);
+            primary_ray = calculateReflected(primary_ray, inters);
+        }
+        else
+        {
+            addColor = Phong(inters, primary_ray);
+        }
 
-        resColor += addColor;
-        resColor = resColor * inters.material.lightKoefs[2];
 
+        resColor += depthFatigue * addColor;
+        depthFatigue *= inters.material.lightKoefs[2];
     }
-
-
     return resColor;
 }
 

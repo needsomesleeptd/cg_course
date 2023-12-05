@@ -13,6 +13,7 @@ struct Material // TODO:: Might be better to make class with restricted access
 	float _k_a;
 	float _k_d;
 	float _k_s;
+	float _k_r;
 	ColorRGB _color;
 };
 

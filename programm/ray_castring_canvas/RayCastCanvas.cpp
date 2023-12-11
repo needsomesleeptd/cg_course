@@ -75,8 +75,7 @@ void RayCastCanvas::initializeGL()
 	_drawManager = DrawManagerCreator().createManager();
 
 	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -2.0f }, { 0.0f, 0.0f, 1.0f }).create();
-	//camera->setImageParams(_scene->height(), _scene->width());
-	//_drawManager->setCamera(camera);
+
 	_sceneManager->getScene()->addCamera(camera);
 
 	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0, 0, 0), 1.0).create();
@@ -145,18 +144,16 @@ void RayCastCanvas::initializeGL()
 		m_program->setUniformValue("prLens.size_cones", cones_count);
 
 		m_program->release();
+		genRandomScene(100);
 	}
 
 }
 
 void RayCastCanvas::resizeGL(int w, int h)
 {
-	//(void)w;
-	//(void)h;
+
 	glViewport(0, 0, w, h);
-	//m_aspectRatio = (float) scaled_width() / scaled_height();
-	//glViewport(0, 0, scaled_width(), scaled_height());
-	//m_raycasting_volume->create_noise();
+
 }
 
 void RayCastCanvas::paintGL()
@@ -209,7 +206,6 @@ void RayCastCanvas::paintGL()
 		m_object.bind();
 		glDrawArrays(GL_TRIANGLES, 0, sizeof(sg_vertexes) / sizeof(sg_vertexes[0]));
 
-		//m_program->setUniformValue("scale", QVector2D(width(), height()));
 		m_object.release();
 	}
 	m_program->release();
@@ -616,6 +612,33 @@ void RayCastCanvas::updateFPS()
 float RayCastCanvas::getFPS()
 {
 	return fps;
+}
+void RayCastCanvas::genRandomScene(int objCount)
+{
+	int maxDelta = 10;
+	int curPrim = add_sphere_idx;
+	srand(time(NULL));
+	for (int i = 0; i < objCount; i++)
+	{
+
+		float x = 1.0 *rand() / RAND_MAX * maxDelta;
+		float y = 1.0 * rand() / RAND_MAX * maxDelta;
+		float z = 1.0 * rand() / RAND_MAX * maxDelta;
+		VecD3 randomDelta = {x,y,z};
+		if (curPrim == add_sphere_idx)
+		{
+			addBox(defaultBox);
+			movePrimitive(i,randomDelta);
+		}
+	}
+}
+void RayCastCanvas::clearScene()
+{
+	spheres_count = 0;
+	cylinders_count = 0;
+	cones_count = 0;
+	boxes_count = 0;
+	_sceneManager->getScene()->getModels().clear();
 }
 
 

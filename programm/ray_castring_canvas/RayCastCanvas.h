@@ -50,6 +50,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int width, int height);
+	void clearScene();
 
 	void updatePrimitives();
 	void mouseReleaseEvent(QMouseEvent* event) override;
@@ -98,6 +99,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void movePrimitive(int idx_prim, VecD3 delta);
 	void addPrimitive(int idx_prim);
 	float getFPS();
+	void genRandomScene(int objCount);
 	std::shared_ptr<DrawManager> _drawManager;
 	std::shared_ptr<SceneManager> _sceneManager;
 

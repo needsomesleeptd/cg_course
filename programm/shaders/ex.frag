@@ -4,15 +4,15 @@
 #define EPS 1e-7
 #define INF 1e7
 
-#define SPHERE_COUNT 40
-#define BOX_COUNT 40
-#define CONES_COUNT 40
-#define CYLINDERS_COUNT 40
+#define SPHERE_COUNT 150
+#define BOX_COUNT 150
+#define CONES_COUNT 150
+#define CYLINDERS_COUNT 150
 
 
 #define  K   0.1f
 
-#define MAX_DEPTH 5
+#define MAX_DEPTH 10
 
 #define PI acos(0) * 2.0f
 

@@ -34,6 +34,7 @@ class MainWindow : public QMainWindow
 		void onRotateButtonClicked();
 		void onAddButtonClicked();
 		void currentShapeChanged(int shape_idx);
+		void MainWindowFPSDisplay();
 
  protected:
 	//void resizeEvent(QResizeEvent *event) override;

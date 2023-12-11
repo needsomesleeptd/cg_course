@@ -2,7 +2,7 @@
 //precision HIGHP float;
 
 #define EPS 1e-7
-#define INF 100000.0
+#define INF 1e7
 
 #define SPHERE_COUNT 40
 #define BOX_COUNT 40
@@ -523,15 +523,22 @@ vec4 RayTrace(Ray primary_ray, PrimitiveArrLens lens) {
 
         vec3 lightVector = normalize(lightSource.position - inters.point);
 
-        vec3 shadow_orig = dot(lightVector, inters.normal) <= 0 ? inters.point - inters.normal * 0.02 : inters.point + inters.normal * 0.02;
+        vec3 shadow_orig = dot(lightVector, inters.normal) < 0 ? inters.point - inters.normal * 1e-3 : inters.point + inters.normal * 1e-3;
         Ray lightRay = Ray(shadow_orig, lightVector);
+
         inters_light = findIntersection(lightRay, spheres, boxes, cylinders, lens);
 
+        float light_inter_dist = length(inters.point - lightSource.position);
+        float light_point_dist = length(shadow_orig  - inters_light.point);
 
-        if (abs(inters.t - INF) < EPS)
+        if (abs(inters_light.t - INF) > EPS && light_inter_dist > light_point_dist)
         {
+
             addColor = vec4(inters.material.color * inters.material.lightKoefs[0],1.0);
+
             primary_ray = calculateReflected(primary_ray, inters);
+
+
         }
         else
         {

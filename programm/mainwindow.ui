@@ -740,7 +740,7 @@
       <x>1440</x>
       <y>940</y>
       <width>281</width>
-      <height>20</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="font">
@@ -752,6 +752,25 @@
     </property>
     <property name="text">
      <string>FPS:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="FPS_OUTPUT">
+    <property name="geometry">
+     <rect>
+      <x>1480</x>
+      <y>940</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <weight>75</weight>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string/>
     </property>
    </widget>
   </widget>

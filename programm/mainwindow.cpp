@@ -31,7 +31,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 	connect(ui->choose_primitives_box, SIGNAL(currentIndexChanged(int)), this, SLOT(currentShapeChanged(int)));
 
-	connect(ui->rotate, SIGNAL(clicked()),this, SLOT(onRotateButtonClicked()));
+	connect(ui->rotate, SIGNAL(clicked()), this, SLOT(onRotateButtonClicked()));
 
 
 	//material work
@@ -53,8 +53,13 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui->light_r, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightColorChangeButtonClicked);
 	connect(ui->light_g, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightColorChangeButtonClicked);
 	connect(ui->light_b, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightColorChangeButtonClicked);
-
+	//FPS
+	connect(ui->graphicsView, SIGNAL(isUpdated()),this, SLOT(MainWindowFPSDisplay()));
 }
+
+
+
+
 void MainWindow::onLightColorChangeButtonClicked()
 {
 	ColorRGB newColor = ColorRGB(ui->light_r->value(), ui->light_g->value(), ui->light_b->value());
@@ -109,10 +114,19 @@ void MainWindow::onLightPositionChangeButtonClicked()
 }
 void MainWindow::onTranslateButtonClicked()
 {
-	int idx = ui->choose_primitives_box->currentIndex();
-	VecD3 moveParams = VecD3(ui->obj_x->value(), ui->obj_y->value(), ui->obj_z->value());
-	qDebug() << "started moving on" << idx << moveParams.x << moveParams.y << moveParams.z;
-	ui->graphicsView->movePrimitive(idx, moveParams);
+	int modelsCount = ui->graphicsView->_sceneManager->getScene()->getModels().size();
+	if (modelsCount == 0)
+	{
+		QMessageBox::critical(nullptr, "Ошибка", "Не добавлено ни одного примитива.");
+
+	}
+	else
+	{
+		int idx = ui->choose_primitives_box->currentIndex();
+		VecD3 moveParams = VecD3(ui->obj_x->value(), ui->obj_y->value(), ui->obj_z->value());
+		qDebug() << "started moving on" << idx << moveParams.x << moveParams.y << moveParams.z;
+		ui->graphicsView->movePrimitive(idx, moveParams);
+	}
 }
 void MainWindow::onAddButtonClicked()
 {
@@ -126,15 +140,23 @@ void MainWindow::onAddButtonClicked()
 }
 void MainWindow::materialUpdate()
 {
-	int idx_model = ui->choose_primitives_box->currentIndex();
-	std::shared_ptr<BaseShape> shape =
-		std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[idx_model]);
-	ColorRGB color(ui->obj_R->value(), ui->obj_G->value(), ui->obj_B->value());
+	int modelsCount = ui->graphicsView->_sceneManager->getScene()->getModels().size();
+	if (modelsCount == 0)
+	{
+		QMessageBox::critical(nullptr, "Ошибка", "Не добавлено ни одного примитива.");
 
-	Material material = Material(ui->obj_k_a->value(), ui->obj_k_d->value(), ui->obj_k_s->value(), color);
-	//qDebug() << "setting color" << color.R << color.G << color.B << "on " << idx_model;
+	}
+	else
+	{
+		int idx_model = ui->choose_primitives_box->currentIndex();
+		std::shared_ptr<BaseShape> shape =
+			std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[idx_model]);
+		ColorRGB color(ui->obj_R->value(), ui->obj_G->value(), ui->obj_B->value());
 
-	shape->setMaterial(material);
+		Material material = Material(ui->obj_k_a->value(), ui->obj_k_d->value(), ui->obj_k_s->value(), color);
+
+		shape->setMaterial(material);
+	}
 
 }
 void MainWindow::currentShapeChanged(int shape_idx)
@@ -164,11 +186,25 @@ void MainWindow::currentShapeChanged(int shape_idx)
 }
 void MainWindow::onRotateButtonClicked()
 {
-	int idx_model = ui->choose_primitives_box->currentIndex();
-	std::shared_ptr<BaseShape> shape =
-		std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[idx_model]);
-	VecD3 rotation_params = { ui->obj_rot_x->value(), ui->obj_rot_y->value(), ui->obj_rot_z->value() };
-	TransformParams transformParams;
-	transformParams.setRotateParams(rotation_params);
-	shape->transform(transformParams);
+	int modelsCount = ui->graphicsView->_sceneManager->getScene()->getModels().size();
+	if (modelsCount == 0)
+	{
+		QMessageBox::critical(nullptr, "Ошибка", "Не добавлено ни одного примитива.");
+
+	}
+	else
+	{
+		int idx_model = ui->choose_primitives_box->currentIndex();
+		std::shared_ptr<BaseShape> shape =
+			std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[idx_model]);
+		VecD3 rotation_params = { ui->obj_rot_x->value(), ui->obj_rot_y->value(), ui->obj_rot_z->value() };
+		TransformParams transformParams;
+		transformParams.setRotateParams(rotation_params);
+		shape->transform(transformParams);
+	}
+}
+void MainWindow::MainWindowFPSDisplay()
+{
+	float fps = ui->graphicsView->getFPS();
+	ui->FPS_OUTPUT->setText(QString(QString::fromStdString(std::to_string(fps))));
 }

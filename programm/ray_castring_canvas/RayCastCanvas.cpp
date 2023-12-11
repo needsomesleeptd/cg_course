@@ -41,36 +41,26 @@ static const Vertex sg_vertexes[] = {
 
 };
 
-/*!
- * \brief Convert a QColor to a QVector3D.
- * \return A QVector3D holding a RGB representation of the colour.
- */
+
 QVector3D to_vector3d(const QColor& colour)
 {
 	return QVector3D(colour.redF(), colour.greenF(), colour.blueF());
 }
 
-/*!
- * \brief Constructor for the canvas.
- * \param parent Parent widget.
- */
+
 RayCastCanvas::RayCastCanvas(QWidget* parent)
 	: QOpenGLWidget{ parent }
 {
 
 }
 
-/*!
- * \brief Destructor.
- */
+
 RayCastCanvas::~RayCastCanvas()
 {
 
 }
 
-/*!
- * \brief Initialise OpenGL-related state.
- */
+
 void RayCastCanvas::initializeGL()
 {
 	spheres_count = 0;
@@ -89,7 +79,7 @@ void RayCastCanvas::initializeGL()
 	//_drawManager->setCamera(camera);
 	_sceneManager->getScene()->addCamera(camera);
 
-	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(-10, 0.2, 0.3), 0.5).create();
+	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0, 0, 0), 1.0).create();
 	lightsource->setColor(ColorRGB(1, 1, 1));
 	_sceneManager->getScene()->setLightSource(lightsource);
 
@@ -224,6 +214,7 @@ void RayCastCanvas::paintGL()
 	}
 	m_program->release();
 	updateFPS();
+	emit isUpdated();
 }
 
 QPointF RayCastCanvas::pixel_pos_to_view_pos(const QPointF& p)
@@ -256,11 +247,11 @@ void RayCastCanvas::update()
 		VecD3 translation = { 0.0f, 0.0f, 0.0f };
 		if (Input::keyPressed(Qt::Key_W))
 		{
-			translation += camera->getViewDirection();
+			translation -= camera->getViewDirection();
 		}
 		if (Input::keyPressed(Qt::Key_S))
 		{
-			translation -= camera->getViewDirection();
+			translation += camera->getViewDirection();
 		}
 		if (Input::keyPressed(Qt::Key_A))
 		{
@@ -297,7 +288,7 @@ void RayCastCanvas::update()
 				pitchDelta = -89.0f;
 			}
 
-			glm::quat q = -glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, camera->_cameraStructure->_right),
+			glm::quat q = glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, camera->_cameraStructure->_right),
 				glm::angleAxis(-yawDelta, glm::vec3(0.f, 1.0f, 0.0f))));
 			//qDebug() << "rotating by yaw " << yawDelta << "pitch " << pitchDelta << "\n";
 
@@ -391,6 +382,7 @@ void RayCastCanvas::addPrimitive(int idx_prim)
 
 void RayCastCanvas::movePrimitive(int idx_prim, VecD3 delta)
 {
+
 	std::shared_ptr<BaseShape>
 		shape = std::dynamic_pointer_cast<BaseShape>(_sceneManager->getScene()->getModels()[idx_prim]);
 	shape->move(delta);

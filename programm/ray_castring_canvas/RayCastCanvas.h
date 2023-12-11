@@ -44,9 +44,9 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
  public slots:
 	void update();
     void updateFPS();
-
+ signals:
+	void isUpdated();
  protected:
-	float getFPS();
 	void initializeGL();
 	void paintGL();
 	void resizeGL(int width, int height);
@@ -97,7 +97,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
  public:
 	void movePrimitive(int idx_prim, VecD3 delta);
 	void addPrimitive(int idx_prim);
-
+	float getFPS();
 	std::shared_ptr<DrawManager> _drawManager;
 	std::shared_ptr<SceneManager> _sceneManager;
 

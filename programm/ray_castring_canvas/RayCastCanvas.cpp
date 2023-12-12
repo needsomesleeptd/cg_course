@@ -8,6 +8,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include "RayCastCanvas.h"
+#include <QThread>
 
 template<class T>
 void setUniformArrayValue(QOpenGLShaderProgram* program,
@@ -73,6 +74,7 @@ void RayCastCanvas::initializeGL()
 	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -2.0f }, { 0.0f, 0.0f, -1.0f }).create();
 
 	_sceneManager->getScene()->addCamera(camera);
+	_sceneManager->setCamera(0);
 
 	std::shared_ptr<BaseLightSource> lightsource = LightSourceFactory(VecD3(0, 0, 0), 1.0).create();
 	lightsource->setColor(ColorRGB(1, 1, 1));
@@ -140,9 +142,9 @@ void RayCastCanvas::initializeGL()
 		m_program->setUniformValue("prLens.size_cones", cones_count);
 
 		m_program->release();
-		//genRandomScene(100, 0);
+		//genScene(100, 0);
 	}
-	//measureTime();
+	//onMeasureTimeClicked();
 
 }
 
@@ -155,6 +157,9 @@ void RayCastCanvas::resizeGL(int w, int h)
 
 void RayCastCanvas::paintGL()
 {
+	if (frameCount == 0)
+		timer.start();
+
 	//qDebug() << "started_painting\n";
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -206,8 +211,10 @@ void RayCastCanvas::paintGL()
 		m_object.release();
 	}
 	m_program->release();
+	frameCount++;
 	updateFPS();
 	emit isUpdated();
+
 }
 
 QPointF RayCastCanvas::pixel_pos_to_view_pos(const QPointF& p)
@@ -387,7 +394,7 @@ void RayCastCanvas::addSphere(const std::shared_ptr<Sphere>& sphere)
 	std::shared_ptr<Sphere> newSpherePtr = std::make_shared<Sphere>(newSphere);
 	_sceneManager->getScene()->addModel(newSpherePtr);
 	shapeTypes.push_back(add_sphere_idx);
-	qDebug() << "spheres add";
+
 	++spheres_count;
 	int shape_count = spheres_count - 1;
 
@@ -397,7 +404,6 @@ void RayCastCanvas::addSphere(const std::shared_ptr<Sphere>& sphere)
 		m_program->setUniformValue("prLens.size_spheres", spheres_count);
 		m_program->release();
 	}
-	qDebug() << "spheres count" << spheres_count;
 
 }
 void RayCastCanvas::addCone(const std::shared_ptr<Cone>& cone)
@@ -496,8 +502,6 @@ void RayCastCanvas::modifyBoxes(int index, std::shared_ptr<Box> box)
 	QVector3D lightCoeffs = { material._k_a, material._k_d, material._k_s };
 	QVector3D color = { material._color.R, material._color.G, material._color.B };
 
-
-
 	m_program->bind();
 
 	setUniformArrayValue<QVector3D>(m_program, box_name, position, index, to_q_vec(box->_position));
@@ -525,7 +529,6 @@ void RayCastCanvas::addCyllinder(const std::shared_ptr<Cyllinder>& cyllinder)
 	m_program->bind();
 	m_program->setUniformValue("prLens.size_cylinders", cylinders_count);
 	m_program->release();
-	qDebug() << "cyl count" << cylinders_count;
 
 }
 void RayCastCanvas::modifyCyllinders(int index, std::shared_ptr<Cyllinder> cyllinder, bool binding)
@@ -595,41 +598,33 @@ void RayCastCanvas::updatePrimitives() // TODO:: fix error for primitives using 
 }
 void RayCastCanvas::updateFPS()
 {
-	frameCount++;
 
-	QTime currentTime = QTime::currentTime();
-	int timeElapsed = lastTime.msecsTo(currentTime);
-
-	lastTime = currentTime;
-
-	fps = (float)frameCount / (timeElapsed / 1000.0);
-	frameCount = 0;
-
+		fps = (double)frameCount / (timer.elapsed() / 1000.0);
 }
 float RayCastCanvas::getFPS()
 {
 	return fps;
 }
-void RayCastCanvas::genRandomScene(int objCount, int objType)
+void RayCastCanvas::genScene(int objCount, int objType)
 {
-	int maxDelta = 10;
+
 	srand(time(NULL));
+	float delta_z = 0.0;
+	float mod = 15;
+	float delta_x = 0.0;
+	float step = 2.0;
 	for (int i = 0; i < objCount; i++)
 	{
+		delta_z += step;
+		if (delta_z > mod)
+		{
+			delta_x += step;
+			delta_z = delta_x / mod;
+		}
 
-		float x = 1.0 * rand() / RAND_MAX * maxDelta;
-		float y = 1.0 * rand() / RAND_MAX * maxDelta;
-		float z = 1.0 * rand() / RAND_MAX * maxDelta;
-		VecD3 randomDelta = { x, y, z };
-		if (objType == add_sphere_idx)
-			addBox(defaultBox);
-		else if (objType == add_cylinder_idx)
-			addCyllinder(defaultCyllinder);
-		else if (objType == add_cone_idx)
-			addCone(defaultCone);
-		else if (objType == add_box_idx)
-			addBox(defaultBox);
-		movePrimitive(i, randomDelta);
+		VecD3 position = { delta_x, 0, delta_z };
+		addPrimitive(objType);
+		movePrimitive(i, position);
 
 	}
 }
@@ -643,26 +638,38 @@ void RayCastCanvas::clearScene()
 }
 void RayCastCanvas::measureTime()
 {
-	int countTimes = 100;
-	float fps_count = 0.0;
-	int min_obj = 10;
-	int max_obj = 140;
-	int obj_step = 10;
+	//VecD3 CameraTestPosition = VecD3({0.0,3.0,1.0});
+	//_sceneManager->getCamera()->_cameraStructure->move(CameraTestPosition);
+	QSignalBlocker blocker(this);
+	int countTimes = 1;
+	float fpsCount = 0.0;
+	int minObj = 10;
+	int maxObj = 130;
+	int objStep = 10;
+	int countShapeTypes = 4;
 
-	for (int j = 0; j < 1; j++)
+	for (int j = 0; j < countShapeTypes; j++)
 	{
-		for (int k = min_obj; k < max_obj; k += obj_step)
+		for (int k = minObj; k < maxObj; k += objStep)
 		{
-			genRandomScene(k, j);
-			fps_count = 0.0;
+			frameCount = 0;
+			genScene(k, j);
+			fpsCount = 0.0;
 			for (int i = 0; i < countTimes; i++)
-				fps_count += getFPS();
+			{
+				paintGL();
+				updateFPS();
+				fpsCount += getFPS();
 
-			fps_count /= countTimes;
+			}
+
+			fpsCount /= countTimes;
 			clearScene();
-			qDebug() << "|" << fps_count << "|" << j << "|" << k << "\n";
+			qDebug() << "|" << fpsCount << "|" << j << "|" << k << "\n";
 		}
 	}
+	clearScene();
+	qDebug() << "finished";
 }
 
 

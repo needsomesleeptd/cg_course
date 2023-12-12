@@ -17,6 +17,7 @@
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLBuffer>
 #include <QTime>
+#include <QElapsedTimer>
 
 #include "sphere.h"
 #include "plane.h"
@@ -86,7 +87,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	std::vector<int> shapeTypes;
 	int frameCount;
 	float fps;
-	QTime lastTime;
+	QElapsedTimer timer;
 
  public:
 	void measureTime();
@@ -99,7 +100,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void movePrimitive(int idx_prim, VecD3 delta);
 	void addPrimitive(int idx_prim);
 	float getFPS();
-	void genRandomScene(int objCount, int objType);
+	void genScene(int objCount, int objType);
 
 	std::shared_ptr<DrawManager> _drawManager;
 	std::shared_ptr<SceneManager> _sceneManager;

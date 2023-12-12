@@ -55,6 +55,9 @@ MainWindow::MainWindow(QWidget* parent)
 	connect(ui->light_b, &QDoubleSpinBox::textChanged, this, &MainWindow::onLightColorChangeButtonClicked);
 	//FPS
 	connect(ui->graphicsView, SIGNAL(isUpdated()),this, SLOT(MainWindowFPSDisplay()));
+
+	//Measure
+	connect(ui->time_measure, SIGNAL(triggered()), this, SLOT(onMeasureTimeClicked()));
 }
 
 
@@ -207,4 +210,8 @@ void MainWindow::MainWindowFPSDisplay()
 {
 	float fps = ui->graphicsView->getFPS();
 	ui->FPS_OUTPUT->setText(QString(QString::fromStdString(std::to_string(fps))));
+}
+void MainWindow::onMeasureTimeClicked()
+{
+	ui->graphicsView->measureTime();
 }

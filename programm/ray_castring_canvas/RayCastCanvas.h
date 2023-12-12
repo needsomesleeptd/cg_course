@@ -89,7 +89,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	QTime lastTime;
 
  public:
-
+	void measureTime();
 	const int add_sphere_idx = 0;
 	const int add_cone_idx = 1;
 	const int add_cylinder_idx = 3;
@@ -99,7 +99,8 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void movePrimitive(int idx_prim, VecD3 delta);
 	void addPrimitive(int idx_prim);
 	float getFPS();
-	void genRandomScene(int objCount);
+	void genRandomScene(int objCount, int objType);
+
 	std::shared_ptr<DrawManager> _drawManager;
 	std::shared_ptr<SceneManager> _sceneManager;
 

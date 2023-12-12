@@ -19,8 +19,8 @@
      <rect>
       <x>11</x>
       <y>11</y>
-      <width>1631</width>
-      <height>711</height>
+      <width>1621</width>
+      <height>701</height>
      </rect>
     </property>
    </widget>
@@ -422,10 +422,10 @@
      <item row="1" column="1">
       <widget class="QDoubleSpinBox" name="obj_rot_x">
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>0.000000000000000</double>
        </property>
        <property name="maximum">
-        <double>1000.000000000000000</double>
+        <double>360.000000000000000</double>
        </property>
        <property name="singleStep">
         <double>0.500000000000000</double>
@@ -459,10 +459,10 @@
      <item row="2" column="1">
       <widget class="QDoubleSpinBox" name="obj_rot_y">
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>0.000000000000000</double>
        </property>
        <property name="maximum">
-        <double>1000.000000000000000</double>
+        <double>360.000000000000000</double>
        </property>
        <property name="singleStep">
         <double>0.500000000000000</double>
@@ -472,10 +472,10 @@
      <item row="3" column="1">
       <widget class="QDoubleSpinBox" name="obj_rot_z">
        <property name="minimum">
-        <double>-1000.000000000000000</double>
+        <double>0.000000000000000</double>
        </property>
        <property name="maximum">
-        <double>1000.000000000000000</double>
+        <double>360.000000000000000</double>
        </property>
        <property name="singleStep">
         <double>0.500000000000000</double>
@@ -720,19 +720,6 @@
       </widget>
      </item>
     </layout>
-   </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>1480</x>
-      <y>1010</y>
-      <width>55</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
    </widget>
    <widget class="QLabel" name="FPS_label">
     <property name="geometry">

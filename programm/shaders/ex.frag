@@ -4,10 +4,10 @@
 #define EPS 1e-7
 #define INF 1e7
 
-#define SPHERE_COUNT 150
-#define BOX_COUNT 150
-#define CONES_COUNT 150
-#define CYLINDERS_COUNT 150
+#define SPHERE_COUNT 100
+#define BOX_COUNT 100
+#define CONES_COUNT 100
+#define CYLINDERS_COUNT 100
 
 
 #define  K   0.1f
@@ -565,35 +565,6 @@ uniform PrimitiveArrLens prLens;
 
 void main(void) {
 
-    Material material = Material(vec3(0.3f, 0.2f, 0.1f), vec3(0.1f, 0.4f, 0.6f));
-    Material new_material = Material(vec3(0.1f, 0.9f, 0.4f), vec3(0.1f, 0.4f, 0.3f));
-
-    Material new_new_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.1f, 0.3f, 0.3f));
-
-
-
-    Material cylinder_material = Material(vec3(0.5f, 0.3f, 1.0f), vec3(0.1f, 0.4f, 0.4f));
-
-
-/* spheres[0] = Sphere(vec3(1.0f, 1.4f, 3.1f), 0.6f, material);
-    spheres[1] = Sphere(vec3(3.0f, 0.7f, -0.1f), 0.7f, new_material);
-    spheres[2] = Sphere(vec3(1.0f, 0.7f, -0.1f), 0.3f, new_new_material);*/
-
-/*boxes[0] = Box(vec3(0.3f, 2.0f, -1.0f), mat3(1.0), vec3(1.0, 1.0, 1.0), gen_random_mat());
-
-    cylinders[0].extr_a = vec3(1.0, 0.0, 1.0);
-
-    cylinders[0].extr_a = vec3(-1.0, 0.0, -1.0);
-
-    cylinders[0].ra = 0.2;
-
-    cylinders[0].material = new_new_material;
-
-
-
-
-
-    cones[0] = Cone(PI / 6, 1, vec3(1.0, 2.0, 1.0), vec3(0.0, 1.0, 0.0), new_new_material);*/
 
     Ray ray = GenerateRay(camera, interpolated_vertex, scale);
 

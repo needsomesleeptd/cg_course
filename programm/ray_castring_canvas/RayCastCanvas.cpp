@@ -41,12 +41,10 @@ static const Vertex sg_vertexes[] = {
 
 };
 
-
 QVector3D to_vector3d(const QColor& colour)
 {
 	return QVector3D(colour.redF(), colour.greenF(), colour.blueF());
 }
-
 
 RayCastCanvas::RayCastCanvas(QWidget* parent)
 	: QOpenGLWidget{ parent }
@@ -54,12 +52,10 @@ RayCastCanvas::RayCastCanvas(QWidget* parent)
 
 }
 
-
 RayCastCanvas::~RayCastCanvas()
 {
 
 }
-
 
 void RayCastCanvas::initializeGL()
 {
@@ -69,12 +65,12 @@ void RayCastCanvas::initializeGL()
 	cones_count = 0;
 
 	setFocusPolicy(Qt::StrongFocus);
-	//qDebug() << "started initialization";
+
 	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 	_sceneManager = SceneManagerCreator().createManager();
 	_drawManager = DrawManagerCreator().createManager();
 
-	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -2.0f }, { 0.0f, 0.0f, 1.0f }).create();
+	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -2.0f }, { 0.0f, 0.0f, -1.0f }).create();
 
 	_sceneManager->getScene()->addCamera(camera);
 
@@ -144,8 +140,9 @@ void RayCastCanvas::initializeGL()
 		m_program->setUniformValue("prLens.size_cones", cones_count);
 
 		m_program->release();
-		genRandomScene(100);
+		//genRandomScene(100, 0);
 	}
+	//measureTime();
 
 }
 
@@ -251,19 +248,19 @@ void RayCastCanvas::update()
 		}
 		if (Input::keyPressed(Qt::Key_A))
 		{
-			translation -= camera->_cameraStructure->getRight();
+			translation += camera->_cameraStructure->getRight();
 		}
 		if (Input::keyPressed(Qt::Key_D))
 		{
-			translation += camera->_cameraStructure->getRight();
+			translation -= camera->_cameraStructure->getRight();
 		}
 		if (Input::keyPressed(Qt::Key_Q))
 		{
-			translation -= camera->getUpVector();
+			translation += camera->getUpVector();
 		}
 		if (Input::keyPressed(Qt::Key_E))
 		{
-			translation += camera->getUpVector();
+			translation -= camera->getUpVector();
 		}
 		//qDebug() << "translation is" << translation.x << translation.y << translation.z;
 		camera->_cameraStructure->move(translation * transSpeed);
@@ -284,7 +281,7 @@ void RayCastCanvas::update()
 				pitchDelta = -89.0f;
 			}
 
-			glm::quat q = glm::normalize(glm::cross(glm::angleAxis(-pitchDelta, camera->_cameraStructure->_right),
+			glm::quat q = glm::normalize(glm::cross(glm::angleAxis(pitchDelta, camera->_cameraStructure->_right),
 				glm::angleAxis(-yawDelta, glm::vec3(0.f, 1.0f, 0.0f))));
 			//qDebug() << "rotating by yaw " << yawDelta << "pitch " << pitchDelta << "\n";
 
@@ -499,7 +496,7 @@ void RayCastCanvas::modifyBoxes(int index, std::shared_ptr<Box> box)
 	QVector3D lightCoeffs = { material._k_a, material._k_d, material._k_s };
 	QVector3D color = { material._color.R, material._color.G, material._color.B };
 
-	qDebug() << "curr box color" << color.x() << color.y() << color.z();
+
 
 	m_program->bind();
 
@@ -613,23 +610,27 @@ float RayCastCanvas::getFPS()
 {
 	return fps;
 }
-void RayCastCanvas::genRandomScene(int objCount)
+void RayCastCanvas::genRandomScene(int objCount, int objType)
 {
 	int maxDelta = 10;
-	int curPrim = add_sphere_idx;
 	srand(time(NULL));
 	for (int i = 0; i < objCount; i++)
 	{
 
-		float x = 1.0 *rand() / RAND_MAX * maxDelta;
+		float x = 1.0 * rand() / RAND_MAX * maxDelta;
 		float y = 1.0 * rand() / RAND_MAX * maxDelta;
 		float z = 1.0 * rand() / RAND_MAX * maxDelta;
-		VecD3 randomDelta = {x,y,z};
-		if (curPrim == add_sphere_idx)
-		{
+		VecD3 randomDelta = { x, y, z };
+		if (objType == add_sphere_idx)
 			addBox(defaultBox);
-			movePrimitive(i,randomDelta);
-		}
+		else if (objType == add_cylinder_idx)
+			addCyllinder(defaultCyllinder);
+		else if (objType == add_cone_idx)
+			addCone(defaultCone);
+		else if (objType == add_box_idx)
+			addBox(defaultBox);
+		movePrimitive(i, randomDelta);
+
 	}
 }
 void RayCastCanvas::clearScene()
@@ -639,6 +640,29 @@ void RayCastCanvas::clearScene()
 	cones_count = 0;
 	boxes_count = 0;
 	_sceneManager->getScene()->getModels().clear();
+}
+void RayCastCanvas::measureTime()
+{
+	int countTimes = 100;
+	float fps_count = 0.0;
+	int min_obj = 10;
+	int max_obj = 140;
+	int obj_step = 10;
+
+	for (int j = 0; j < 1; j++)
+	{
+		for (int k = min_obj; k < max_obj; k += obj_step)
+		{
+			genRandomScene(k, j);
+			fps_count = 0.0;
+			for (int i = 0; i < countTimes; i++)
+				fps_count += getFPS();
+
+			fps_count /= countTimes;
+			clearScene();
+			qDebug() << "|" << fps_count << "|" << j << "|" << k << "\n";
+		}
+	}
 }
 
 

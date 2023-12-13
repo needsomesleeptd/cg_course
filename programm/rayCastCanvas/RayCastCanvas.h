@@ -89,8 +89,9 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	float fps;
 	QElapsedTimer timer;
 
+
  public:
-	void measureTime();
+	void measureTime(int objType);
 	const int add_sphere_idx = 0;
 	const int add_cone_idx = 1;
 	const int add_cylinder_idx = 3;
@@ -109,7 +110,6 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	QString m_active_mode;
 
 	QOpenGLBuffer m_vertex;
-	QOpenGLBuffer spheres;
 	QOpenGLVertexArrayObject m_object;
 
 
@@ -119,7 +119,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	int boxes_count;
 	int cones_count;
 
-	QPointF pixel_pos_to_view_pos(const QPointF& p);
+
 
 };
 #endif //LAB_03_CG_COURSE_PROGRAMM_RAY_CASTRING_CANVAS_RAYCASTCANVAS_H_

@@ -761,6 +761,33 @@
     </property>
    </widget>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1665</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="measure">
+    <property name="title">
+     <string>Замеры</string>
+    </property>
+    <addaction name="time_measure"/>
+   </widget>
+   <addaction name="measure"/>
+  </widget>
+  <action name="action">
+   <property name="text">
+    <string>Времени</string>
+   </property>
+  </action>
+  <action name="time_measure">
+   <property name="text">
+    <string>Время</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>

@@ -35,6 +35,7 @@ class MainWindow : public QMainWindow
 		void onAddButtonClicked();
 		void currentShapeChanged(int shape_idx);
 		void MainWindowFPSDisplay();
+		void onMeasureTimeClicked();
 
  protected:
 	//void resizeEvent(QResizeEvent *event) override;

@@ -9,11 +9,7 @@
 #include "cone.h"
 #include "color.h"
 
-float GenerateRandom()
-{
 
-	return rand() / (RAND_MAX + 1.);
-}
 
 MainWindow::MainWindow(QWidget* parent)
 	: QMainWindow(parent), ui(new Ui::MainWindow)
@@ -213,5 +209,5 @@ void MainWindow::MainWindowFPSDisplay()
 }
 void MainWindow::onMeasureTimeClicked()
 {
-	ui->graphicsView->measureTime();
+	//ui->graphicsView->measureTime(ui->addPrimitivesBox->currentIndex());
 }

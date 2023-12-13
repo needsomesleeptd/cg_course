@@ -4,15 +4,15 @@
 #define EPS 1e-7
 #define INF 1e7
 
-#define SPHERE_COUNT 100
-#define BOX_COUNT 100
-#define CONES_COUNT 100
-#define CYLINDERS_COUNT 100
+#define SPHERE_COUNT 140
+#define BOX_COUNT 140
+#define CONES_COUNT 140
+#define CYLINDERS_COUNT 140
 
 
 #define  K   0.1f
 
-#define MAX_DEPTH 10
+#define MAX_DEPTH 20
 
 #define PI acos(0) * 2.0f
 
@@ -239,15 +239,6 @@ bool IntersectRayBox(Ray ray, Box box, out float fraction, out vec3 normal)
 }
 
 
-vec3 cylNormal(in vec3 p, Cylinder cyl)
-{
-    vec3 pa = p - cyl.extr_a;
-    vec3 ba = cyl.extr_b - cyl.extr_a;
-    float baba = dot(ba, ba);
-    float paba = dot(pa, ba);
-    float h = dot(pa, ba) / baba;
-    return vec3(pa - ba * h) / cyl.ra;
-}
 
 
 bool IntersectRayCyl(Ray ray, Cylinder cyl, out float fraction, out vec3 normal)
@@ -308,7 +299,7 @@ bool IntersectRayCone(Ray r, Cone s, out float fraction, out vec3 normal)
     float t1 = (-b - det) / (2. * a);
     float t2 = (-b + det) / (2. * a);
 
-    // This is a bit messy; there ought to be a more elegant solution.
+
     float t = t1;
     if (t < 0.0f || (t2 > 0.0f && t2 < t)) t = t2;
     if (t < 0.) return false;

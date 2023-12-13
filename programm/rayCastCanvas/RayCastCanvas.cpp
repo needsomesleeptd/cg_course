@@ -9,6 +9,14 @@
 #include <glm/gtx/quaternion.hpp>
 #include "RayCastCanvas.h"
 #include <QThread>
+#include <QCoreApplication>
+
+void delay(int waitSec)
+{
+	QTime dieTime= QTime::currentTime().addSecs(waitSec);
+	while (QTime::currentTime() < dieTime)
+		QCoreApplication::processEvents(QEventLoop::AllEvents, waitSec * 1000); // cause in mc
+}
 
 template<class T>
 void setUniformArrayValue(QOpenGLShaderProgram* program,
@@ -60,14 +68,17 @@ RayCastCanvas::~RayCastCanvas()
 
 void RayCastCanvas::initializeGL()
 {
+	initializeOpenGLFunctions();
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
+
+
 	spheres_count = 0;
 	cylinders_count = 0;
 	boxes_count = 0;
 	cones_count = 0;
 
 	setFocusPolicy(Qt::StrongFocus);
-
-	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 	_sceneManager = SceneManagerCreator().createManager();
 	_drawManager = DrawManagerCreator().createManager();
 
@@ -82,11 +93,11 @@ void RayCastCanvas::initializeGL()
 
 	camera->setImageParams(QWidget::height(), QWidget::width());
 	m_program = new QOpenGLShaderProgram();
-	initializeOpenGLFunctions();
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+
 
 	{
-		// Create Shader (Do not release until VAO is created)]
+
 
 
 
@@ -142,10 +153,9 @@ void RayCastCanvas::initializeGL()
 		m_program->setUniformValue("prLens.size_cones", cones_count);
 
 		m_program->release();
-		//genScene(100, 0);
+		//genScene(10, 1);
 	}
 	//onMeasureTimeClicked();
-
 }
 
 void RayCastCanvas::resizeGL(int w, int h)
@@ -157,6 +167,7 @@ void RayCastCanvas::resizeGL(int w, int h)
 
 void RayCastCanvas::paintGL()
 {
+
 	if (frameCount == 0)
 		timer.start();
 
@@ -219,6 +230,11 @@ void RayCastCanvas::paintGL()
 	//model + view + projection
 	m_program->setUniformValue(view, QMatrix4x4(&camera->_cameraStructure->_mView[0][0]));
 	m_program->setUniformValue(projection, QMatrix4x4(&camera->_cameraStructure->_mProjection[0][0]));
+	//shapes_sizes
+	m_program->setUniformValue("prLens.size_spheres", spheres_count);
+	m_program->setUniformValue("prLens.size_cylinders", cylinders_count);
+	m_program->setUniformValue("prLens.size_boxes", boxes_count);
+	m_program->setUniformValue("prLens.size_cones", cones_count);
 
 	{
 
@@ -234,11 +250,7 @@ void RayCastCanvas::paintGL()
 
 }
 
-QPointF RayCastCanvas::pixel_pos_to_view_pos(const QPointF& p)
-{
-	return QPointF(2.0 * float(p.x()) / width() - 1.0,
-		1.0 - 2.0 * float(p.y()) / height());
-}
+
 
 void RayCastCanvas::update()
 {
@@ -365,7 +377,7 @@ void RayCastCanvas::modifySpheres(int index, std::shared_ptr<Sphere> sphere)
 	QString mat_color_str = "material.color";
 	QString mat_coefs_str = "material.lightKoefs";
 
-	char* sphereSizes = "prLens.size_spheres";
+	const char* sphereSizes = "prLens.size_spheres";
 
 	Material material = sphere->getMaterial();
 	QVector3D lightCoeffs = { material._k_a, material._k_d, material._k_s };
@@ -434,29 +446,12 @@ void RayCastCanvas::addCone(const std::shared_ptr<Cone>& cone)
 	shapeTypes.push_back(add_cone_idx);
 	++cones_count;
 	int shape_count = cones_count - 1;
+	modifyCones(shape_count, newConePtr);
 
-	std::string cone_pos = "cones[" + std::to_string(shape_count) + ']';
-	std::string angle = ".cosa";
-	std::string height = ".h";
-	std::string tip_position = ".c";
-	std::string axis = ".v";
-	std::string mat_color_str = ".material.color";
-	std::string mat_coefs_str = ".material.lightKoefs";
-	char* size_cones_path = "prLens.size_cones";
+
+	const char* size_cones_path = "prLens.size_cones";
 	{
 		m_program->bind();
-		QVector3D lightCoeffs = { defaultMaterial._k_a, defaultMaterial._k_d, defaultMaterial._k_s };
-		QVector3D color = { defaultMaterial._color.R, defaultMaterial._color.G, defaultMaterial._color.B };
-
-		m_program->setUniformValue((cone_pos + angle).c_str(), cone->_cosa);
-		m_program->setUniformValue((cone_pos + height).c_str(), cone->_h);
-
-		m_program->setUniformValue((cone_pos + axis).c_str(), to_q_vec(cone->_v));
-
-		m_program->setUniformValue((cone_pos + tip_position).c_str(), to_q_vec(cone->_c));
-
-		m_program->setUniformValue((cone_pos + mat_color_str).c_str(), color);
-		m_program->setUniformValue((cone_pos + mat_coefs_str).c_str(), lightCoeffs);
 		m_program->setUniformValue(size_cones_path, cones_count);
 		m_program->release();
 	}
@@ -467,29 +462,33 @@ void RayCastCanvas::modifyCones(int index, std::shared_ptr<Cone> cone)
 
 	int shape_count = index;
 
-	std::string cone_pos = "cones[" + std::to_string(shape_count) + ']';
-	std::string angle = ".cosa";
-	std::string height = ".h";
-	std::string tip_position = ".c";
-	std::string axis = ".v";
-	std::string mat_color_str = ".material.color";
-	std::string mat_coefs_str = ".material.lightKoefs";
+
+	QString coneName = "cones";
+	QString angle = "cosa";
+	QString height = "h";
+	QString tip_position = "c";
+	QString axis = "v";
+	QString mat_color_str = "material.color";
+	QString mat_coefs_str = "material.lightKoefs";
 
 	Material material = cone->getMaterial();
 	QVector3D lightCoeffs = { material._k_a, material._k_d, material._k_s };
 	QVector3D color = { material._color.R, material._color.G, material._color.B };
+	const char* size_cones_path = "prLens.size_cones";
 	{
 		m_program->bind();
 
-		m_program->setUniformValue((cone_pos + angle).c_str(), cone->_cosa);
-		m_program->setUniformValue((cone_pos + height).c_str(), cone->_h);
 
-		m_program->setUniformValue((cone_pos + axis).c_str(), to_q_vec(cone->_v));
+		setUniformArrayValue<float>(m_program, coneName, angle, index, cone->_cosa);
+		setUniformArrayValue<float>(m_program, coneName, height, index, cone->_h);
 
-		m_program->setUniformValue((cone_pos + tip_position).c_str(), to_q_vec(cone->_c));
+		setUniformArrayValue<QVector3D>(m_program, coneName, axis, index, to_q_vec(cone->_v));
+		setUniformArrayValue<QVector3D>(m_program, coneName, tip_position, index, to_q_vec(cone->_c));
 
-		m_program->setUniformValue((cone_pos + mat_color_str).c_str(), color);
-		m_program->setUniformValue((cone_pos + mat_coefs_str).c_str(), lightCoeffs);
+		setUniformArrayValue<QVector3D>(m_program, coneName, mat_color_str, index, color);
+		setUniformArrayValue<QVector3D>(m_program, coneName, mat_coefs_str, index, lightCoeffs);
+		m_program->setUniformValue(size_cones_path, cones_count);
+
 		m_program->release();
 	}
 
@@ -579,12 +578,13 @@ void RayCastCanvas::modifyCyllinders(int index, std::shared_ptr<Cyllinder> cylli
 }
 void RayCastCanvas::updatePrimitives()
 {
-	int shape_count = spheres_count + cylinders_count + boxes_count + cones_count;
+
+	int shape_count =  shapeTypes.size();
 	int cur_spheres_index = 0;
 	int cur_cylinders_index = 0;
 	int cur_boxes_index = 0;
 	int cur_cones_index = 0;
-
+	//qDebug() << "shapeTypes size" << shape_count << "models size" <<_sceneManager->getScene()->getModels().size();
 	for (int i = 0; i < shape_count; i++)
 	{
 		std::shared_ptr<BaseShape>
@@ -618,8 +618,12 @@ void RayCastCanvas::updatePrimitives()
 }
 void RayCastCanvas::updateFPS()
 {
-
 	fps = (double)frameCount / (timer.elapsed() / 1000.0);
+	/*if (timer.elapsed() > 1000)
+	{
+		frameCount = 0;
+		timer.restart();
+	}*/
 }
 float RayCastCanvas::getFPS()
 {
@@ -628,19 +632,18 @@ float RayCastCanvas::getFPS()
 void RayCastCanvas::genScene(int objCount, int objType)
 {
 
-	srand(time(NULL));
-	float delta_z = 0.0;
-	float mod = 15;
-	float delta_x = 0.0;
-	float step = 2.0;
+
+	int delta_z = 0;
+	int mod = 10;
+	int delta_x = 0;
+	int step = 2;
 	for (int i = 0; i < objCount; i++)
 	{
-		delta_z += step;
-		if (delta_z > mod)
-		{
-			delta_x += step;
-			delta_z = delta_x / mod;
-		}
+		delta_z = (i % mod) * step;
+		delta_x = i  / (mod) * step;
+
+
+
 
 		VecD3 position = { delta_x, 0, delta_z };
 		addPrimitive(objType);
@@ -650,45 +653,53 @@ void RayCastCanvas::genScene(int objCount, int objType)
 }
 void RayCastCanvas::clearScene()
 {
+	disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
+	//delay(1);
+
 	spheres_count = 0;
 	cylinders_count = 0;
 	cones_count = 0;
 	boxes_count = 0;
 	_sceneManager->getScene()->getModels().clear();
+	shapeTypes.clear();
+	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 }
-void RayCastCanvas::measureTime()
+void RayCastCanvas::measureTime(int objType)
 {
 	//VecD3 CameraTestPosition = VecD3({0.0,3.0,1.0});
 	//_sceneManager->getCamera()->_cameraStructure->move(CameraTestPosition);
-	QSignalBlocker blocker(this);
+	//QSignalBlocker blocker(this);
 	int countTimes = 1;
 	float fpsCount = 0.0;
-	int minObj = 10;
-	int maxObj = 130;
+	int minObj = 90;
+	int maxObj = 110;
 	int objStep = 10;
 	int countShapeTypes = 4;
+	int waitSec = 30;
 
-	for (int j = 0; j < countShapeTypes; j++)
+	for (int j = minObj; j < maxObj; j+=objStep)
 	{
-		for (int k = minObj; k < maxObj; k += objStep)
-		{
+
+
 			frameCount = 0;
-			genScene(k, j);
-			fpsCount = 0.0;
-			for (int i = 0; i < countTimes; i++)
-			{
-				paintGL();
-				updateFPS();
-				fpsCount += getFPS();
+			genScene(j, objType);
+			//qDebug() << k;
+			QElapsedTimer timer;
+			timer.start();
+			delay(waitSec);
 
-			}
-
-			fpsCount /= countTimes;
+			fpsCount = (double)frameCount / (timer.elapsed() / 1000.0);
+			frameCount = 0;
+			//qDebug() << cones_count << spheres_count << boxes_count << cylinders_count;
+			qDebug() << "|" << fpsCount << "|" << j << "|" << "\n";
 			clearScene();
-			qDebug() << "|" << fpsCount << "|" << j << "|" << k << "\n";
-		}
+
+
+
+
 	}
 	clearScene();
+
 	qDebug() << "finished";
 }
 

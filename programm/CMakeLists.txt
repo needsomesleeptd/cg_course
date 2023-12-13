@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_EXTENDED_FLAGS -O2)
+set(CMAKE_EXTENDED_FLAGS -O1)
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${CMAKE_EXTENDED_FLAGS} -lGL")
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
@@ -60,7 +60,7 @@ set(PROJECT_SOURCES
 
         renderer/baseRenderer.h color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h material/material.cpp material/material.h object/visibleObject/shapes/plane/plane.cpp object/visibleObject/shapes/plane/plane.h
         Input/Input.h Input/Input.cpp
-        ray_castring_canvas/RayCastCanvas.cpp ray_castring_canvas/RayCastCanvas.h
+        rayCastCanvas/RayCastCanvas.cpp rayCastCanvas/RayCastCanvas.h
         object/visibleObject/shapes/cyllinder/cyllinder.cpp object/visibleObject/shapes/cyllinder/cyllinder.h)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

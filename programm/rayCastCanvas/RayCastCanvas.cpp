@@ -619,14 +619,15 @@ void RayCastCanvas::updatePrimitives()
 void RayCastCanvas::updateFPS()
 {
 	fps = (double)frameCount / (timer.elapsed() / 1000.0);
-	/*if (timer.elapsed() > 1000)
+	if (timer.elapsed()  > 1000) //because time is in msecs
 	{
 		frameCount = 0;
-		timer.restart();
-	}*/
+		//timer.restart();
+	}
 }
 float RayCastCanvas::getFPS()
 {
+	updateFPS();
 	return fps;
 }
 void RayCastCanvas::genScene(int objCount, int objType)

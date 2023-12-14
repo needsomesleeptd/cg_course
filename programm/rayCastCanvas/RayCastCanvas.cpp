@@ -75,10 +75,10 @@ void RayCastCanvas::initializeGL()
 	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 
 
-	spheres_count = 0;
-	cylinders_count = 0;
-	boxes_count = 0;
-	cones_count = 0;
+	spheresCount = 0;
+	cylindersCount = 0;
+	boxesCount = 0;
+	conesCount = 0;
 
 	setFocusPolicy(Qt::StrongFocus);
 	_sceneManager = SceneManagerCreator().createManager();
@@ -149,10 +149,10 @@ void RayCastCanvas::initializeGL()
 
 		//ended with transferring buffers
 
-		m_program->setUniformValue("prLens.size_spheres", spheres_count);
-		m_program->setUniformValue("prLens.size_cylinders", cylinders_count);
-		m_program->setUniformValue("prLens.size_boxes", boxes_count);
-		m_program->setUniformValue("prLens.size_cones", cones_count);
+		m_program->setUniformValue("prLens.size_spheres", spheresCount);
+		m_program->setUniformValue("prLens.size_cylinders", cylindersCount);
+		m_program->setUniformValue("prLens.size_boxes", boxesCount);
+		m_program->setUniformValue("prLens.size_cones", conesCount);
 
 		m_program->release();
 		//genScene(10, 1);
@@ -233,10 +233,10 @@ void RayCastCanvas::paintGL()
 	m_program->setUniformValue(view, QMatrix4x4(&camera->_cameraStructure->_mView[0][0]));
 	m_program->setUniformValue(projection, QMatrix4x4(&camera->_cameraStructure->_mProjection[0][0]));
 	//shapes_sizes
-	m_program->setUniformValue("prLens.size_spheres", spheres_count);
-	m_program->setUniformValue("prLens.size_cylinders", cylinders_count);
-	m_program->setUniformValue("prLens.size_boxes", boxes_count);
-	m_program->setUniformValue("prLens.size_cones", cones_count);
+	m_program->setUniformValue("prLens.size_spheres", spheresCount);
+	m_program->setUniformValue("prLens.size_cylinders", cylindersCount);
+	m_program->setUniformValue("prLens.size_boxes", boxesCount);
+	m_program->setUniformValue("prLens.size_cones", conesCount);
 
 	{
 
@@ -393,7 +393,7 @@ void RayCastCanvas::modifySpheres(int index, std::shared_ptr<Sphere> sphere)
 		setUniformArrayValue<float>(m_program, sphere_pos, radius_str, index, (float)sphere->getRadius());
 		setUniformArrayValue<QVector3D>(m_program, sphere_pos, mat_color_str, index, color);
 		setUniformArrayValue<QVector3D>(m_program, sphere_pos, mat_coefs_str, index, lightCoeffs);
-		m_program->setUniformValue(sphereSizes, spheres_count);
+		m_program->setUniformValue(sphereSizes, spheresCount);
 		m_program->release();
 	}
 
@@ -402,13 +402,13 @@ void RayCastCanvas::modifySpheres(int index, std::shared_ptr<Sphere> sphere)
 void RayCastCanvas::addPrimitive(int idx_prim)
 {
 
-	if (idx_prim == add_sphere_idx)
+	if (idx_prim == sphereIdx)
 		addSphere(defaultSphere);
-	if (idx_prim == add_cone_idx)
+	if (idx_prim == coneIdx)
 		addCone(defaultCone);
-	if (idx_prim == add_box_idx)
+	if (idx_prim == boxIdx)
 		addBox(defaultBox);
-	if (idx_prim == add_cylinder_idx)
+	if (idx_prim == cylinderIdx)
 		addCyllinder(defaultCyllinder);
 
 }
@@ -426,15 +426,15 @@ void RayCastCanvas::addSphere(const std::shared_ptr<Sphere>& sphere)
 	Sphere newSphere = *sphere.get();
 	std::shared_ptr<Sphere> newSpherePtr = std::make_shared<Sphere>(newSphere);
 	_sceneManager->getScene()->addModel(newSpherePtr);
-	shapeTypes.push_back(add_sphere_idx);
+	shapeTypes.push_back(sphereIdx);
 
-	++spheres_count;
-	int shape_count = spheres_count - 1;
+	++spheresCount;
+	int shape_count = spheresCount - 1;
 
 	modifySpheres(shape_count, newSpherePtr);
 	{
 		m_program->bind();
-		m_program->setUniformValue("prLens.size_spheres", spheres_count);
+		m_program->setUniformValue("prLens.size_spheres", spheresCount);
 		m_program->release();
 	}
 
@@ -445,16 +445,16 @@ void RayCastCanvas::addCone(const std::shared_ptr<Cone>& cone)
 	std::shared_ptr<Cone> newConePtr = std::make_shared<Cone>(newCone);
 
 	_sceneManager->getScene()->addModel(newConePtr);
-	shapeTypes.push_back(add_cone_idx);
-	++cones_count;
-	int shape_count = cones_count - 1;
+	shapeTypes.push_back(coneIdx);
+	++conesCount;
+	int shape_count = conesCount - 1;
 	modifyCones(shape_count, newConePtr);
 
 
 	const char* size_cones_path = "prLens.size_cones";
 	{
 		m_program->bind();
-		m_program->setUniformValue(size_cones_path, cones_count);
+		m_program->setUniformValue(size_cones_path, conesCount);
 		m_program->release();
 	}
 
@@ -489,7 +489,7 @@ void RayCastCanvas::modifyCones(int index, std::shared_ptr<Cone> cone)
 
 		setUniformArrayValue<QVector3D>(m_program, coneName, mat_color_str, index, color);
 		setUniformArrayValue<QVector3D>(m_program, coneName, mat_coefs_str, index, lightCoeffs);
-		m_program->setUniformValue(size_cones_path, cones_count);
+		m_program->setUniformValue(size_cones_path, conesCount);
 
 		m_program->release();
 	}
@@ -500,13 +500,13 @@ void RayCastCanvas::addBox(const std::shared_ptr<Box>& box)
 	Box newBox = *box;
 	std::shared_ptr<Box> newBoxPtr = std::make_shared<Box>(newBox);
 	_sceneManager->getScene()->addModel(newBoxPtr);
-	++boxes_count;
-	shapeTypes.push_back(add_box_idx);
-	int shape_count = boxes_count - 1;
+	++boxesCount;
+	shapeTypes.push_back(boxIdx);
+	int shape_count = boxesCount - 1;
 
 	modifyBoxes(shape_count, newBoxPtr);
 	m_program->bind();
-	m_program->setUniformValue("prLens.size_boxes", boxes_count);
+	m_program->setUniformValue("prLens.size_boxes", boxesCount);
 	m_program->release();
 }
 void RayCastCanvas::modifyBoxes(int index, std::shared_ptr<Box> box)
@@ -541,14 +541,14 @@ void RayCastCanvas::addCyllinder(const std::shared_ptr<Cyllinder>& cyllinder)
 	std::shared_ptr<Cyllinder> newCylPtr = std::make_shared<Cyllinder>(newCylinder);
 
 	_sceneManager->getScene()->addModel(newCylPtr);
-	shapeTypes.push_back(add_cylinder_idx);
-	cylinders_count++;
-	int shape_count = cylinders_count - 1;
+	shapeTypes.push_back(cylinderIdx);
+	cylindersCount++;
+	int shape_count = cylindersCount - 1;
 
 	modifyCyllinders(shape_count, newCylPtr, false);
 
 	m_program->bind();
-	m_program->setUniformValue("prLens.size_cylinders", cylinders_count);
+	m_program->setUniformValue("prLens.size_cylinders", cylindersCount);
 	m_program->release();
 
 }
@@ -592,25 +592,25 @@ void RayCastCanvas::updatePrimitives()
 		std::shared_ptr<BaseShape>
 			shape = std::dynamic_pointer_cast<BaseShape>(_sceneManager->getScene()->getModels()[i]);
 		int shapeType = shapeTypes[i];
-		if (shapeType == add_sphere_idx)
+		if (shapeType == sphereIdx)
 		{
 			std::shared_ptr<Sphere> sphere = std::dynamic_pointer_cast<Sphere>(shape);
 			modifySpheres(cur_spheres_index, sphere);
 			++cur_spheres_index;
 		}
-		else if (shapeType == add_cone_idx)
+		else if (shapeType == coneIdx)
 		{
 			std::shared_ptr<Cone> cone = std::dynamic_pointer_cast<Cone>(shape);
 			modifyCones(cur_cones_index, cone);
 			++cur_cones_index;
 		}
-		else if (shapeType == add_box_idx)
+		else if (shapeType == boxIdx)
 		{
 			std::shared_ptr<Box> box = std::dynamic_pointer_cast<Box>(shape);
 			modifyBoxes(cur_boxes_index, box);
 			++cur_boxes_index;
 		}
-		else if (shapeType == add_cylinder_idx)
+		else if (shapeType == cylinderIdx)
 		{
 			std::shared_ptr<Cyllinder> cylinder = std::dynamic_pointer_cast<Cyllinder>(shape);
 			modifyCyllinders(cur_cylinders_index, cylinder, false);
@@ -659,10 +659,10 @@ void RayCastCanvas::clearScene()
 	disconnect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
 	//delay(1);
 
-	spheres_count = 0;
-	cylinders_count = 0;
-	cones_count = 0;
-	boxes_count = 0;
+	spheresCount = 0;
+	cylindersCount = 0;
+	conesCount = 0;
+	boxesCount = 0;
 	_sceneManager->getScene()->getModels().clear();
 	shapeTypes.clear();
 	connect(this, SIGNAL(frameSwapped()), this, SLOT(update()));
@@ -693,7 +693,7 @@ void RayCastCanvas::measureTime(int objType)
 
 			fpsCount = (double)frameCount / (timer.elapsed() / 1000.0);
 			frameCount = 0;
-			//qDebug() << cones_count << spheres_count << boxes_count << cylinders_count;
+			//qDebug() << conesCount << spheresCount << boxesCount << cylindersCount;
 			qDebug() << "|" << fpsCount << "|" << j << "|" << "\n";
 			clearScene();
 

@@ -65,26 +65,26 @@ void MainWindow::onLightColorChangeButtonClicked()
 
 void MainWindow::addToSelectionPrimitives(int idx)
 {
-	if (idx == ui->graphicsView->add_sphere_idx)
+	if (idx == ui->graphicsView->sphereIdx)
 	{
-		int spheres_count = ui->graphicsView->spheres_count;
+		int spheres_count = ui->graphicsView->spheresCount;
 		ui->choose_primitives_box->addItem(("Сфера" + std::to_string(spheres_count)).c_str());
 	}
-	if (idx == ui->graphicsView->add_cone_idx)
+	if (idx == ui->graphicsView->coneIdx)
 	{
-		int cones_count = ui->graphicsView->cones_count;
+		int cones_count = ui->graphicsView->conesCount;
 		ui->choose_primitives_box->addItem(("Конус" + std::to_string(cones_count)).c_str());
 	}
 
-	if (idx == ui->graphicsView->add_box_idx)
+	if (idx == ui->graphicsView->boxIdx)
 	{
-		int boxes_count = ui->graphicsView->boxes_count;
+		int boxes_count = ui->graphicsView->boxesCount;
 		ui->choose_primitives_box->addItem(("Куб" + std::to_string(boxes_count)).c_str());
 	}
 
-	if (idx == ui->graphicsView->add_cylinder_idx)
+	if (idx == ui->graphicsView->cylinderIdx)
 	{
-		int cylinders_count = ui->graphicsView->cylinders_count;
+		int cylinders_count = ui->graphicsView->cylindersCount;
 		ui->choose_primitives_box->addItem(("Цилиндр" + std::to_string(cylinders_count)).c_str());
 	}
 

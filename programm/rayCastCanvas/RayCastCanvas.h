@@ -86,14 +86,16 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	QElapsedTimer timer;
 	std::shared_ptr<SceneManager> _sceneManager;
 
+	QOpenGLShaderProgram* m_program;
 
- public:
 
-	void measureTime(int objType);
-	const int add_sphere_idx = 0;
-	const int add_cone_idx = 1;
-	const int add_cylinder_idx = 3;
-	const int add_box_idx = 2;
+	QOpenGLBuffer m_vertex;
+	QOpenGLVertexArrayObject m_object;
+
+
+
+
+
 
  public:
 	std::shared_ptr<BaseShape> getPrim(int index);
@@ -103,21 +105,20 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void addPrimitive(int idx_prim);
 	float getFPS();
 	void genScene(int objCount, int objType);
+	void measureTime(int objType);
+	const int sphereIdx = 0;
+	const int coneIdx = 1;
+	const int cylinderIdx = 3;
+	const int boxIdx = 2;
 
 
 
-	QOpenGLShaderProgram* m_program;
 
 
-	QOpenGLBuffer m_vertex;
-	QOpenGLVertexArrayObject m_object;
-
-
-
-	int spheres_count;
-	int cylinders_count;
-	int boxes_count;
-	int cones_count;
+	int spheresCount;
+	int cylindersCount;
+	int boxesCount;
+	int conesCount;
 
 
 

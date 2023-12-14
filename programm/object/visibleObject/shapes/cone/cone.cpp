@@ -14,12 +14,7 @@ void Cone::transform(const TransformParams& transformParams)
 	_v = TransformParams::rotatePoint(_v, rotate);
 
 }
-float Cone::intersection(const Ray& ray)
-{
 
-	//TODO::implement this
-	return -1.0;
-}
 void Cone::setSpectralParams(float k_a, float k_d, float k_s)
 {
 	_material._k_a = k_a;
@@ -38,11 +33,7 @@ void Cone::accept(std::shared_ptr<Visitor> visitor)
 {
 	;// do smth
 }
-VecD3 Cone::getNormal(VecD3 intersectionPoint)
-{
-	//TODO::implementinh
-	return VecD3(1.0);
-}
+
 Cone::Cone(float cosa, float h, const VecD3& c, const VecD3& v, const Material& material)
 {
 	_cosa = cosa;

@@ -1,9 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "sphere.h"
-#include "plane.h"
 #include "camera.h"
-#include "Renderer.h"
 #include "LightSource.h"
 #include <stdlib.h>
 #include "cone.h"

@@ -56,9 +56,9 @@ set(PROJECT_SOURCES
         manager/scene/sceneManagerCreator.cpp manager/scene/sceneManagerCreator.h
 
 
-        renderer/Renderer.cpp renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
+         object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 
-        renderer/baseRenderer.h color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h material/material.cpp material/material.h object/visibleObject/shapes/plane/plane.cpp object/visibleObject/shapes/plane/plane.h
+        color/color.cpp color/color.h image_adapter/ImageAdapter.cpp image_adapter/ImageAdapter.h material/material.cpp material/material.h
         Input/Input.h Input/Input.cpp
         rayCastCanvas/RayCastCanvas.cpp rayCastCanvas/RayCastCanvas.h
         object/visibleObject/shapes/cyllinder/cyllinder.cpp object/visibleObject/shapes/cyllinder/cyllinder.h)

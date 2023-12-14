@@ -51,10 +51,7 @@ void Box::transform(const TransformParams& transformParams)
 
 	_rotation = rot_x  * rot_y * rot_z;
 }
-float Box::intersection(const Ray& ray)
-{
-	return -1.0;
-}
+
 void Box::setSpectralParams(float k_a, float k_d, float k_s)
 {
 	_material._k_a = k_a;
@@ -69,10 +66,7 @@ Material Box::getMaterial()
 {
 	return _material;
 }
-VecD3 Box::getNormal(VecD3 intersectionPoint)
-{
-	return VecD3(1.0);
-}
+
 void Box::accept(std::shared_ptr<Visitor> visitor)
 {
 	//do smth;

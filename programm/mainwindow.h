@@ -8,8 +8,6 @@
 #include <QKeyEvent>
 #include <memory>
 
-#include "drawManager.h"
-#include "drawManagerCreator.h"
 #include "sceneManager.h"
 #include "sceneManagerCreator.h"
 

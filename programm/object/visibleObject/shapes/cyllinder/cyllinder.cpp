@@ -29,11 +29,7 @@ void Cyllinder::transform(const TransformParams& transformParams)
 	qDebug() << "pos_extr" << _extr_a.x << _extr_a.y << _extr_a.z;
 
 }
-float Cyllinder::intersection(const Ray& ray)
-{
-	//pass
-	return 0;
-}
+
 void Cyllinder::setSpectralParams(float k_a, float k_d, float k_s)
 {
 	_material._k_a = k_a;
@@ -48,10 +44,7 @@ Material Cyllinder::getMaterial()
 {
 	return _material;
 }
-VecD3 Cyllinder::getNormal(VecD3 intersectionPoint)
-{
-	return VecD3(-1.0); //pass
-}
+
 void Cyllinder::accept(std::shared_ptr<Visitor> visitor)
 {
 	//pass;

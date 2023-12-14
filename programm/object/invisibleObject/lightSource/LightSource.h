@@ -6,7 +6,7 @@
 #define LAB_03_CG_COURSE_PROGRAMM_OBJECT_INVISIBLEOBJECT_LIGHTSOURCE_H_
 
 #include "baseLightSource.h"
-#include "vector.h"
+
 
 class TransformVisitor;
 

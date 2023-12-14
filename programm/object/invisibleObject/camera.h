@@ -11,7 +11,7 @@ class Camera : public BaseCamera
 {
  public:
 
-	//friend void TransformVisitor::visit(const Camera& camera);
+
 	friend TransformVisitor;
 	friend RayCastCanvas;
 
@@ -30,7 +30,7 @@ class Camera : public BaseCamera
 
 
 	void setImageParams(int height, int width);
-	void update(float time);
+
 
 	void accept(std::shared_ptr<Visitor> visitor) override;
 

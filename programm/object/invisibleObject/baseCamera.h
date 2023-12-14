@@ -6,7 +6,7 @@
 #define LAB_03_OBJECT_INVISIBLEOBJECT_BASECAMERA_H_
 
 #include "object.h"
-#include "vector.h"
+#include "glmWrapper.h"
 
 class BaseCamera : public InvisibleObject
 {

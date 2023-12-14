@@ -5,7 +5,6 @@
 #include <vector>
 #include "visitor.h"
 #include "material.h"
-#include "ray.h"
 
 class BaseObject;
 using Iterator = std::vector<std::shared_ptr<BaseObject>>::iterator;
@@ -15,10 +14,6 @@ class BaseObject
  public:
 	BaseObject() = default;
 	virtual ~BaseObject() = default;
-	virtual float intersection(const Ray& ray)
-	{
-		return -1.0;
-	};
 	virtual Material getMaterial()
 	{
 		return Material();

@@ -35,8 +35,6 @@ set(PROJECT_SOURCES
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-        math_primitives/vector/vector.cpp math_primitives/vector/vector.h math_primitives/vector/vector_exceptions.h
-        math_primitives/ray/ray.cpp math_primitives/ray/ray.h
         object/primitives/vertex.h
         visitor/TransformVisitor.h visitor/TransformVisitor.cpp visitor/visitor.h
         object/primitives/transform.h

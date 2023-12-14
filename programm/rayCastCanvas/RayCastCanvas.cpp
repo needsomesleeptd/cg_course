@@ -705,5 +705,17 @@ void RayCastCanvas::measureTime(int objType)
 
 	qDebug() << "finished";
 }
+std::shared_ptr<BaseShape> RayCastCanvas::getPrim(int index)
+{
+	return std::dynamic_pointer_cast<BaseShape>(_sceneManager->getScene()->getModels()[index]);
+}
+std::shared_ptr<LightSource> RayCastCanvas::getLight()
+{
+	return std::dynamic_pointer_cast<LightSource>(_sceneManager->getScene()->getLightSource());
+}
+int RayCastCanvas::getModelsCount()
+{
+	return _sceneManager->getScene()->getModels().size();
+}
 
 

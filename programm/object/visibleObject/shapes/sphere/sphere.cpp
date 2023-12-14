@@ -3,8 +3,7 @@
 //
 
 #include "sphere.h"
-#include "vector.h"
-#include <iostream> //TODO::remove after print
+
 void Sphere::transform(const TransformParams& transformParams)
 {
 	//Do nothing

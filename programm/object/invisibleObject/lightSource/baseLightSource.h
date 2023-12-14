@@ -6,7 +6,7 @@
 #define LAB_03_CG_COURSE_PROGRAMM_OBJECT_INVISIBLEOBJECT_LIGHTSOURCE_BASELIGHTSOURCE_H_
 
 #include "object.h"
-#include "vector.h"
+#include "glmWrapper.h"
 
 class BaseLightSource : public InvisibleObject
 {

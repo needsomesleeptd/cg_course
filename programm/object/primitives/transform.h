@@ -1,7 +1,7 @@
 #ifndef LAB_03_TRANSFORM_H
 #define LAB_03_TRANSFORM_H
 
-#include "vector.h"
+#include "glmWrapper.h"
 
 class TransformParams
 {

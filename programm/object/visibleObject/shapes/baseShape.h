@@ -6,7 +6,6 @@
 #define LAB_03_CG_COURSE_PROGRAMM_OBJECT_VISIBLEOBJECT_SHAPES_BASESHAPE_H_
 #include "object.h"
 #include "transform.h"
-#include "ray.h"
 #include "material.h"
 const float EPS = 1e-6;
 

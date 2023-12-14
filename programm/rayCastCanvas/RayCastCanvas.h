@@ -20,9 +20,7 @@
 #include <QElapsedTimer>
 
 #include "sphere.h"
-#include "plane.h"
 #include "camera.h"
-#include "Renderer.h"
 #include "LightSource.h"
 #include "Input.h"
 #include "sceneManager.h"
@@ -66,6 +64,7 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	void addBox(const std::shared_ptr<Box>& box);
 	void addCyllinder(const std::shared_ptr<Cyllinder>& cyllinder);
 
+
 	Material defaultMaterial = Material(0.1, 0.1, 0.1, ColorRGB(0.3, 0.5, 0.7));
 	VecD3 defaultInitPos = VecD3(0.0);
 	std::shared_ptr<Sphere> defaultSphere = std::make_shared<Sphere>(defaultInitPos, 1.0, defaultMaterial);
@@ -85,9 +84,11 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	int frameCount;
 	float fps;
 	QElapsedTimer timer;
+	std::shared_ptr<SceneManager> _sceneManager;
 
 
  public:
+
 	void measureTime(int objType);
 	const int add_sphere_idx = 0;
 	const int add_cone_idx = 1;
@@ -95,15 +96,18 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	const int add_box_idx = 2;
 
  public:
+	std::shared_ptr<BaseShape> getPrim(int index);
+	std::shared_ptr<LightSource> getLight();
+	int getModelsCount();
 	void movePrimitive(int idx_prim, VecD3 delta);
 	void addPrimitive(int idx_prim);
 	float getFPS();
 	void genScene(int objCount, int objType);
 
-	std::shared_ptr<SceneManager> _sceneManager;
+
 
 	QOpenGLShaderProgram* m_program;
-	QString m_active_mode;
+
 
 	QOpenGLBuffer m_vertex;
 	QOpenGLVertexArrayObject m_object;

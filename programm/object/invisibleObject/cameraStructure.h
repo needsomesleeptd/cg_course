@@ -2,6 +2,7 @@
 #define LAB_03_CAMERASTRUCTURE_H
 
 #include "transform.h"
+#include "glmWrapper.h"
 
 const int defaultViewPortHeight = 1151;
 const int defaultViewPortWidth = 901;
@@ -26,8 +27,7 @@ struct CameraStructureImp
 	void setCoordinates(const VecD3& coordinates);
 	void transform(const TransformParams& transformParams);
 
-	//[[nodiscard]] Matrix4 getViewDirection();
-	//[[nodiscard]] Matrix4 getProjection() const;
+
 	void move(const VecD3& moveParams);
 	void setDirection(const VecD3& direction);
 	void updateView();
@@ -57,8 +57,6 @@ struct CameraStructureImp
 	float _nearCLip = 10.0f;
 
 	float _farClip = 100.0f;
-
-
 
 };
 

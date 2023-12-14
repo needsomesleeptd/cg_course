@@ -60,7 +60,7 @@ MainWindow::MainWindow(QWidget* parent)
 void MainWindow::onLightColorChangeButtonClicked()
 {
 	ColorRGB newColor = ColorRGB(ui->light_r->value(), ui->light_g->value(), ui->light_b->value());
-	ui->graphicsView->_sceneManager->getScene()->getLightSource()->setColor(newColor);
+	ui->graphicsView->getLight()->setColor(newColor);
 }
 
 void MainWindow::addToSelectionPrimitives(int idx)
@@ -105,13 +105,13 @@ void MainWindow::updateScene()
 }
 void MainWindow::onLightPositionChangeButtonClicked()
 {
-	ui->graphicsView->_sceneManager->getScene()->getLightSource()->setPosition(VecD3(ui->light_x->value(),
+	ui->graphicsView->getLight()->setPosition(VecD3(ui->light_x->value(),
 		ui->light_y->value(),
 		ui->light_z->value()));
 }
 void MainWindow::onTranslateButtonClicked()
 {
-	int modelsCount = ui->graphicsView->_sceneManager->getScene()->getModels().size();
+	int modelsCount = ui->graphicsView->getModelsCount();
 	if (modelsCount == 0)
 	{
 		QMessageBox::critical(nullptr, "Ошибка", "Не добавлено ни одного примитива.");
@@ -137,7 +137,7 @@ void MainWindow::onAddButtonClicked()
 }
 void MainWindow::materialUpdate()
 {
-	int modelsCount = ui->graphicsView->_sceneManager->getScene()->getModels().size();
+	int modelsCount = ui->graphicsView->getModelsCount();
 	if (modelsCount == 0)
 	{
 		QMessageBox::critical(nullptr, "Ошибка", "Не добавлено ни одного примитива.");
@@ -146,8 +146,7 @@ void MainWindow::materialUpdate()
 	else
 	{
 		int idx_model = ui->choose_primitives_box->currentIndex();
-		std::shared_ptr<BaseShape> shape =
-			std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[idx_model]);
+		std::shared_ptr<BaseShape> shape = ui->graphicsView->getPrim(idx_model);
 		ColorRGB color(ui->obj_R->value(), ui->obj_G->value(), ui->obj_B->value());
 
 		Material material = Material(ui->obj_k_a->value(), ui->obj_k_d->value(), ui->obj_k_s->value(), color);
@@ -162,7 +161,7 @@ void MainWindow::currentShapeChanged(int shape_idx)
 	if (ui->choose_primitives_box->count() > 0)
 	{
 		std::shared_ptr<BaseShape> shape =
-			std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[shape_idx]);
+			ui->graphicsView->getPrim(shape_idx);
 		qDebug() << "curr_shape_idx" << shape_idx;
 		VecD3 pos = shape->getCenter();
 		Material material = shape->getMaterial();
@@ -183,7 +182,7 @@ void MainWindow::currentShapeChanged(int shape_idx)
 }
 void MainWindow::onRotateButtonClicked()
 {
-	int modelsCount = ui->graphicsView->_sceneManager->getScene()->getModels().size();
+	int modelsCount = ui->graphicsView->getModelsCount();
 	if (modelsCount == 0)
 	{
 		QMessageBox::critical(nullptr, "Ошибка", "Не добавлено ни одного примитива.");
@@ -193,7 +192,7 @@ void MainWindow::onRotateButtonClicked()
 	{
 		int idx_model = ui->choose_primitives_box->currentIndex();
 		std::shared_ptr<BaseShape> shape =
-			std::dynamic_pointer_cast<BaseShape>(ui->graphicsView->_sceneManager->getScene()->getModels()[idx_model]);
+			ui->graphicsView->getPrim(idx_model);
 		VecD3 rotation_params = { ui->obj_rot_x->value(), ui->obj_rot_y->value(), ui->obj_rot_z->value() };
 		TransformParams transformParams;
 		transformParams.setRotateParams(rotation_params);

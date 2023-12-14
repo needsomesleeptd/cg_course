@@ -1,5 +1,5 @@
 #include "cameraStructure.h"
-#include "vector.h"
+
 
 CameraStructureImp::CameraStructureImp(const  VecD3& coordinates, const  VecD3& direction)
 	: _coordinates(coordinates), _forward(direction)

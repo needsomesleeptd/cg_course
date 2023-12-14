@@ -6,7 +6,7 @@
 #define LAB_03_CG_COURSE_PROGRAMM_SPECTRAL_PARAMETERS_MATERIAL_H_
 
 #include "color.h"
-struct Material // TODO:: Might be better to make class with restricted access
+struct Material //
 {
 	Material() = default;
 	explicit Material(float k_a_src, float k_d_src, float k_s_src, ColorRGB color);

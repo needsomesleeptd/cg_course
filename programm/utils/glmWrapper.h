@@ -10,7 +10,7 @@
 
 using VecD3 = glm::vec3;
 using Vector4 = glm::vec4;
-using Matrix4 = glm::mat4;
+using MatD4 = glm::mat4;
 
 /*Matrix4 translate(const Matrix4&mat, const Vector3& offset);
 Matrix4 rotate(const Matrix4&mat, float rad, const Vector3& offset);

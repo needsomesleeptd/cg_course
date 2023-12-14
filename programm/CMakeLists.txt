@@ -37,6 +37,7 @@ set(PROJECT_SOURCES
         mainwindow.ui
         math_primitives/vector/vector.cpp math_primitives/vector/vector.h math_primitives/vector/vector_exceptions.h
         math_primitives/ray/ray.cpp math_primitives/ray/ray.h
+        object/primitives/vertex.h
         visitor/TransformVisitor.h visitor/TransformVisitor.cpp visitor/visitor.h
         object/primitives/transform.h
         object/visibleObject/shapes/sphere/sphere.cpp object/visibleObject/shapes/sphere/sphere.h
@@ -53,8 +54,7 @@ set(PROJECT_SOURCES
         utils/glmWrapper.h utils/glmWrapper.cpp
         manager/scene/sceneManager.cpp manager/scene/sceneManager.h
         manager/scene/sceneManagerCreator.cpp manager/scene/sceneManagerCreator.h
-        manager/draw/drawManager.cpp manager/draw/drawManager.h
-        manager/draw/drawManagerCreator.cpp manager/draw/drawManagerCreator.h
+
 
         renderer/Renderer.cpp renderer/Renderer.h object/invisibleObject/lightSource/LightSource.cpp object/invisibleObject/lightSource/LightSource.h object/invisibleObject/lightSource/baseLightSource.h
 

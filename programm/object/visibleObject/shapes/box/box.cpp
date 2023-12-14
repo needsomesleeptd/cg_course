@@ -3,6 +3,20 @@
 //
 
 #include "box.h"
+
+glm::mat3 rotationAxisAngle( VecD3 v, float angle )
+{
+	float s = sin( angle ); //in radians
+	float c = cos( angle );
+	float ic = 1.0 - c;
+
+	return glm::mat3( v.x*v.x*ic + c,     v.y*v.x*ic - s*v.z, v.z*v.x*ic + s*v.y,
+		v.x*v.y*ic + s*v.z, v.y*v.y*ic + c,     v.z*v.y*ic - s*v.x,
+		v.x*v.z*ic - s*v.y, v.y*v.z*ic + s*v.x, v.z*v.z*ic + c);
+}
+
+
+
 Box::Box(const VecD3& position, glm::mat3 rotation, VecD3 halfSize, const Material& material)
 {
 	_position = position;
@@ -18,23 +32,24 @@ void Box::transform(const TransformParams& transformParams)
 	float angle_y = rotate.y;
 	float angle_z = rotate.z;
 
+	VecD3 axis_x = VecD3(1.0,0.0,0.0);
+	VecD3 axis_y = VecD3(0.0,1.0,0.0);
+	VecD3 axis_z = VecD3(0.0,0.0,1.0);
 
 
 
 
-	glm::mat3 rot_x = {{ 1.0, 0.0, 0.0 },
-	                   { 0, cos(angle_x), -sin(angle_x) },
-	                   { 0, sin(angle_x), cos(angle_x) }};
 
-	glm::mat3 rot_y = {{ cos(angle_y), 0.0, sin(angle_y) },
-	                   { 0.0, 1, 0.0 },
-	                   { -sin(angle_y), 0, cos(angle_y) }};
+	glm::mat3 rot_x = rotationAxisAngle(axis_x,angle_x);
 
-	glm::mat3 rot_z = {{ cos(angle_z), -sin(angle_z), 0.0 },
-	                   { sin(angle_z), cos(angle_x), 0.0 },
-	                   { 0.0, 0.0, 1.0 }};
+	glm::mat3 rot_y = rotationAxisAngle(axis_y,angle_y);
 
-	_rotation = rot_x * rot_y * rot_z;
+	glm::mat3 rot_z = rotationAxisAngle(axis_z,angle_z);
+
+
+
+
+	_rotation = rot_x  * rot_y * rot_z;
 }
 float Box::intersection(const Ray& ray)
 {

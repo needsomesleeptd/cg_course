@@ -11,6 +11,8 @@
 #include <QThread>
 #include <QCoreApplication>
 
+#include "vertex.h"
+
 void delay(int waitSec)
 {
 	QTime dieTime= QTime::currentTime().addSecs(waitSec);
@@ -80,7 +82,7 @@ void RayCastCanvas::initializeGL()
 
 	setFocusPolicy(Qt::StrongFocus);
 	_sceneManager = SceneManagerCreator().createManager();
-	_drawManager = DrawManagerCreator().createManager();
+
 
 	std::shared_ptr<Camera> camera = CameraFactory({ 0, 0, -2.0f }, { 0.0f, 0.0f, -1.0f }).create();
 

@@ -9,52 +9,13 @@ void Cone::transform(const TransformParams& transformParams)
 
 	VecD3 rotate = TransformParams::toRadians(transformParams.getRotateParams());
 
-
 	VecD3 center = getCenter();
-	//_v -= center;
 
-
-	_v= TransformParams::rotatePoint(_v, rotate);
-
-	//_v += center;
-
-
+	_v = TransformParams::rotatePoint(_v, rotate);
 
 }
 float Cone::intersection(const Ray& ray)
 {
-	/*// Calculate the ray origin relative to the cone apex
-	VecD3 origin = ray.E - this->_apex;
-
-	// Calculate the coefficients for the quadratic equation
-	float a = dot(ray.D, ray.D) - (1 + this->_slope * this->_slope) * dot(ray.D, this->_axis) * dot(ray.D, this->_axis);
-	float b = 2 * (dot(ray.D, origin) - (1 + this->_slope * this->_slope) * dot(ray.D, this->_axis) * dot(origin, this->_axis));
-	float c = dot(origin, origin) - (1 + this->_slope * this->_slope) * dot(origin, this->_axis) * dot(origin, this->_axis);
-
-	// Calculate the discriminant
-	float discriminant = b * b - 4 * a * c;
-
-	if (discriminant < 0)
-		return -1.0; // No intersection
-
-	// Calculate the two possible values of t
-	float discriminant_value = sqrt(discriminant);
-	float t1 = (-b + discriminant_value) / (2 * a);
-	float t2 = (-b - discriminant_value) / (2 * a);
-
-	// Check if either of the values of t is negative
-	if (t1 < 0 && t2 < 0)
-		return -1.0; // No intersection
-
-	// Find the minimum non-negative value of t
-	float t = std::min(t1, t2);
-	if (t < 0)
-	{
-		if (t1 < 0)
-			t = t2;
-		else if (t2 < 0)
-			t = t1;
-	}*/
 
 	//TODO::implement this
 	return -1.0;

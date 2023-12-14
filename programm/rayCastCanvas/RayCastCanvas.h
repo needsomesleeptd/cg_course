@@ -25,12 +25,9 @@
 #include "Renderer.h"
 #include "LightSource.h"
 #include "Input.h"
-#include "drawManager.h"
 #include "sceneManager.h"
 #include "sceneManagerCreator.h"
-#include "drawManagerCreator.h"
 
-#include "vertex.h"
 #include "cone.h"
 #include "box.h"
 #include "cyllinder.h"
@@ -103,7 +100,6 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	float getFPS();
 	void genScene(int objCount, int objType);
 
-	std::shared_ptr<DrawManager> _drawManager;
 	std::shared_ptr<SceneManager> _sceneManager;
 
 	QOpenGLShaderProgram* m_program;

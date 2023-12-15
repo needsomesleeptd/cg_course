@@ -337,7 +337,7 @@
     <property name="geometry">
      <rect>
       <x>620</x>
-      <y>740</y>
+      <y>750</y>
       <width>261</width>
       <height>31</height>
      </rect>
@@ -394,7 +394,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Поворот Примитива:</string>
+     <string>Поворот Примитива</string>
     </property>
    </widget>
    <widget class="QWidget" name="formLayoutWidget_3">

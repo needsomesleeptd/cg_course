@@ -11,7 +11,7 @@ bool IntersectRayCyl(Ray ray, Cylinder cyl, out float fraction, out vec3 normal)
     float h = k1 * k1 - k2 * k0;
     if (h < 0.0)
     {
-        return false;//no intersection
+        return false;
     }
     h = sqrt(h);
     float t = (-k1 - h) / k2;

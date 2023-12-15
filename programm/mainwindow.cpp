@@ -121,19 +121,27 @@ void MainWindow::onTranslateButtonClicked()
 	{
 		int idx = ui->choose_primitives_box->currentIndex();
 		VecD3 moveParams = VecD3(ui->obj_x->value(), ui->obj_y->value(), ui->obj_z->value());
-		qDebug() << "started moving on" << idx << moveParams.x << moveParams.y << moveParams.z;
 		ui->graphicsView->movePrimitive(idx, moveParams);
 	}
 }
 void MainWindow::onAddButtonClicked()
 {
-	int idx = ui->addPrimitivesBox->currentIndex();
-	ui->graphicsView->addPrimitive(idx);
-	addToSelectionPrimitives(idx);
+	int modelsCount = ui->graphicsView->getModelsCount();
+	int maxModels = ui->graphicsView->maxPrims;
+	qDebug() << modelsCount << maxModels;
+	if (modelsCount >= maxModels)
+	{
+		QMessageBox::critical(nullptr, "Ошибка", "Превышено максимальное число примитивов");
+	}
+	else
+	{
+		int idx = ui->addPrimitivesBox->currentIndex();
+		ui->graphicsView->addPrimitive(idx);
+		addToSelectionPrimitives(idx);
+	}
 
 
-	//int models_count = ui->graphicsView->_sceneManager->getScene()->getModels().size();
-	//ui->choose_primitives_box->setCurrentIndex(models_count - 1);
+
 }
 void MainWindow::materialUpdate()
 {

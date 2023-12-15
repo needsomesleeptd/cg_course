@@ -112,50 +112,6 @@ uniform mat4 projection;
 
 
 
-vec3 RandomHemispherePoint(vec2 rand)
-{
-    float cosTheta = sqrt(1.0 - rand.x);
-    float sinTheta = sqrt(rand.x);
-    float phi = 2.0 * PI * rand.y;
-    return vec3(
-        cos(phi) * sinTheta,
-        sin(phi) * sinTheta,
-        cosTheta
-    );
-}
-
-vec3 NormalOrientedHemispherePoint(vec2 rand, vec3 n)
-{
-    vec3 v = RandomHemispherePoint(rand);
-    return dot(v, n) < 0.0 ? -v : v;
-
-}
-
-
-float rand(vec2 co)
-{
-
-    highp float a = 12.9898;
-
-    highp float b = 78.233;
-
-    highp float c = 43758.5453;
-
-    highp float dt = dot(co.xy, vec2(a, b));
-
-    highp float sn = mod(dt, 3.14);
-
-    return fract(sin(sn) * c);
-
-}
-
-int rand_val = 0;
-vec3 Random3D()
-{
-    rand_val++;
-    return vec3(rand(vec2(interpolated_vertex.x + rand_val, rand_val)), rand(vec2(interpolated_vertex.y + rand_val, rand_val)), rand(vec2(interpolated_vertex.z + rand_val, rand_val)));
-}
-
 
 Ray GenerateRay(Camera camera, vec3 texcoord, vec2 viewportSize) {
 
@@ -347,7 +303,7 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
 
 
     float lightIntersect = max(0.0f, diffuseLight);
-    rayColor += lightIntersect * shapeMaterial.lightKoefs[1] * intersect.material.color;
+    rayColor += lightIntersect * shapeMaterial.lightKoefs[1] * intersect.material.color * lightSource.intensivity;
 
 
 
@@ -544,11 +500,6 @@ vec4 RayTrace(Ray primary_ray, PrimitiveArrLens lens) {
 }
 
 
-Material gen_random_mat()
-{
-    Material material = Material(normalize(Random3D()), normalize(Random3D()));
-    return material;
-}
 
 
 uniform PrimitiveArrLens prLens;

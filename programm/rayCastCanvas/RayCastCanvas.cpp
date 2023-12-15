@@ -462,7 +462,7 @@ void RayCastCanvas::addCone(const std::shared_ptr<Cone>& cone)
 void RayCastCanvas::modifyCones(int index, std::shared_ptr<Cone> cone)
 {
 
-	int shape_count = index;
+
 
 
 	QString coneName = "cones";

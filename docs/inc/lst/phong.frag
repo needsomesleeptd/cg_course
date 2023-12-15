@@ -18,22 +18,12 @@ vec4 Phong(Intersection intersect, out Ray rayReflected) {
 
 
     float lightIntersect = max(0.0f, diffuseLight);
-    rayColor += lightIntersect * shapeMaterial.lightKoefs[1] * intersect.material.color;
-
-
-
+    rayColor += lightIntersect * shapeMaterial.lightKoefs[1] * intersect.material.color * lightSource.intensivity;
 
 
     Ray reflected = calculateReflected(intersect.tracedRay, intersect);
-
     float specularDot = pow(max(dot(-reflected.direction, intersect.tracedRay.direction), 0.0f), 5);
-
     rayColor += shapeMaterial.lightKoefs[2] * lightSource.intensivity * specularDot;
-    vec3 point = intersect.tracedRay.origin + intersect.tracedRay.direction * intersect.t;
-
-
-
-
     rayReflected = reflected;
     return vec4(rayColor, 1);
 }

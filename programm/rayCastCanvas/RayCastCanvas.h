@@ -106,10 +106,12 @@ class RayCastCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
 	float getFPS();
 	void genScene(int objCount, int objType);
 	void measureTime(int objType);
+
 	const int sphereIdx = 0;
 	const int coneIdx = 1;
 	const int cylinderIdx = 3;
 	const int boxIdx = 2;
+	const int maxPrims = 100;
 
 
 

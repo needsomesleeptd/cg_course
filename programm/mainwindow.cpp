@@ -50,8 +50,7 @@ MainWindow::MainWindow(QWidget* parent)
 	//FPS
 	connect(ui->graphicsView, SIGNAL(isUpdated()),this, SLOT(MainWindowFPSDisplay()));
 
-	//Measure
-	connect(ui->time_measure, SIGNAL(triggered()), this, SLOT(onMeasureTimeClicked()));
+
 }
 
 
@@ -128,7 +127,7 @@ void MainWindow::onAddButtonClicked()
 {
 	int modelsCount = ui->graphicsView->getModelsCount();
 	int maxModels = ui->graphicsView->maxPrims;
-	qDebug() << modelsCount << maxModels;
+
 	if (modelsCount >= maxModels)
 	{
 		QMessageBox::critical(nullptr, "Ошибка", "Превышено максимальное число примитивов");
@@ -165,12 +164,12 @@ void MainWindow::materialUpdate()
 }
 void MainWindow::currentShapeChanged(int shape_idx)
 {
-	qDebug() << "curr_shape_idx" << shape_idx;
+
 	if (ui->choose_primitives_box->count() > 0)
 	{
 		std::shared_ptr<BaseShape> shape =
 			ui->graphicsView->getPrim(shape_idx);
-		qDebug() << "curr_shape_idx" << shape_idx;
+
 		VecD3 pos = shape->getCenter();
 		Material material = shape->getMaterial();
 		ColorRGB color = material._color;
